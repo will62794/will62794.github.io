@@ -1,0 +1,27 @@
+---
+layout: page
+title: Projects
+permalink: /projects/
+---
+
+{% for project in site.projects %}
+
+<a href="{{ project.url | prepend: site.baseurl }}">
+
+	<div class="projectBox">
+		<img src="/assets/{{project.thumbnail}}" onload="this.style.opacity=1;this.parentNode.style.opacity='1';">
+		<div class="cover">
+			<div class="titles">
+				<div class="project-meta">{{project.title}}</div>
+				<br>
+				<div class="project-meta-subtitle">{{project.subtitle}}</div>
+			</div>
+		</div>
+		<!--span class="project-meta">{{project.subtitle}}</span-->
+
+	</div>
+</a>
+
+<!--a class="post-link" href="{{ project.url | prepend: site.baseurl }}"-->
+
+{% endfor %}
