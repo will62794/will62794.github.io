@@ -125,18 +125,19 @@
     }
 
 	@include media-query($on-palm) {
-		position: absolute;
+		// position: absolute;
 		top: 9px;
 		right: 30px;
 		background-color: $background-color;
-		border: 1px solid $grey-color-light;
+		// border: 1px solid $grey-color-light;
 		border-radius: 2px;
 		text-align: right;
 		margin-top:0px;
+		width:100%;
 
 
 		.menu-icon {
-			display: block;
+			display: none;
 			float: right;
 			width: 36px;
 			height: 26px;
@@ -156,17 +157,26 @@
 
 		.trigger {
 			clear: both;
-			display: none;
+			display: block;
+			text-align:center;
 		}
 
 		&:hover .trigger {
 			display: block;
-			padding-bottom: 5px;
+			// padding-bottom: 5px;
 		}
 
 		.page-link {
 			display: block;
 			padding: 5px 50px;
+		}
+		.page-link:hover{
+			background-color:$brand-color;
+			color:white;
+		}
+		.page-link.active-link{
+			background-color:$brand-color;
+			color:white;
 		}
 	}
 }
@@ -517,3 +527,9 @@
 	margin-right:12px;
 
 }
+
+.faded{
+	opacity:0;
+}
+
+

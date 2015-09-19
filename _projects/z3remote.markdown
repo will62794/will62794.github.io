@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: project
 title:  "Sportzcast Video Encoder Control System"
 subtitle: "Inegrating Sportzcast's live score service into Linux video encoding boards"
@@ -20,3 +20,4 @@ Sportzcast is a company that provides real time score data feeds. They wanted to
 
 
 
+ -->
