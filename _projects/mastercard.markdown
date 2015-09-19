@@ -3,7 +3,8 @@ layout: project
 title:  "Mastercard Innovation Express"
 subtitle: "Product Concept Video"
 year:   2014
-categories: electronics design hardware C programming
+tools: Video Production, DSLR, Product Design
+categories: video production film product
 thumbnail: "rewardingcover1.jpg"
 ---
 

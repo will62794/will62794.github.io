@@ -4,7 +4,8 @@ title: Projects
 permalink: /projects/
 ---
 
-{% for project in site.projects %}
+{% assign projects = site.projects | sort: 'year' %}
+{% for project in projects reversed%}
 
 <a href="{{ project.url | prepend: site.baseurl }}">
 

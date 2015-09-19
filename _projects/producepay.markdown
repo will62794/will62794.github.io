@@ -3,6 +3,7 @@ layout: project
 title:  "ProducePay Video"
 subtitle: "Animated Product Video for Tech Startup"
 year:   2014
+tools: After Effects, Logic Pro, Animation
 categories: animation video after effects
 thumbnail: "producepaycover1.jpg"
 ---

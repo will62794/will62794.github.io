@@ -3,6 +3,7 @@ layout: project
 title:  "Digital Buzzer System"
 subtitle: "12 player Quiz Bowl Machine"
 year:   2011
+tools: C, Microelectronics
 categories: electronics design hardware C programming
 thumbnail: "buzzercover5.jpg"
 ---

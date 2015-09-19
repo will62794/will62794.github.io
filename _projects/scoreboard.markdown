@@ -3,6 +3,7 @@ layout: project
 title:  "Scoreboard Decoder"
 subtitle: "Reverse Engineering the MP-69D"
 year:   2013
+tools: Microelectronics, Arduino, Python
 categories: electronics software hardware design
 thumbnail: "scoreboardcover4.jpg"
 ---

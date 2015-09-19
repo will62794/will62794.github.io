@@ -3,6 +3,7 @@ layout: project
 title:  "Portable Pen Plotter"
 subtitle: "CNC Pen Plotter Prototype"
 year:   2014
+tools: CNC Machining, Microelectronics, Python 
 categories: electronics software hardware design
 thumbnail: "plottercover3.jpg"
 ---

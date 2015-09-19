@@ -3,6 +3,7 @@ layout: project
 title:  "resourcewater.org"
 subtitle: "Educational Resource Website"
 year:   2013
+tools: PHP, MySQL
 categories: web development software php mysql
 thumbnail: "waternewcover.jpg"
 ---

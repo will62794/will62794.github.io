@@ -3,6 +3,7 @@ layout: project
 title:  "LittleData"
 subtitle: "Web Connected LED Display"
 year:   2014
+tools: Arduino, Python, Flask, C, Raspberry Pi
 categories: electronics software web
 thumbnail: "littledatacover3.jpg"
 ---
