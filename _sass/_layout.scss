@@ -452,14 +452,17 @@
 		width:98%;
 	}
 	width:100;
+	transition:all 1s;
+
 
 }
-.projectBox>img{
+.projectBox img{
 	width:100%;
 	float:right;
 	top:0px;
 	opacity:0;
 	z-index:0;
+	transition:all 1s;
 }
 .projectBox .cover{
 	position:absolute;
