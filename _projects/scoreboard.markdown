@@ -11,21 +11,18 @@ thumbnail: "scoreboardcover4.jpg"
 
 This was a project that I started in my first year at Cornell University. On the weekends I worked as a cameraman for the Athletics Department, filming sports games which would be streamed over the web. Basketball was one of the sports we covered, and we didn't really have a good way of overlaying live statistics from the game (score,clock, fouls, etc.) onto our video stream. I figured we could try to decode the signals coming out of the scoreboard controller box, the one that drove the main arena scoreboard, and convert them into a data format that we could then use to develop a graphic overlay on our live video stream. The Cornell basketball stadium uses a Fairplay MP-69D scoreboard controller, which I reverse engineered by analyzing the raw signal on digital oscilloscope.
 
-![alt text](/assets/signal1.jpg)
+![alt text](/assets/scoreboard/signal1.jpg)
 
-![alt text](/assets/purple1.jpg)
+![alt text](/assets/scoreboard/purple1.jpg)
 
 
 
 Once I worked out the nature of the protocol I was able to retrieve all types of scoreboard data. I used an Arduino Uno to process the raw signal. In conjunction I also originally developed a simple Python Tkinter application to run on a Raspberry Pi, that takes in serial data from the Arduino over USB and displays and creates a scoreboard graphic with live data overlaid on top of it. The Raspberry Pi has an HDMI and component video output, which could theoretically be fed into any video streaming application. I have been working on writing an additional Python script to integrate my hardware with NewTek's LiveText graphics system. LiveText is an application that is used with NewTek's high-end TriCaster video system, and can receive data dynamically from text files and/or database files to display in graphic templates. My goal is to use the Arduino to decode the signal coming from the MP-69D controller, send the serial data to a laptop, and have a Python script running that reads the incoming serial data, updates a static .txt file, and, in turn, updates LiveText (it can pull data from a .txt. file).
 
-![alt text](/assets/mp69ports1.jpg)
-
-![alt text](/assets/arduino1.jpg)
 
 Recently I had a printed circuit board made up that plugs right onto an Arduino and has 1/4" jack inputs right on the board for the Scoreboard and Timer outputs of the MP-69D. You can see the image of the board on an Arduino Uno below.
 
-![alt text](/assets/shield1.jpg)
+![alt text](/assets/scoreboard/shield1.jpg)
 
 [Github Code](https://github.com/will62794/MP-69D-Scoreboard-Decoder)
 
