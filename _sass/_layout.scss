@@ -5,6 +5,7 @@
 
 @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
 @import url(https://fonts.googleapis.com/css?family=Oxygen:300);
+@import url(https://fonts.googleapis.com/css?family=Hind:300);
 
 /**
 * Site header
@@ -518,6 +519,12 @@
 .projectBox:hover>img{
 	opacity:0.7;
 
+}
+
+.postBox{
+	width:98%;
+	min-height:80px;
+	max-height:120px;
 }
 
 #aboutImage{
