@@ -5,5 +5,4 @@ permalink: /contact/
 ---
 
 Willy Schultz\\
-wschultz@williamjdesign.com\\
-215-518-1218
+wschultz@williamjdesign.com
