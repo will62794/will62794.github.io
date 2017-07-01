@@ -1,0 +1,27 @@
+---
+layout: page
+title: Posts
+permalink: /posts/
+---
+
+{% assign posts = site.posts | sort: 'year' %}
+{% for post in posts %}
+
+	<a href="{{ post.url | prepend: site.baseurl }}">
+
+		<div class="projectBox postBox">
+			<img src="/assets/{{post.thumbnail}}" onload="this.style.opacity=1;">
+			<div class="cover">
+				<div class="titles">
+					<div class="project-meta">{{post.title}}</div>
+					<br>
+					<div class="project-meta-subtitle">{{ post.date | date: '%B %d, %Y' }}</div>
+				</div>
+			</div>
+
+		</div>
+	</a>
+
+<!--a class="post-link" href="{{ project.url | prepend: site.baseurl }}"-->
+
+{% endfor %}
