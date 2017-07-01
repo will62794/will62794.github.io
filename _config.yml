@@ -12,6 +12,6 @@ markdown: kramdown
 collections:
   projects:
     output: true
-  posts
+  posts:
 gems:
   - jekyll-sitemap
