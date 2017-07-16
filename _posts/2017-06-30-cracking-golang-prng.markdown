@@ -232,13 +232,16 @@ When deployed, the app ran in a Linux Docker container, so I tested the app loca
   }
 {% endhighlight %}
 
-There is a call to the global `rand` function that is used to generate a random DNS packet id. This was promising, since it seemed like DNS resolution could potentially be a pretty hot section of code for anything that makes any kind of network requests. If this was portion of code was in fact being executed by the app server, though, there were still two things to figure out: 1. What explained the apparently consistent 30 second periodic generation skips 2. Why were these skips observed only when run on the Docker container, but not when testing locally on my Mac?
+There is a call to the global `rand` function that is used to generate a random DNS packet id. This was promising, since it seemed like DNS resolution could potentially be a pretty hot section of code for anything that makes any kind of network requests. If this was portion of code was in fact being executed by the app server, though, there were still two things to figure out: 
 
-#### Culprit 1: DNS Resolution
+1. What explained the generation skips occurring every 30 seconds?
+2. Why were these skips observed only when run on the Docker container, but not when testing locally on my Mac?
+
+### Culprit 1: DNS Resolution
 
 My hypothesis was that this DNS resolution code was what was injecting extra skips into the global PRNG, but I wanted to come up with a test that would validate this. It turns out that this test also served as a way to see why the behavior was different between the Linux Docker container and my Mac. I started with this simple Go script:
 
-```go
+{% highlight go linenos %}
 package main
 
 import "fmt"
@@ -266,8 +269,9 @@ func main() {
 	http.Get("http://google.com")
 	fmt.Printf("Post HTTP request: %d\n", rand.Int())
 }
-```
-It seeds `math/rand` with a fixed seed, generates a few numbers, re-seeds with the same seed, generates a single number, makes an HTTP request, and then generates a second number. The first loop is used as a reference to see what the first few generations of the *Seed 42* sequence are without any interference. In the Go documentation on DNS resolution, there is a note about the existence of two different DNS resolvers. You can optionally use a native C library DNS resolver, or a pure Go resolver, and this can configured via the `GODEBUG` environment variable. This is the terminal output of the above script when run with the two different DNS resolvers:
+{% endhighlight %}
+
+It seeds `math/rand` with a fixed seed, generates a few numbers, re-seeds with the same seed, generates a single number, makes an HTTP request, and then generates a second number. The first loop is used as a reference to see what the first few generations of the *Seed 42* sequence are without any interference. In the Go documentation on DNS resolution, there is a note about the existence of two different DNS resolvers. You can optionally use a native C library DNS resolver, or a pure Go resolver, and this can be configured via the `GODEBUG` environment variable. This is the terminal output of the above script when run with the two different DNS resolvers:
 
 ```
 ➜  golang_rng GODEBUG=netdns=cgo go run test_http.go
@@ -296,6 +300,7 @@ Seeded 'rand' with 42
 Pre  HTTP request: 3440579354231278675
 Post HTTP request: 3534334367214237261
 ```
+
 You can see that, when using the `cgo` DNS resolver, the HTTP request doesn't affect the random number generator, but when using the `go` resolver, the HTTP request skips the random number generator forward by 4 generations! This seemed like a very clear sign that the DNS resolver was the likely culprit for PRNG interference. The Go documentation for the `net` package backed up this hypothesis:
 
 ```
@@ -311,13 +316,116 @@ under a variety of conditions: on systems that do not let programs make direct D
 requests (OS X),...
 ```
  
-#### Culprit 2: The mgo MongoDB Database Driver
+### Culprit 2: The mgo MongoDB Database Driver
 
-After determining that DNS resolution was the most likely cause for PRNG generation skips, I wanted to figure out why they were happening at such regular intervals. If the app is dormant i.e. no users are active, it seemed like there could be very few possible components that would potentially be making network requests i.e. causing DNS lookups. One candidate, however, was the database driver. In order to persist various app data, user info, etc. when the server starts up it creates a connection to a MongoDB replica set, by means of the [mgo](https://labix.org/mgo) driver. I wanted to see if the driver could potentially be executing requests on some background thread, even while there was no explicit user activity.
+After determining that DNS resolution was the most likely cause for PRNG generation skips, I wanted to figure out why they were happening at regular intervals. If the app is dormant i.e. no users are active, it seemed like there could be very few possible components that would be making network requests and therefore causing DNS lookups. One candidate, however, was the database driver. In order to persist various types of application data, the server, on startup, creates a connection to a MongoDB replica set, by means of the [mgo](https://labix.org/mgo) driver. I wanted to see if the driver could potentially be executing requests on some background thread, even while there was no explicit user activity. I tried to monitor the network traffic while the app was running locally, and I persued the mgo source code a bit keeping in mind the 30 second interval time. This bit of logic, in `mgo/cluster.go` seemed like a good candidate:
+
+{% highlight go linenos %}
+// How long to wait for a checkup of the cluster topology if nothing
+// else kicks a synchronization before that.
+const syncServersDelay = 30 * time.Second
+const syncShortDelay = 500 * time.Millisecond
+
+// syncServersLoop loops while the cluster is alive to keep its idea of
+// the server topology up-to-date. It must be called just once from
+// newCluster.  The loop iterates once syncServersDelay has passed, or
+// if somebody injects a value into the cluster.sync channel to force a
+// synchronization.  A loop iteration will contact all servers in
+// parallel, ask them about known peers and their own role within the
+// cluster, and then attempt to do the same with all the peers
+// retrieved.
+func (cluster *mongoCluster) syncServersLoop() {
+	...
+	...
+	...
+}
+{% endhighlight %}
+
+This status checking logic runs once every 30 seconds! This fit with the interval of generation skips, and also with the number of skips I was seeing, which was around 12 on average. I had seen an HTTP request skip the random number generator forward 4 iterations, and if the mgo driver was connecting to a 3-node replica set for a status check, that would fit witho 4 generations * 3 connections = 12 generations per status check. I also verified this behavior by observing the app's network traffic. It was clear that it would try to make connectins to MongoDB cluster members periodically. So, with this affirmed, I updated my understanding of the observed gambling outcomes.
+
+# Bringing it Together
+
+I now had a complete understanding of how the random number sequences I observed were generated and how they were affected by the internal app logic. My model of this can be illustrated as follows:
+
+<!-- Random Number Sequence with Skips Diagram -->
+<svg height="80" width="800" style="background:none;">
+  <text x="10" y="20" style="font-size:14px;font-family:monospace;">
+  	<!-- True -->
+  	<tspan x="0" y="25">True:</tspan>
+    <tspan x="100" y="25">
+    	...01011000010101101<tspan style="fill:#FF4500;">101001101101</tspan>011010110101111010011100<tspan style="fill:#FF4500;">000001001111</tspan>000000111...
+    </tspan>
+    <!-- Observed -->
+  	<tspan x="0" y="55">Observed:</tspan>
+    <tspan x="100" y="55">
+    	...01011000010101101<tspan style="fill:gray;">____________</tspan>011010110101111010011100<tspan style="fill:gray;">____________</tspan>000000111...
+    </tspan>
+  </text>
+</svg>
+
+I could observe partial runs of contiguous generations, but there would be skips interspersed, and I had to take that into account when trying to predict future outputs. To crack the seed, I took a slightly different approach than my original lookup table. Instead of looking for prefixes of generated sequences in the observed sequence, I decided instead to look for subsequences that appeared anywhere. 
+
+#### Seed Search Approach
+
+First, let's establish some notation to make things easier.
+
+- $$R_{seed}$$ : the random sequence generated by seeding the generator with the value $$seed$$. This is an infinite sequence.
+- $$S[i_0:i_1]$$ : the subsequence of a sequence $$S$$ that starts at index $$i_0$$ and ends at index $$i_1$$.
+- $$Subseq(P, Q)$$ : $$P$$ is a subsequence of $$Q$$, where $$P$$ is a finite sequence.
+- $$Len(S)$$ : the length of a finite sequence $$S$$.
+
+
+We want to establish the fact that observing a particular subsequence of a random sequence is a practical way to identify it uniquely. The meaning of that will become clearer in the following section. Let's consider a set of 2 different finite random sequences:
+
+$$ S_a = R_{seed_a}[:N] $$ 
+
+$$ S_b = R_{seed_b}[:N] $$
+
+and a sequence $$V$$, with $$Len(V)=M$$, $$Subseq(V, S_a)$$, and $$M << N$$. Now, let $$F$$ be the event $$Subseq(V, S_b)$$. We can call it an event if we consider the above sequences as ranging over a set of parameters with uniform probability. We want to compute the following conditional probability:
+
+$$ P( seed_a=seed_b | F) $$
+
+In other words, we want to find the probability that our two sequences $$S_a$$ and $$S_b$$ have the same seed if we observe $$V$$ in $$S_b$$  (Remember that we established $$Subseq(V, S_a)$$ as a fixed assumption). We can apply Bayes' Rule to compute the above expression. For two events $$A, B$$ Bayes' rule is defined as follows:
+
+$$ P(A\mid B) = \dfrac{P(A)P(B\mid A)}{P(B)} $$
+
+So, applying this:
+
+$$ 
+\begin{align*}
+P( seed_a=seed_b \mid F) = \dfrac{ P(F \mid seed_a=seed_b) P(seed_a=seed_b) }{ P(F) }
+\end{align*}
+$$
+
+Let's see if we can figure out the values for each of these sub-expressions:
+
++ $$ P(seed_a=seed_b) $$: If we think about $$seed_a $$ and $$ seed_b $$ as ranging over all possible unique seed values, then each one can be exactly one of $$2^{31}-1$$ values. Therefore, the probability that they are equal is simply $$\dfrac{1}{2^{31}-1}$$ (Fix one, and see what the probability of choosing the other one equal to it is).
+
++ $$ P(F \mid seed_a=seed_b) $$: If $$ seed_a=seed_b $$ this means that $$ S_a $$ and $$S_b$$ are identical sequences. So, if $$ S_a = S_b $$, what is the probability of $$F$$ i.e. that $$V$$ is a subsequence of $$S_b$$? Since we know that $$Subseq(V, S_a)$$, and $$S_a=S_b$$, then $$V$$ must be a subsequence of $$V_b$$. Thus, this conditional probability is equal to 1.
+
++ $$ P(F) $$: This is is equal to the probability that $$V$$ is a subsequence of $$S_b$$. If $$V$$ ranges over all possible sequences of length $$N$$ then there are $$2^N$$ possible choices for $$V$$. Now, within a particular $$S_b$$, how many different subsequences are actually seen? Well, if we think about sliding a fixed window of length $$N$$ from left to right across the whole sequence $$S_b$$ we can see that there are $$M-N$$ possible unique subsequences that appear in one particular $$S_b$$. So, there are $$2^M$$ choices for $$S_b$$, and each choice contains a set of at most $$M-N$$ unique subsequences. In order for $$F$$ to occur, we would have to choose a $$V$$ that was in the set of subseqences of $$S_b$$, of which there are only $$M-N$$. So, if we choose uniformly at random from the entire space of $$V$$, we have a probability of
+
+$$ \dfrac{M-N}{2^N} $$
+
+that we choose one that is actually a subsequence of $$S_b$$. If we plug back in to our original expression:
+
+$$ 
+\begin{align*}
+P( seed_a=seed_b \mid F) = \dfrac{1}{2^{31}} \times \dfrac{2^N}{M-N}
+\end{align*}
+$$
+
+
+This result tells us that if we encounter a specific subsequence of length N in an observed random number sequence, and we also observe that subsequence in a another random sequence, the two random sequences were generated with the same seed, with a very high probability.
+
+
+
 
 Slot Machine Hack: [https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/]
 
 # Building the Autogambler Bot
+
+To figure out the seed, we can feed a large number of gambles into the system to ensure that we can observe contiguous output sequence i.e. there are no generation skips. If we are able to predict, roughly, when the server was last restarted, we can estimate how many generations have passed in total due to the periodic status checks. We can then write a Go program that generates random sequences of at least that length, and we can search for the observed subsequence in random sequences generated by each possible seed. If we find the subsequence in a random sequence, then we should have our seed.
 
 
 
