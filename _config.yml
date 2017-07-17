@@ -1,9 +1,9 @@
 # Site settings
-title: williamjdesign.com
+title: willyschultz.com
 email: wschultz@williamjdesign.com
 description: My name is Willy Schultz and this is my website where you can find my projects and ideas. I am a programmer, designer, and builder. I am currently studying Mathematics at Cornell University.
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://williamjdesign.com" # the base hostname & protocol for your site
+url: "http://willyschultz.com" # the base hostname & protocol for your site
 twitter_username: willyjschultz
 github_username:  will62794
 
