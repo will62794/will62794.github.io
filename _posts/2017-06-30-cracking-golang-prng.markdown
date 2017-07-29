@@ -12,7 +12,7 @@ categories: jekyll update
 
 {% endhighlight %}
 
-Recently, a friend of mine set up an application that was a kind of mini, virtual payment network. It provided users with a virtual currency that they could send and receive from each other. Every user starts with a fixed number of virtual tokens, and the only way to gain or lose tokens is by giving or receiving tokens from someone else. There was another feature, however, for the more reckless users. It allowed for a very simple form of gambling, as a way for a user to win (or lose) tokens. You can wager some amount of tokens X, bet on the outcome of a virtual coin toss, and if you win, you gain X tokens, if you lose, you lose X tokens. The gambling feature intrigued me, and I wanted to see if there might be a way to game the system. Not long ago, I had listened to a story about some Russian hackers who were able to crack a particular model of casino slot machines by exploiting their weak internal random number generators, and I was curious if something similar would be possible here. The app's source code, written in Go, was publicly  available, which allowed me to see the internals of the web API etc. What intrigued and encouraged me was the fact that the gambling logic utilized Go's `math/rand` package for the generation of virtual coin toss outcomes (`crypto/rand` is Go's cryptographically secure PRNG). The default PRNG shouldn't be used for security sensitive applications, but I was curious to see what it would take to "crack" Go's default PRNG and beat the app's gambling system.
+Recently, a friend of mine set up a social application that allowed users to make virtual payments to each other. It provided users with a virtual currency that they could send and receive from each other. Every user starts with a fixed number of virtual tokens, and the only way to gain or lose tokens is by giving or receiving tokens from someone else. It also had a simple gambling feature. Users can wager some amount of tokens, bet on the outcome of a virtual coin toss, and win or lose the wagered tokens based on the coin toss outcome. The gambling feature intrigued me, and I wanted to see if there might be a way to beat the system. Recently, I had listened to [a story about Russian hackers](https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/) who were able to crack casino slot machines by exploiting their weak random number generators, and I was curious if something similar would be possible here. The application was written in Go, and the source code was publicly  available, which allowed me to investigate the internals. The gambling logic utilized Go's `math/rand` package for the generation of virtual coin toss outcomes, which intrigued me. Using Go's default pseudo random number generator for something like this is certainly bad practice, but I wanted to see what it would take to actually crack it and beat the app's gambling system.
 
 <!-- 
 # Pseudo Random Number Generators: An Investigation
@@ -44,14 +44,14 @@ This is a  that delves into the details of Go's number generator. -->
 
 # Predicting PRNG Sequences
 
-To consider a random number generator "broken", there must be some efficient way to predict it's next output. We can consider this as obtaining an "oracle" on the RNG. Being able to do this would obviously provide a way to easily beat the gambling system. If you could predict every next output, you could win every gamble with full certainty. There were a few approaches I fiddled with in order to find such an "oracle". I had recently played around with [Microsoft's Z3 Theorem Prover](https://github.com/Z3Prover/z3). It is great at efficiently solving many different types of constraint systems (strings, bitvectors, real numbers, etc.). Go's random number generator algorithm in [`math/rand/rng.go`](https://golang.org/src/math/rand/rng.go) is not too well documented but after some searching it seemed to be an implementation of a well known algorithm, the [Additive Lagged Fibonacci Generator](https://en.wikipedia.org/wiki/Lagged_Fibonacci_generator). This is a [good article](https://appliedgo.net/random/) that describes some of the internal details of Go's number generator. 
+There are many ways to analyze deficiences in random number generator algorithms, but for my purposes, I just needed to figure out an efficient way to predict the generator's next output. This would provide a way to easily beat the gambling system, since I would be able to predict every coin toss outcome with full certainty. There were a few initial approaches I fiddled with. I had recently played around with [Microsoft's Z3 Theorem Prover](https://github.com/Z3Prover/z3), which is great at efficiently solving many different types of constraint systems. Go's random number generator algorithm in [`math/rand/rng.go`](https://golang.org/src/math/rand/rng.go) is not too well documented but after some searching it seemed to be an implementation of a well known algorithm, the [Additive Lagged Fibonacci Generator](https://en.wikipedia.org/wiki/Lagged_Fibonacci_generator). This is a [good article](https://appliedgo.net/random/) that describes some of the internal details of Go's number generator. 
 
-I figured I could encode Go's number generation algorithm within Z3, give it an observed sequence of outputs, and see if it could solve for the next output. My hope was that the combined information of the algorithm and a long sequence of output values would constrain the system enough to allow Z3 to find a unique next output. The main problem with this approach was that I was uncertain if it would actually work. I might up end investing a lot of time into encoding the algorithm properly in Z3 and debugging it, only to find out that its solver wasn't actually able to compute what I wanted in a reasonable amount of time. It may still be a valid approach, but I haven't explored it further. From what I've read, the ALFG algorithm is considered a very strong random number generator, and I didn't find any easy, known exploits that took advantage of a particular weakness. After thinking some more on the problem, and poking around the source code in `math/rand/rng.go`, I noticed a subtle but important detail that led me down a new, more promising path of investigation.
+I figured I could encode Go's number generation algorithm within Z3, give it an observed sequence of outputs, and see if it could solve for the next output. My hope was that the combined information of the algorithm and a long sequence of output values would constrain the system enough to allow Z3 to find a unique next output. The main issue with this approach was that I was uncertain it would actually work. I might up end investing a lot of time into encoding the algorithm properly in Z3 and debugging it, only to find out that its solver wasn't actually able to compute what I wanted in a reasonable amount of time. It may still be a valid approach, but I haven't explored it further. From what I've read, the ALFG algorithm is considered a very strong random number generator, and I didn't find any easy, known exploits that took advantage of a particular weakness. After thinking some more on the problem, and poking around the source code in `math/rand/rng.go`, I noticed a subtle but important detail that led me down a new, more promising path of investigation.
 
 
-# Investigating a Seed Subtlety
+# Seed of an Idea
 
-The interface to the Go random number generator is provided in `math/rand/rand.go`. A random number generator "source" is an instance of a random number generator that holds its own internal state. Different RNG sources can be advanced independently of each other without affecting the internal state of a different source. To seed a source, Go provides the following function
+The interface to Go's random number generator is provided in `math/rand/rand.go`. A random number generator "source" is an instance of a random number generator that holds its own internal state. Different RNG sources can be advanced independently of each other without affecting the internal state of a different source. To seed a source, Go provides the following function
 
 {% highlight go linenos %}
 // Seed uses the provided seed value to initialize the generator to a deterministic state.
@@ -59,10 +59,11 @@ The interface to the Go random number generator is provided in `math/rand/rand.g
 func (r *Rand) Seed(seed int64)
 {% endhighlight %}
 
-which takes a 64-bit integer as its argument. Random number generator seeds are a way to initialize the state of the generator to some known state. This means that two generators initialized with the same seeds produce the same number sequences. The `rand.Seed` function relies on another internal function, the `Seed` function in `math/rand/rng.go` which does most of the actual seeding logic:
+which takes a 64-bit integer as its argument. Random number generator seeds are a way to initialize the state of the generator source to some known state. This means that two sources initialized with the same seeds produce the same number sequences. The `rand.Seed` function relies on another internal function: the `Seed` function in `math/rand/rng.go` which executes the core seeding logic:
 
 {% highlight go linenos %}
-// Seed uses the provided seed value to initialize the generator to a deterministic state.
+// Seed uses the provided seed value to initialize the 
+// generator to a deterministic state.
   func (rng *rngSource) Seed(seed int64) {
   	rng.tap = 0
   	rng.feed = _LEN - _TAP
@@ -92,7 +93,7 @@ which takes a 64-bit integer as its argument. Random number generator seeds are 
   }
 {% endhighlight %}
 
-The details of the seed arithmetic aren't really that important, but there was one intriguing part. The underscored variables that appear in this function are constants defined at the top of the file:
+The details of the seed arithmetic aren't really that important, but there was one intriguing part. The underscored variables that appear in this function are constants defined at the top of the same file:
 
 {% highlight go linenos %}
 const (
@@ -108,24 +109,25 @@ const (
 {% endhighlight %}
 
 
-and it was the value of `_M` that looked suspicious. Let's look at line 6 of the above `Seed` function:
+and it was the value of `_M` that looked suspicious. Look at line 6 of the above `Seed` function:
 
 {% highlight go %}
 seed = seed % _M
 {% endhighlight %}
 
-The given seed argument is being taken modulo `_M`, defined as `(1 << 31) - 1` i.e. $$ 2^{31} - 1 $$. So even though the seed argument is given as a 64-bit integer, only 31 bits of it are actually used. In other words, there are only $$ 2^{31} - 1 $$ unique seeds, since the seed argument undergoes the modulo operation before being used in any of the actual seeding logic. This felt questionable to me. When I went back to look at the official Go documentation, I realized that this is, in fact, mentioned. It is, hoever, easy to miss in my opinion, especially if you use the Seed function by just looking at its function signature. The Go documentation for `math/rand.Seed` reads:
+The given seed argument is being taken modulo `_M`, defined as `(1 << 31) - 1` i.e. $$ 2^{31} - 1 $$. So even though the seed argument is given as a 64-bit integer, only 31 bits of it are actually used. In other words, there are only $$ 2^{31} - 1 $$ unique seeds, since the seed argument undergoes the modulo operation before being used in any of the actual seeding logic. This seemed a bit odd. When I went back to look at the official Go documentation, I realized that this detail is, in fact, mentioned. It would be easy to miss, though, especially if you use the Seed function by just looking at its function signature. The Go documentation for `math/rand.Seed` reads:
 
 > Seed uses the provided seed value to initialize the default Source to a deterministic state. If Seed is not called, the generator behaves as if seeded by Seed(1). **Seed values that have the same remainder when divided by 2^31-1 generate the same pseudo-random sequence.** Seed, unlike the Rand.Seed method, is safe for concurrent use.
 
-This was a key discovery. If there were $$2^{64}$$ possible seeds, it would be infeasible to somehow search for a seed by brute force. With only $$2^{31}$$ seed possibilities, however, brute forcing a seed seemed within reach. 
+This was a crucial discovery. If there were $$2^{64}$$ possible seeds, it would be infeasible to search for a seed by brute force. With only $$2^{31}$$ seed possibilities, however, brute forcing a seed seemed within reach.
 
 
 # Finding the Seed
 
-If I could figure out the initial seed, I would then have a way to produce the entire future sequence of gambles, giving me a perfect way to win every time. The app server seeded the random number generator once at startup, and generated random numbers for gambles based on that initial seed, until the server process was stopped and started again. By scraping the app's public API, I was able to compile a list of all gambles that ever occurred. Each gamble was saved with the outcome of the virtual coin toss (heads or tails) and a timestamp of when the gamble occurred, so I could easily sort them. In the following sections I will refer to this global sequence of app gambles as $$GAMBLESEQ$$.
+If I could figure out the initial seed, I would then have a way to produce the entire future sequence of gambles, giving me a perfect way to win every time. The app server seeded the global random number generator once at startup, and generated random numbers for gambles based on that initial seed, until the server process was stopped and started again. By scraping the app's public API, I was able to compile a set of all gambles that ever occurred
+Each gamble was saved with the outcome of the virtual coin toss (heads or tails) and a timestamp of when the gamble occurred on the server, which allowed me to create a full, ordered sequence of gambles. In the following sections I will refer to this global sequence of app gambles as $$ALLGAMBLES$$.
 
-I started with the following assumption. If the server has been restarted a few times over the course of the app's lifetime, there should be "restart" points within $$GAMBLESEQ$$, where the sequence was re-seeded. If I could find the most recent re-seed point, and its seed, then I would be able to predict all future outputs of $$GAMBLESEQ$$ by continuing from the re-seed point. To find these re-seed points, I used prefixes of random number sequences as a way to "fingerprint" a random sequence. Since there are only $$2^{31}-1$$ unique seeds, then there must be no more than $$2^{31}-1$$ unique random number sequences, since each seed produces one unique sequence. Thus, I figured that each sequence would, most likely, have a unique 31-bit prefix.
+I started with the following assumption. If the server has been restarted a few times over the course of the app's lifetime, there should be positions within $$ALLGAMBLES$$ where the sequence was re-seeded. If I could find the most recent re-seed point, and its seed, then I would be able to predict all future outputs of $$ALLGAMBLES$$ by continuing from the re-seed point. To find these re-seed points, I used prefixes of random number sequences as a way to "fingerprint" a random sequence. Since there are only $$2^{31}-1$$ unique seeds, there must be no more than $$2^{31}-1$$ unique random number sequences. Thus, I figured that each sequence would, most likely, have a unique 31-bit prefix.
 
 <!-- Random Number Sequence Prefix Diagram -->
 <svg height="180" width="800">
@@ -153,23 +155,24 @@ I started with the following assumption. If the server has been restarted a few 
   </text>
 </svg>
 
- Even if there were prefix collisions between sequences, the colliding sequences could easily be disambiguated by looking at a longer prefix. With this in mind, I decided to create a lookup table that mapped sequence prefixes of length 31 to the seeds that produced the sequence. Every seed can be considered a unique "id" for the sequence that it generates:
+ Even if there were prefix collisions between sequences, the colliding sequences could easily be disambiguated by looking at a longer prefix. With this in mind, I decided to create a lookup table that mapped sequence prefixes of length 31 to the seeds that produced the sequence. Every seed can be considered a unique "id" for the sequence that it generates. My lookup table looked something like the following:
 
+| **Sequence Prefix**   	  | **Seed**			  |
+| :------------------------:| :--------------:|
+| `0011110110110110`  		  | 1287343389 		  |
+| `0110110111001101`  		  | 9347019211    	|
+| `1011110010111100` 		    | 22277781193   	|
+| ...                       | ...             |
+| `1011110010010100`        | 4441238103      |
 
-| **Sequence Prefix**   	| **Seed**			|
-| :------------------------:| :----------------:|
-| `0011110110110110`  		| 1287343389 		|
-| `0110110111001101`  		| 9347019211    	|
-| `1011110010111100` 		| 22277781193   	|
-| ... 						| ...   			|
 
 Each key is a 31-bit value, and each value is a 64-bit seed. For simplicity, both were stored as 64-bit values, so each key-value pair would occupy around 16 bytes. There are $$2^{31}-1$$ unique seeds, so I estimated the whole table could be stored in a reasonable amount of space: 
 
 $$  2^{31} \; \text{seeds} * 16  \; \text{bytes/entry} = 34,359,738,368 \; \text{bytes} \approx 32 \; \text{GB} $$
 
-I generated the lookup table using a Go script that inserted the key value pairs as documents in a MongoDB database. It took around an hour to generate. For computing this, I was using a Ubuntu Linux desktop machine with 12 Intel i7-4930K CPU @ 3.40GHz processor cores. 
+I generated the lookup table using a Go script that inserted the key value pairs as documents in a MongoDB database. It took around an hour to generate on an Ubuntu Linux desktop machine with 12 Intel i7-4930K CPU @ 3.40GHz processor cores. 
 
-Once the table was built, I could efficiently find the seed for any given 31-bit prefix. So, I tried to scan through $$GAMBLESEQ$$ looking for subsequences of length 31 that mapped to valid seeds. If a subsequence mapped to a valid seed, then I would check to see if the seed produced the correct sequence beyond the 31 element subsequence. If it didn't, I assumed it was a false positive. Unfortunately, this didn't produce the results I was hoping for. I couldn't find seeds that actually produced observed subsequences that extended beyond 31 elements. My working assumption was that, within the full sequence of gambles, there may have been some server restarts, so there would be points where the RNG was re-seeded, but that was fine, since I could find the re-seed points by looking through all subsequences and trying to find valid sequence prefixes.
+Once the table was built, I could efficiently find the seed for any given 31-bit sequence prefix. I tried to scan through $$GAMBLESEQ$$ looking for subsequences of length 31 that mapped to valid seeds. If a subsequence mapped to a valid seed, then I would check to see if the seed produced the correct sequence beyond the 31 element subsequence. If it didn't, I assumed it was a false positive. Unfortunately, I couldn't find seeds that produced subsequences that matched observed subsequences beyond length 31. 
  
 <!-- Random Number Reseeding Diagram -->
 <svg height="100" width="800" style="background:none;">
@@ -186,13 +189,17 @@ When I couldn't produce satisfactory results with this approach, I went back to 
 
 # Random Interference
 
-The source code for the app was available, so I was able to download it and run it locally. I wanted to check my assumption that every gamble that gets executed corresponds to exactly 1 generation of the random number generator. This was the basic assumption I was going off of for the lookup table approach i.e. that I was observing contiguous sequences of gamble results and therefore contiguous outputs of the random number generator. When running the app on my Macbook and simulating some gambles, I was able to verify that each gamble jumped the global random generator forward exactly 1 generation. Even after running the app for a while and exercising various other behaviors, this would hold true. Since this didn't seem to match what I observed against the real app, I tried to make sure I was replicating the exact environment the app server was running in. 
+The source code for the app was available, so I was able to download it and run it locally. I wanted to check my assumption that every app gamble corresponded to 1 generation of the random number generator. This was the basic assumption that my lookup table approach relied on i.e. that I was observing contiguous sequences of gamble results and therefore contiguous outputs of the random number generator. When running the app on my Macbook and simulating some gambles, I was able to verify that each gamble moved the global random generator forward exactly 1 generation. Even after running the app for a while and exercising various other behaviors, this would hold true. Since this didn't seem to match what I observed against the real app, I tried to make sure I was replicating the exact environment the app server was running in. 
 
-When deployed, the app ran in a Linux based Docker container, so I tested the app locally inside the same Docker container configuration. Surprisingly, this setup produced some noticeably different behavior regarding the way the app generated random numbers. By executing gambles continuously, at a fixed rate, I was able to observe the current generation of the random number generator. So, for every simulated gamble, I would observe and make sure that the PRNG skipped a single generation. This was not the case, however. It seemed that, at a roughly fixed interval, about every 30 seconds or so, the PRNG would skip forward, on average, around 12-13 generations. My thought was that, since the app uses Go's global random number generator, any other code that makes a call to it would affect the state of the generator. There weren't that many Go packages that the gambling code utilized, beyond standard library packages. After searching the Go codebase a bit, however, I did find a couple noticeable places that do make calls to the global random number generator. One which seemed significant was in the Go DNS resolution logic. The following, condensed code snippet is a function inside `net/dnsclient_unix.go`:
+When deployed, the app ran in a Linux based Docker container, so I ran the app locally inside the same Docker container configuration. Surprisingly, this setup produced some noticeably different behavior regarding the way the app generated random numbers. By executing gambles continuously, I was able to observe the current generation of the random number generator. For every gamble execution, I would observe and see if the PRNG skipped a single generation. This was not the case, however. It seemed that, at a roughly fixed interval, about every 30 seconds or so, the PRNG would skip forward, on average, around 12-13 generations. Since the app uses Go's global random number generator, any other code that makes a call to it would affect the state of the generator. There weren't that many Go packages outside the standard library that the gambling code utilized. After searching the Go codebase a bit, however, I did find a couple noticeable places that make calls to the global random number generator. One which seemed significant was in the Go DNS resolution logic. The following, condensed code snippet is a function inside `net/dnsclient_unix.go`:
 
 {% highlight go linenos %}
 // exchange sends a query on the connection and hopes for a response.
-  func exchange(ctx context.Context, server, name string, qtype uint16, timeout time.Duration) (*dnsMsg, error) {
+  func exchange(ctx context.Context, 
+                server, 
+                name string, 
+                qtype uint16, 
+                timeout time.Duration) (*dnsMsg, error) {
   	...
   	...
   	...
@@ -225,12 +232,12 @@ When deployed, the app ran in a Linux based Docker container, so I tested the ap
   }
 {% endhighlight %}
 
-On line 21 in the above code snippet, there is a call to the global `rand` function that is used to generate a random DNS packet id. This was promising, since it seemed like DNS resolution could potentially be a pretty hot section of code for anything that makes some kind of network request. If this was portion of code was in fact being executed by the app server, though, there were still two questions to answer: 
+On line 21 in the above code snippet, there is a call to the global `rand` function that is used to generate a random DNS packet id. This was promising, since it seemed like DNS resolution could potentially be a pretty hot section of code for anything that makes some kind of network request. If this was portion of code was in fact being called in the running app server, though, there were still two questions to answer: 
 
 1. Why were these skips observed only when run on the Docker container, but not when testing locally on my Mac?
 2. What explained the generation skips occurring at regular 30 second intervals?
 
-### Answer 1: Platform Dependent DNS Resolution Logic
+### Solution 1: Platform Dependent DNS Resolution
 
 My hypothesis was that the DNS resolution code was injecting extra skips into the global number generator, but I wanted to produce a test that would validate this. It turns out that this test also served as a way to see why the app behavior varied between the Docker container and my Macbook. I came up with this simple Go script:
 
@@ -252,7 +259,7 @@ func main() {
 }
 {% endhighlight %}
 
-It seeds `math/rand` with a fixed seed, generates a single number, makes an HTTP request, and then generates a second number. The first loop is used as a reference to see what the first few generations of the $$R_{42}$$ sequence are without any interference. In the Go documentation on DNS resolution, there is a note about the existence of two different DNS resolvers. You can optionally use a native C library DNS resolver, or a pure Go resolver, and this can be configured via the `GODEBUG` environment variable. This is the terminal output of the above script when run with the two different DNS resolvers:
+It seeds `math/rand` with a fixed seed, generates a single number, makes an HTTP request, and then generates a second number. In the Go documentation on DNS resolution, there is a note about the existence of two different DNS resolvers. You can optionally use a native C library DNS resolver, or a pure Go resolver, and this can be configured via the `GODEBUG` environment variable. This is the terminal output of the above script when run with the two different DNS resolvers:
 
 ```
 ➜  GODEBUG=netdns=cgo go run test_http.go
@@ -292,7 +299,7 @@ requests (OS X),...
 
 This matched the behavior I observed. On my Macbook, if the C resolver was being used, it wouldn't be calling any Go code, and so the global random number generator would be unaffected. On Linux, however, the DNS resolver would advance the state of the global number generator, affecting the random number output I observed.
  
-### Answer 2: The mgo MongoDB Database Driver
+### Solution 2: The mgo MongoDB Database Driver
 
 After determining that the DNS resolver was the most likely cause for generation skips, I wanted to figure out why they were happening at regular intervals. If the app is dormant i.e. no users are active, it seemed like there could be very few possible components that would be making network requests and therefore causing DNS lookups. One candidate, however, was the database driver. In order to persist various types of application data, the server, on startup, creates a connection to a MongoDB replica set, by means of the [mgo](https://labix.org/mgo) driver. I wanted to see if the driver could potentially be executing requests on some background thread, even while there was no explicit user activity. I tried to monitor the network traffic while the app was running locally, and I perused the mgo source code a bit keeping in mind the 30 second interval time. This bit of logic, in `mgo/cluster.go` seemed like a good candidate:
 
@@ -317,11 +324,13 @@ func (cluster *mongoCluster) syncServersLoop() {
 }
 {% endhighlight %}
 
-This status checking logic runs once every 30 seconds. This fit with the interval of generation skips, and also with the number of skips I was seeing, which was around 12 on average. An HTTP request skips the random number generator forward 4 iterations, and if the mgo driver was connecting to a 3-node replica set for a status check, that would fit with 4 generations * 3 connections = 12 generations per status check. I also verified this behavior by observing the app's network traffic locally. It was clear that it would try to make connections to MongoDB cluster members periodically.
+This status checking logic runs once every 30 seconds. This fit with the interval of generation skips, and also with the number of skips I was seeing, which was around 12 on average. An HTTP request skips the random number generator forward 4 iterations, and if the mgo driver was connecting to a 3-node replica set for a status check, that would fit with 4 generations * 3 connections = 12 generations per status check. I also verified this behavior by observing the app's network traffic locally. It was clear that it would try to make connections to MongoDB cluster members periodically. 
+
+So, I had a satisfactory explanation for the random interference I was observing in the PRNG output. Now I just needed to apply my findings to a new approach for the cracking the gambling system.
 
 # Bringing it Together
 
-I now had a complete understanding of how the random number sequences I observed were generated and how they were affected by the internal app logic. My model of this can be illustrated as follows:
+I had a complete understanding of how the random number sequences I observed were generated and how they were affected by the internal app logic. My model of this can be illustrated as follows:
 
 <!-- Random Number Sequence with Skips Diagram -->
 <svg height="80" width="800" style="background:none;">
@@ -329,19 +338,19 @@ I now had a complete understanding of how the random number sequences I observed
   	<!-- True -->
   	<tspan x="0" y="25">True:</tspan>
     <tspan x="100" y="25">
-    	...01011000010101101<tspan style="fill:#FF4500;">101001101101</tspan>011010110101111010011100<tspan style="fill:#FF4500;">000001001111</tspan>000000111...
+    	01011[0]00010101101<tspan style="fill:#FF4500;">101001101101</tspan>01101011010111101001[1]100<tspan style="fill:#FF4500;">000001001111</tspan>000000111...
     </tspan>
     <!-- Observed -->
   	<tspan x="0" y="55">Observed:</tspan>
     <tspan x="100" y="55">
-    	...01011000010101101<tspan style="fill:gray;">____________</tspan>011010110101111010011100<tspan style="fill:gray;">____________</tspan>000000111...
+    	01011[0]00010101101<tspan style="fill:gray;">____________</tspan>01101011010111101001[1]100<tspan style="fill:gray;">____________</tspan>000000111...
     </tspan>
   </text>
 </svg>
 
-I could observe partial runs of contiguous generations, but there would be skips interspersed, and I had to take that into account when trying to predict future outputs. To crack the seed, I took a slightly different approach than my original lookup table. Instead of looking for prefixes of generated sequences in the observed sequence, I decided instead to look for subsequences that appeared anywhere. 
+I could observe partial runs of contiguous generations, but there would be skips interspersed, in addition to potential re-seeds. I had to take this into account when trying to predict future outputs. The first step in my apporach still involved figuring out the latest PRNG seed. Instead of looking for prefixes of generated sequences , as I had tried before, I decided on something slightly different. I figured that, if I could observe a contiguous subsequence of considerable length, say 64 elements, this could also act as a fingerprint for a random sequence, even if it wasn't the prefix. My thought was that it is very unlikely that two different random sequences (of some non-massive finite length) contain exactly the same 64-element subsequence. Why is this a reasonable hypothesis? Well, there are $$2^{64}$$ possible binary sequences of length 64, but, in a random sequence of say, length 5000, there are only around 5000 different subsequences that appear (think of sliding a 64-element wide window along the 5000 element sequence). So, in any one length 5000 sequence you only see around 5000 out of 2^{64} possible length 64 subsequences. This means the probability of a particular subsequence appearing in a particular length 5000 sequence extremely low. So, this subsequence approach should provide a feasible way to fingerprint sequences, and therefore search for a seed.
 
-#### Seed Search Approach
+<!-- #### Seed Search Approach
 
 First, let's establish some notation to make things easier.
 
@@ -392,26 +401,23 @@ P( seed_a=seed_b \mid F) = \dfrac{1}{2^{31}} \times \dfrac{2^N}{M-N}
 $$
 
 
-This result tells us that if we encounter a specific subsequence of length N in an observed random number sequence, and we also observe that subsequence in a another random sequence, the two random sequences were generated with the same seed, with a very high probability.
+This result tells us that if we encounter a specific subsequence of length N in an observed random number sequence, and we also observe that subsequence in a another random sequence, the two random sequences were generated with the same seed, with a very high probability. -->
 
 
 
+# Building an Autogambler Bot
 
-Slot Machine Hack: [https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/]
+To figure out the seed, we can feed a large number of gambles into the system to ensure that we observe contiguous output sequence i.e. there are no generation skips. If we are able to predict, roughly, when the server was last restarted, we can estimate how many generations have passed in total due to the periodic status checks. We can then have a Go script that generates random sequences of at least that length, and we can search for the observed subsequence in the sequence generated by each seed. If we find the observed subsequence in a sequence, then we should have our seed.
 
-# Building the Autogambler Bot
-
-To figure out the seed, we can feed a large number of gambles into the system to ensure that we observe contiguous output sequence i.e. there are no generation skips. If we are able to predict, roughly, when the server was last restarted, we can estimate how many generations have passed in total due to the periodic status checks. We can then write a Go program that generates random sequences of at least that length, and we can search for the observed subsequence in random sequences generated by each possible seed. If we find the subsequence in a random sequence, then we should have our seed.
-
-Once we have determined the likely seed we can now start gambling. Since we know that any continuous runs of the random number generator will be periodically interrupted by the database status checks, we take this into account when coming up with a gambling strategy. Basically, the strategy was the following:
+Once we have determined the seed we can start gambling. Since we know that any continuous runs of the random number generator will be periodically interrupted, we take this into account when coming up with a gambling strategy. Basically, the strategy is the following:
 
 
-1. Feed some gambles into the system as fast as possible, so as to produce a run of gambles, call it PRIMER, with no random number generator skips.
-2. Since we know the full random number sequence(because we know the seed), use the sequence PRIMER to find where in the sequence we are. It should be easy to approximate where in the sequence we are since we can estimate how long it's been since the server has started.
-3. Once we locate what generation the app's internal PRNG is at, we start gambling, using each next output of the random number sequence as our prediction. Gamble continuously until the first loss, at whatever desired rate of risk. Once we lose, we assume that a status check interfered with our continuous generation run. 
-4. Wait a small period of time, say, 4-5 seconds, for the status check to finish. Then go back to step 1 and repeat.
+1. Feed a small number of gambles into the system as fast as possible, so as to produce a run of gambles, call it $$PRIMER$$, with no random number generator skips.
+2. Since we know the full random number sequence (because we know the seed), use the sequence $$PRIMER$$ to locate ourselves in the sequence. It should be easy to approximate where in the sequence we are since we can estimate how long it's been since the server has started.
+3. Once we determine the current PRNG generation, we start gambling, using each next output of the random number sequence as our prediction. Gamble continuously until the first loss, at whatever desired rate of risk. Once we lose, we assume that a status check interfered with our continuous generation run. 
+4. Wait a small period of time for the status check to finish. Then go back to step 1 and repeat.
 
-This approach was successful. Even with occasional losses, or unexpected blips, it still was a winning strategy. There might be eight winning gambles or so, and then one loss, but the overall odds were beaten. It was simple to continue this strategy, upping the stakes as my personal coffers grew.
+This was a successful approach. Even with occasional losses, or unexpected blips, it still was a winning strategy. There might be eight winning gambles or so, and then one loss, but the overall odds were beaten. It was simple to continue this strategy, upping the stakes as my personal coffers grew.
 
 
 
