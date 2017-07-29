@@ -11,9 +11,6 @@
 @import url('https://fonts.googleapis.com/css?family=PT+Sans');
 @import url('https://fonts.googleapis.com/css?family=Lora');
 
-
-
-
 /**
 * Site header
 */
@@ -40,15 +37,12 @@
 }
 
 .site-title {
-	font-size:26px;
+	font-size:24px;
 	line-height: 56px;
-	letter-spacing: -1px;
 	margin-bottom: 0;
-	// float: left;
 	margin:auto;
-	text-align:center;
-	font-family: "Titillium Web", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
-	// font-family: "Oxygen", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+	text-align:left;
+	font-family: "Roboto Mono", "Fira Sans", sans-serif; 
 
 	font-weight: 200;
 	letter-spacing: 1px;
@@ -71,13 +65,12 @@
 }
 
 .site-nav {
-	// float: right;
 	font-size:14px;
 	text-transform:uppercase;
-	font-family: "Source Sans Pro", sans-serif;
-	margin-top:20px;
+	font-family: "Roboto Mono", sans-serif;
+	margin-top: 20px;
 	margin:auto;
-	text-align:center;
+	text-align:left;
 
 	.menu-icon {
 		display: none;
@@ -91,8 +84,8 @@
 		letter-spacing: 0px;
 
 
-		padding-left:15px;
-		padding-right:23px;
+		padding-left:5px;
+		padding-right:33px;
 		padding-bottom:1px;
 
 		// Gaps between nav items, but not on the first one
@@ -114,7 +107,10 @@
 
 	}
 	.page-link:hover{
-		text-decoration: none;
+		text-decoration: underline;
+		text-decoration: underline;
+    	-moz-text-decoration-color: $brand-color; /* Code for Firefox */
+    	text-decoration-color: $brand-color;
 		color:$brand-color;
 		-webkit-transition: all 100ms cubic-bezier(0.215, 0.610, 0.355, 1.000); 
 		   -moz-transition: all 100ms cubic-bezier(0.215, 0.610, 0.355, 1.000); 
