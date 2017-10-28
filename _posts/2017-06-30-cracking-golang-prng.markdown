@@ -11,42 +11,17 @@ date:   2017-06-30 12:00:00
 
 {% endhighlight %}
 
-A friend of mine recently built a Golang app that allowed users to exchange virtual currency. Every user starts with a fixed number of virtual tokens, and they could give or receive these tokens from other users. It also included a basic "gambling" feature. The app lets you wager some tokens, and then bet on the outcome of a virtual coin toss.  Not long before this, I had listened to [a story about Russian hackers](https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/) who were able to crack casino slot machines by exploiting their weak random number generators, and I was curious if something similar would be possible here. The application source code was publicly available, which allowed me to investigate the app internals. The gambling logic utilized Go's `math/rand` package for the generation of virtual coin toss outcomes, which piqued my interest. I wanted to see what it would take to actually crack it and beat the app's gambling system. The following is an account of my exploits.
-
-<!-- 
-# Pseudo Random Number Generators: An Investigation
-
-Most every programming language has a built in way to generate "random" numbers. For most applications the precise meaning of "random" isn't that important. Roughly, a random number generator should be able to produce an apparently arbitrary sequence of numbers, ideally suitable for things like simulations, randomized testing, etc. For what seems like a relatively straightforward task on the surface, however, there is a significant amount of research that has gone into developing ways to generate streams of these "pseudo" random numbers with the right statistical properties. Some of the oldest and simplest PRNG algorithms are called **Linear Congruential Generators** (LCG). These operate by computing a simple modular addition to generate the next number in a random sequence. They can be described with the following equation:
-
-$$
-\begin{align*}
-x_{n+1} = ax_{n} + c \mod{m}
-\end{align*}
-$$
-
-
-
-Some of the other popular algorithms include the Mersenne Twister, and the Linear Feedback Shift Register. Some of these vary in their level of security. -->
-
-<!-- # Go's Additive Lagged Fibonacci Generator
-
-The random number generation algorithm used in [`math/rand/rng.go`](https://golang.org/src/math/rand/rng.go) is not very well documented. There is a comment in the file referencing two authors, "DP Mitchell and JA Reeds", but there isn't much beyond that. Searching around a bit, I was able to find a few internet threads with mentions of the algorithm used in `math/rand`, but I couldn't find any official mention anywhere within the Go documentation. There were a few references to it as being an *Additive Lagged Fibonacci Generator*, which seemed [relatively well known](https://en.wikipedia.org/wiki/Lagged_Fibonacci_generator) as a method for random number generation. The ALFG's method for computing random numbers is very simple to describe. It's called a "Fibonacci" generator because it produces a number sequence in a similar way to the Fibonacci sequence. The n'th number of the sequence is a sum of two previous elements of the sequence:
-
-$$
-\begin{align*}
-x_{n} = x_{n-j} + x_{n-k}
-\end{align*}
-$$
-
-
-This is a  that delves into the details of Go's number generator. -->
+A friend of mine recently built a Golang app called "Mongobucks" that allowed users to exchange virtual currency. Every user starts with a fixed number of virtual tokens, and they could give or receive these tokens from other users. It also included a basic "gambling" feature. The app lets you wager some tokens, and then bet on the outcome of a virtual coin toss.  Not long before this, I had listened to [a story about Russian hackers](https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/) who were able to crack casino slot machines by exploiting their weak random number generators, and I was curious if something similar would be possible here. The application source code was publicly available, which allowed me to investigate the app internals. The gambling logic utilized Go's `math/rand` package for the generation of virtual coin toss outcomes, which piqued my interest. Of course, any application remotely worried about security should be using a cryptographically secure random number generator, which Go provides as part of its `crypto/rand` package. As a personal challenge, though, I wanted to see how difficult it would be to actually crack the Go's default number generator and beat the app's gambling system. The following is an account of my exploits.
 
 # Application Architecture
 
-The structure of the app was very simple. There was a single server that handled incoming requests from users to transfer money between each other, or to execute new gambles. There was also a backing  database that stored user information and logged operations. Every time a money transfer occurred, it would be logged in the database. In addition, every gamble that occurred, and its outcome, would be saved, along with a timestamp of when that gamble occurred. By scraping the public API a bit, it was possible to obtain a full, ordered list of all gambles that ever occurred. The application server used a single, global random number generator to simulate the virtual coin tosses, and so my initial hypothesis was very simple: every gamble corresponds to one generation of the app's internal random number generator. This formed the basis of my initial approach: figure out a way, when given a sequence of values generated by the internal random number generator, to predict the next value that would be generated. This would allow me to predict the outcome of any gamble with perfect accuracy. In the rest of this post, I will refer to the sequence of gambles as a binary sequence, since each gamble, and corresponding random number generator output, is either heads or tails i.e. 0 or 1.
+The structure of the app was very simple. There was a single server that handled incoming requests from users to transfer money between each other, or to execute new gambles. There was also a backing  database that stored user information and logged operations. Every time a money transfer occurred, it would be logged in the database. In addition, every gamble that occurred, and its outcome, would be saved, along with a timestamp of when that gamble occurred. Users could interact with the app via a Slack bot or a web interface where they could see transaction histories, etc. By scraping the public API a bit, it was possible to obtain a full, ordered list of all gambles that ever occurred. The application server used a single, global random number generator to simulate the virtual coin tosses, and so my initial hypothesis was very simple: every gamble corresponds to one generation of the app's internal random number generator. This formed the basis of my initial approach: figure out a way, when given a sequence of values generated by the internal random number generator, to predict the next value that would be generated. This would allow me to predict the outcome of any gamble with perfect accuracy. In the rest of this post, I will refer to the sequence of gambles as a binary sequence, since each gamble, and corresponding random number generator output, is either heads or tails i.e. 0 or 1. 
 
-*** IMAGE OF APP SERVER ***
+![alt text](/assets/cracking_go_prng/slack_mongobucks_balance.png "Logo Title Text 1")
+*Retrieving your current Mongobucks balance via Slack*
 
+![alt text](/assets/cracking_go_prng/slack_mongobucks_gamble.png "Logo Title Text 1")
+*Executing a simple gamble*
 
 # Predicting PRNG Sequences
 
@@ -291,7 +266,7 @@ When I couldn't produce satisfactory results with this approach, I went back to 
 
 The source code for the app was available, so I was able to download it and run it locally. I wanted to check my assumption that every app gamble corresponded to 1 random number generation. This was the basic assumption that my first approach relied on i.e. that I was observing contiguous sequences of gamble results and therefore contiguous outputs of the random number generator. When running the app on my Macbook and simulating some gambles, I was able to verify that each gamble moved the global random generator forward exactly 1 generation. After running the app for a while and exercising various other behaviors, this would hold true. Since this didn't seem to match what I observed against the real app, I tried to make sure I was replicating the exact environment of the deployed app. 
 
-The production app ran in a Linux based Docker container, so I ran the app locally inside the same Docker container configuration. This setup produced noticeably different behavior regarding the way the app generated random numbers. By executing gambles continuously, I was able to observe the current generation of the random number generator. For every gamble execution, I would check to see if the RNG skipped a single generation. It seemed that, at a roughly fixed interval, about every 30 seconds or so, the RNG would skip forward, on average, around 12-13 generations. Since the app uses Go's global random number generator, any other code that makes a call to it would affect the state of the generator. There weren't that many Go packages outside the standard library that the gambling code utilized. After searching the Go codebase a bit, however, I did find a couple noticeable places that make calls to the global random number generator. One which seemed significant was in the Go DNS resolution logic. The following, condensed code snippet is a function inside `net/dnsclient_unix.go`:
+The production app ran in a Linux based Docker container, so I ran the app locally inside the same Docker container configuration. This setup produced noticeably different behavior regarding the way the app generated random numbers. By executing gambles continuously, I was able to observe the current generation of the random number generator. For every gamble execution, I would check to see if the RNG skipped a single generation. It appeared that, ***at a roughly fixed interval, about every 30 seconds or so, the RNG would skip forward, on average, around 12-13 generations***. This seemed odd. Since the app uses Go's global random number generator, any other code that makes a call to it would affect the state of the generator. There weren't that many Go packages outside the standard library that the gambling code utilized. After searching the Go codebase a bit, however, I did find a couple noticeable places that make calls to the global random number generator. One which seemed significant was in the Go DNS resolution logic. The following, condensed code snippet is a function inside `net/dnsclient_unix.go`:
 
 {% highlight go linenos %}
 // exchange sends a query on the connection and hopes for a response.
@@ -536,7 +511,7 @@ This was ultimately successful. Even with occasional losses, or unexpected blips
 
 # Concluding Thoughts
 
-For me, this was an interesting exploration of Go's random number generator and some of its unexpected behaviors. Typically, default random number generators are considered insecure, but I wanted to see what it would actually take to beat one that uses a non-trivial algorithm. It turned out to be a good exercise in debugging, programming, and penetration testing. For those interested, there is a somewhat random collection of code that I used throughout this process located [here](https://github.com/will62794/go_prng_cracker). They are mostly one-off scripts and probably can't be used for anything general purpose, but they represent a dump of the tools I used during this hacking process.
+For me, this was an interesting exploration of Go's random number generator and some of its unexpected behaviors. Typically, default random number generators are considered insecure, but I wanted to see what it would actually take to beat one that uses a non-trivial algorithm. It turned out to be a good exercise in programming, debugging, and penetration testing. For those interested, there is a somewhat random collection of code that I used throughout this process located [here](https://github.com/will62794/go_prng_cracker). They are mostly one-off scripts and probably can't be used for anything general purpose, but they represent a dump of the tools I used during this hacking process. Also, you can view the original app source code [here](https://github.com/c0nrad/mongobucks).
 
 
 
