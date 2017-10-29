@@ -107,7 +107,7 @@ If I could figure out the initial seed, I would then have a way to produce the e
 First, I considered the following hypothesis. If the server has been restarted a few times over the course of the app's lifetime, there should be positions within $$GambleSeq$$ where the sequence was reseeded. If I could find the most recent reseed point, and its seed, then I would be able to predict all future outputs of $$GambleSeq$$ by continuing from the reseed point. 
 
 <!-- Random Number Sequence Prefix Diagram -->
-<svg height="120" width="800" style="background-color:rgb(241,241,241);">
+<svg height="120" width="850" style="background-color:rgb(241,241,241);">
   <text x="10" y="50" style="font-size:20px;">
     <tspan y="50">  GambleSeq </tspan>
     <tspan x="10" dy="1.8em" style="font-size:16px;font-family:monospace;">
@@ -125,7 +125,7 @@ First, I considered the following hypothesis. If the server has been restarted a
 To find these seed points within the sequence, I tried to use prefixes of random number sequences as a way to "fingerprint" a random sequence. Since there are only $$2^{31}-1$$ unique seeds, there must be no more than $$2^{31}-1$$ unique random number sequences. So, each sequence should have a unique 31-bit prefix.
 
 <!-- Random Number Sequence Prefix Diagram -->
-<svg height="240" width="800" style="background-color:rgb(241,241,241);">
+<svg height="240" width="850" style="background-color:rgb(241,241,241);">
   <text x="10" y="60" style="font-size:16px;font-family:monospace;">
     <tspan y="30"> Seed &#160;&#160;&#160;&#160;&#160;&#160; Sequence Produced By Seed </tspan>
   </text>
@@ -385,7 +385,7 @@ So, I had a satisfactory explanation for the random interference I was observing
 I now had what seemed like a complete understanding of how the random number sequences I observed were begin generated. My model was as follows:
 
 <!-- Random Number Sequence with Skips Diagram -->
-<svg height="140" width="800" style="background-color:rgb(241,241,241);">
+<svg height="140" width="850" style="background-color:rgb(241,241,241);">
 
   <text x="505" y="35" style="font-size:13px;">
     <tspan x="378" y="28">Internal Skips</tspan>

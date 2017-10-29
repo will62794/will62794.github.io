@@ -127,10 +127,10 @@ blockquote {
  */
 pre,
 code {
-    font-size: 15px;
-    border: 1px solid $grey-color-light;
-    border-radius: 3px;
-    background-color: #eef;
+    // border: 1px solid $grey-color-light;
+    // background-color: #eef;
+    font-size: 14px;
+    border-radius: 8px;
 }
 
 code {
@@ -139,7 +139,7 @@ code {
 
 pre {
     padding: 8px 12px;
-    overflow-x: scroll;
+    // overflow-x: scroll;
 
     > code {
         border: 0;

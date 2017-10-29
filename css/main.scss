@@ -6,10 +6,10 @@
 
 
 // Our variables
-$base-font-family: Hind, Titillium Web, Arial, sans-serif;
-$base-font-size:   19px;
+$base-font-family: "Hind", Hind, Titillium Web, Arial, sans-serif;
+$base-font-size:   16px;
 $small-font-size:  $base-font-size * 0.875;
-$base-line-height: 1.5;
+$base-line-height: 1.4;
 
 $spacing-unit:     30px;
 
@@ -22,7 +22,7 @@ $grey-color-light: lighten($grey-color, 40%);
 $grey-color-dark:  darken($grey-color, 25%);
 
 // Width of the content area
-$content-width:    850px;
+$content-width:    900px;
 
 $on-palm:          600px;
 $on-laptop:        800px;
