@@ -13,5 +13,5 @@ collections:
   projects:
     output: true
   posts:
-gems:
+plugins:
   - jekyll-sitemap
