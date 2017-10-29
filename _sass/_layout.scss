@@ -529,9 +529,18 @@
 }
 
 .postBox{
+	font-size:20px;
+	color:#222;
 	width:98%;
 	min-height:80px;
 	max-height:120px;
+	padding-left:10px;
+}
+.postBox:hover{
+}
+
+.postBox > .date{
+	color:#555;
 }
 
 #aboutImage{
