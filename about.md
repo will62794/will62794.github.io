@@ -4,12 +4,6 @@ title: About
 permalink: /about/
 ---
 
-<!-- <div id="aboutImage">
-<img src="/assets/me_cali_1_sized.jpg" width="px" />
-</div>
- -->
-<br>
-
 My name is Willy Schultz. I am currently working as a software engineer at MongoDB in NYC on their database replication system. Before that I studied at Cornell University and graduated in 2016. My interests recently have been focused on distributed systems and formal methods, specifically the TLA+ specification language.
 
 <!-- I like building, designing, and thinking about technology. My engineering background began with building things out of wood and foam in my dad's machine shop, and from there I moved on to CNC machining, electronics prototyping, and, in the past few years, software engineering and mathematics.

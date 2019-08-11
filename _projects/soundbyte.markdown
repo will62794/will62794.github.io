@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: project
 title:  "Soundbyte"
 subtitle: "iOS App for Sending Sound Clip Messages"
@@ -22,3 +22,4 @@ Soundbyte is an iOS app I built that provides a super simple way to send sound c
 
 
 
+ -->

@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: project
 title:  "LiveSportzCG"
 subtitle: "Mac Application for Sportzcast, LLC"
@@ -20,3 +20,4 @@ Sportzcast has been in beta testing with the Mac version of the application and 
 
 
 
+ -->
