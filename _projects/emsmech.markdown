@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: project
 title:  "emsmechanical.com"
 subtitle: "Web Portfolio for Electro Mechanical Systems"
@@ -29,3 +29,4 @@ This was a website I built for Electro Mechanical Systems, a small business in S
 
 
 
+ -->
