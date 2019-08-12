@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: project
 title:  "resourcewater.org"
 subtitle: "Educational Resource Website"
@@ -31,3 +31,4 @@ thumbnail: "waternewcover.jpg"
 
 
 
+ -->
