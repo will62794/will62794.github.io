@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: project
 title:  "Digital Buzzer System"
 subtitle: "12 player Quiz Bowl Machine"
@@ -22,3 +22,4 @@ This project was built for my high school Latin Club, who participated in Quiz B
 
 
 
+ -->

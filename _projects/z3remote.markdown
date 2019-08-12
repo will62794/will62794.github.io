@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: project
 title:  "Sportzcast Encoder Control System"
 subtitle: "Inegrating Sportzcast's Live Score service into Linux Video Encoding Boards"
@@ -25,3 +25,4 @@ Web Interface:
 
 
 
+ -->
