@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TLA+ Trace Visualizer</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<!-- <script src="js/jquery.min.js"></script> -->
+</head>
+<body>
+
+<style type="text/css">
+	body{
+		font-family: sans-serif;
+	}
+	div{
+		padding: 10px;
+	}
+</style>
+
+<div id="container" style="text-align:center;">
+
+	<h2>TLA+ Trace Animator</h2>
+
+	<!-- Text area for pasting SVG frames. -->
+	<div style="text-align: center;margin:auto;">
+		<textarea id="textdrop" cols=60 rows=20 placeholder="Paste SVG Frames Here" style="font-size:16px;"></textarea>
+	</div>
+		
+	<!-- <svg id="svgBox" width="40%" viewBox="0 0 100 90" style="border:solid;float:right"> -->
+	<div style="margin:auto">
+		<svg id="svgBox" width="50%" height="500px" style="border:solid; border-width: 1px; border-color:lightgray; visibility: hidden">
+		</svg>
+	</div>
+
+	<!-- Control Buttons and Frame Info -->
+	<button id="prevBtn">Prev Frame</button>
+	<button id="nextBtn">Next Frame</button>
+	<div id="frameNum"></div>
+
+</div>
+
+
+<script type="text/javascript">
+	let frameElems = $("g.frame");
+	let currFrame = 0;
+	let maxFrame = frameElems.length;
+
+	function init(){
+		frameElems = $("g.frame");
+		currFrame = 0;
+		maxFrame = frameElems.length;
+	}
+
+	$("#textdrop").on('input', function(ev) {
+	    var text = $("#textdrop").val();
+		$("#svgBox").html(text);
+		console.log("text area input changed.");
+
+		// Hide the text area input and show the SVG viewer.
+		$(this).hide();
+		init();
+		reload();
+		$("#svgBox").css("visibility", "visible");
+
+	});
+
+	function reload(){
+		frameElems.each(function(index){
+			let gid = $(this).attr("id");
+			if(index == currFrame){
+				$(this).attr("visibility", "visible");
+				console.log("Activating Frame " + gid);
+			} else{
+				$(this).attr("visibility", "hidden");
+			}
+		});
+		$("#frameNum").html("Frame Number: "+ currFrame);
+	}
+
+	// Set the current frame to the given index. If an out of bound frame index is given, we take the
+	// index modulo the maximum frame index.
+	function setFrame(frameInd){
+		currFrame = frameInd % maxFrame;
+		reload();
+	}
+
+
+	function advanceFrame(){
+		currFrame = (currFrame + 1) % maxFrame;
+		reload();
+	}
+
+	function prevFrame(){
+		if(currFrame - 1 < 0){
+			currFrame = maxFrame - 1;
+		} else{
+			currFrame = currFrame - 1;
+		}
+		reload();
+	}
+
+	$(document).keydown(function(e) {
+    switch(e.which) {
+        case 37: // left
+        	prevFrame();
+        	break;
+
+        case 39: // right
+        	advanceFrame();
+        	break;
+
+        default: return; // exit this handler for other keys
+    }
+	    e.preventDefault(); // prevent the default action (scroll / move caret)
+	});
+
+	$("#nextBtn").click(advanceFrame);
+	$("#prevBtn").click(prevFrame);
+
+	reload();
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
