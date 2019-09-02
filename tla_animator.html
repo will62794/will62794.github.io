@@ -27,7 +27,7 @@
 		
 	<!-- <svg id="svgBox" width="40%" viewBox="0 0 100 90" style="border:solid;float:right"> -->
 	<div style="margin:auto">
-		<svg id="svgBox" width="50%" height="500px" style="border:solid; border-width: 1px; border-color:lightgray; visibility: hidden">
+		<svg id="svgBox" width="50%" height="500px" viewBox="0 0 300 300" style="border:solid; border-width: 1px; border-color:lightgray; visibility: hidden">
 		</svg>
 	</div>
 
@@ -40,20 +40,29 @@
 
 
 <script type="text/javascript">
-	let frameElems = $("g.frame");
+	let frameClass = "tlaframe";
+	let frameElems = $("g." + frameClass);
 	let currFrame = 0;
 	let maxFrame = frameElems.length;
 
 	function init(){
-		frameElems = $("g.frame");
+		frameElems = $("g." + frameClass);
 		currFrame = 0;
 		maxFrame = frameElems.length;
+		console.log("Initialized animation. Current frame: " + currFrame + ", Total Frames: " + maxFrame);
 	}
 
 	$("#textdrop").on('input', function(ev) {
 	    var text = $("#textdrop").val();
-		$("#svgBox").html(text);
-		console.log("text area input changed.");
+
+		// The pasted text should be a TLA+ sequence (tuple) of records, where each record has
+		// one key-value pair, whose value is the SVG element for that frame. We pull out all lines 
+		// that contain an SVG frame string.
+		frameLines = text.split("\n").filter(line => line.includes(frameClass));
+		frames = frameLines.map(line => line.split("|->").pop());
+		framesText = frames.join("");
+
+		$("#svgBox").html(framesText);
 
 		// Hide the text area input and show the SVG viewer.
 		$(this).hide();
@@ -68,12 +77,12 @@
 			let gid = $(this).attr("id");
 			if(index == currFrame){
 				$(this).attr("visibility", "visible");
-				console.log("Activating Frame " + gid);
 			} else{
 				$(this).attr("visibility", "hidden");
 			}
 		});
 		$("#frameNum").html("Frame Number: "+ currFrame);
+		console.log("Current frame: " + currFrame);
 	}
 
 	// Set the current frame to the given index. If an out of bound frame index is given, we take the
