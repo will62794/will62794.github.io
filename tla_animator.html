@@ -41,12 +41,17 @@
 
 <script type="text/javascript">
 	let frameClass = "tlaframe";
-	let frameElems = $("g." + frameClass);
+	let frameElems = $([]); // stores all SVG frame elements.
 	let currFrame = 0;
 	let maxFrame = frameElems.length;
 
 	function init(){
-		frameElems = $("g." + frameClass);
+		// children = ;
+		// console.log(children);
+		// We expect that first level <g> child that lives inside the SVG box is its own frame. This is a simple convention 
+		// that makes the contract between the TLA+ toolbox and this web animator tool simpler. The only thing 
+		// the toolbox needs to export is a sequence of <g> elements, where each one is an animation frame.
+		frameElems = $("#svgBox > g"); // gets all first-level children.		
 		currFrame = 0;
 		maxFrame = frameElems.length;
 		console.log("Initialized animation. Current frame: " + currFrame + ", Total Frames: " + maxFrame);
@@ -56,9 +61,13 @@
 	    var text = $("#textdrop").val();
 
 		// The pasted text should be a TLA+ sequence (tuple) of records, where each record has
-		// one key-value pair, whose value is the SVG element for that frame. We pull out all lines 
-		// that contain an SVG frame string.
-		frameLines = text.split("\n").filter(line => line.includes(frameClass));
+		// one key-value pair, whose value is the SVG element for that frame. We expect
+		// that the record has been filtered to only include the view expression, so we 
+		// pull out all lines that contain a record delimiter. We might want to eventually
+		// make this a regex that properly matches and extracts key-value pairs from a TLA+
+		// record, but for now this will do the job.
+		tlaRecordDelim = "|->";
+		frameLines = text.split("\n").filter(line => line.includes(tlaRecordDelim));
 		frames = frameLines.map(line => line.split("|->").pop());
 		framesText = frames.join("");
 
