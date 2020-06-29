@@ -5,14 +5,43 @@ permalink: /posts/
 ---
 
 {% assign posts = site.posts | sort: 'year' %}
+
+
+<!-- The post list -->
+
+<ul class="post-list">
+  {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+  {%- for post in posts -%}
+  <li>
+    <span class="post-meta">{{ post.date | date: date_format }}</span>
+    <h3>
+      <a class="post-link" href="{{ post.url | relative_url }}">
+        {{ post.title | escape }}
+      </a>
+    </h3>
+    {%- if site.show_excerpts -%}
+      {{ post.excerpt }}
+    {%- endif -%}
+  </li>
+  {%- endfor -%}
+</ul>
+
+
+
+
 {% for post in posts %}
 
-<a href="{{ post.url | prepend: site.baseurl }}">
+<!-- <a href="{{ post.url | prepend: site.baseurl }}">
 	<div class="postBox">
 		<div class="">{{post.title}}</div>
-		<small class="date">{{ post.date | date: '%B %d, %Y' }}</small>
+		        <h3>
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title | escape }}
+          </a>
+        </h3>
+		<span class="post-meta">{{ post.date | date: '%B %d, %Y' }}</span>
 	</div>
-</a>
+</a> -->
 
 <!--a class="post-link" href="{{ project.url | prepend: site.baseurl }}"-->
 
