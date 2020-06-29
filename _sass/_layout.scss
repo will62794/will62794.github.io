@@ -1,5 +1,7 @@
 @import url(http://fonts.googleapis.com/css?family=Titillium+Web:400,300,200);
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400);
+@import url(http://fonts.googleapis.com/css?family=Source+Serif+Pro:200,300,400);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:200,300,400);
 @import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);
 @import url(http://fonts.googleapis.com/css?family=Ubuntu);
 
@@ -66,11 +68,10 @@
 }
 
 .site-nav {
-	font-size:18px;
-	// font-family: sans-serif;
+	font-size:14px;
 	margin-top: 20px;
 	margin:auto;
-	text-align:right;
+	text-align:left;
 
 	.menu-icon {
 		display: none;
@@ -84,7 +85,7 @@
 		letter-spacing: 0px;
 
 
-		padding-left:15px;
+		padding-left:0px;
 		padding-right:23px;
 		padding-bottom:1px;
 
