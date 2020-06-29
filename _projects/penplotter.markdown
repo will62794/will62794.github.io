@@ -20,7 +20,6 @@ Currently, the plotter uses a control board made by Synthetos.com called the Tin
 
 
 
-
 ![alt text](/assets/yaxis1.jpg)
 
 ![alt text](/assets/controlboard2.jpg)

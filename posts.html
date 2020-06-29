@@ -7,12 +7,12 @@ permalink: /posts/
 {% assign posts = site.posts | sort: 'year' %}
 {% for post in posts %}
 
-	<a href="{{ post.url | prepend: site.baseurl }}">
-		<div class="postBox">
-			<div class="">{{post.title}}</div>
-			<small class="date">{{ post.date | date: '%B %d, %Y' }}</small>
-		</div>
-	</a>
+<a href="{{ post.url | prepend: site.baseurl }}">
+	<div class="postBox">
+		<div class="">{{post.title}}</div>
+		<small class="date">{{ post.date | date: '%B %d, %Y' }}</small>
+	</div>
+</a>
 
 <!--a class="post-link" href="{{ project.url | prepend: site.baseurl }}"-->
 
