@@ -9,20 +9,20 @@
 $base-font-family: -apple-system, Helvetica, arial, sans-serif;;
 $base-font-size:   16px;
 $small-font-size:  $base-font-size * 0.875;
-$base-line-height: 1.6;
+$base-line-height: 1.5;
 
 $spacing-unit:     10px;
 
-$text-color:       #37474f;
+$text-color:       #333;
 $background-color: #fdfdfd;
-$brand-color:      #1d3147;
+$brand-color:      #111;
 
 $grey-color:       #828282;
 $grey-color-light: lighten($grey-color, 40%);
 $grey-color-dark:  darken($grey-color, 25%);
 
 // Width of the content area
-$content-width:    900px;
+$content-width:    800px;
 
 $on-palm:          600px;
 $on-laptop:        800px;

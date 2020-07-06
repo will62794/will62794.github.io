@@ -6,7 +6,7 @@ categories: electronics hardware reverse-engineering
 thumbnail: "scoreboardcover4.jpg"
 ---
 
-During my first year at Cornell, I worked as a cameraman for the athletics department on the weekends, filming sports games so they could be streamed online. Basketball was one of the sports we covered, and we didn't really have a good way of overlaying statistics from the game (score, clock, fouls, etc.) onto our video stream in real time. I figured we could try to decode the signals coming out of the scoreboard controller box, the one that drove the main arena scoreboard, and convert them into a data format that we could then use to develop a graphic overlay on our live video stream. The  basketball stadium uses a Fairplay MP-69D scoreboard controller, which I reverse engineered by analyzing the raw signal on digital oscilloscope.
+During my first year at Cornell, I worked as a cameraman for the athletics department on the weekends, filming sports games so they could be streamed online. Basketball was one of the sports we covered, and we didn't really have a good way of overlaying statistics from the game (score, clock, fouls, etc.) onto our video stream in real time. I figured we could try to decode the signals coming out of the scoreboard controller box, the one that drove the main arena scoreboard, and convert them into a data format that we could then use to develop a graphic overlay on our live video stream. The  basketball stadium uses a Fairplay MP-69D scoreboard controller, which I reverse engineered by analyzing its output signal on a digital oscilloscope.
 
 <img height="300px" src="/assets/fairplayweb.jpg" style="float:left;margin:4px;">
 
