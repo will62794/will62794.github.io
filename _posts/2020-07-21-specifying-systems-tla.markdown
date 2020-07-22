@@ -4,8 +4,6 @@ title:  "Specifications and Properties in TLA+"
 categories: tlaplus formal-methods refinement
 ---
 
-When people are first learning about how to use TLA+ to model and verify systems, I have found that there is often a confusion related to the distinction between a *specification* and a *property*. I also struggled with this concept when first learning TLA+ and I think it was one of the more important hurdles in understanding how to model systems in a mathematical, declarative way. Below is an explanation of my current understanding of the topic in an effort to clarify some of the surrounding confusion for myself and others.
-
 Temporal logic, which TLA+ is based on, provides a way to describe properties about behaviors, where a behavior is just an infinite sequence of states. We could call these "temporal properties" or, more simply, "properties".  You can classify certain properties as "safety" or "liveness" properties, but those are just categorizations within the general space of properties you might care about. Roughly, a safety property is one that is violated by a finite behavior (a behavior prefix), and a liveness property is one that is violated by an infinite behavior. The paper [*Defining Liveness*](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf) is a bit old but I think it gives clear, formal definitions of this.
 
 In TLA+, there are basically two things you might use a temporal property for:
@@ -46,7 +44,11 @@ $$\begin{align}&\wedge x=0 \\ &\wedge x' \neq x\end{align}$$
 
 but it is unclear how you would sensibly go about enumerating the allowed transitions (e.g. there might be an infinite number of them). Nevertheless, it's a perfectly sensible mathematical question to ask if a particular pair of values satisfies the relation i.e. $$(x=0, x'=\sqrt{-1})$$ satisfies our relation, even though it might make little sense for a real system that we would want to specify or build.
 
-For the case of **verification**, you also define a temporal property (or several), but these are properties that you typically want to verify are true, given the definition of your system by the initial state and next state predicate. If you think about your system specification as a set of  allowable behaviors, $$B$$, and a correctness property, similarly, as a set of behaviors $$P$$ which satisfy the property, then verification (e.g. model checking) is about ensuring that all behaviors of $$B$$ lie within $$P$$ i.e. $$B \subseteq P$$.
+For the case of **verification**, you also define a temporal property (or several), but these are properties that you typically want to verify are true, given the definition of your system by the initial state and next state predicate. If you think about your system specification as a set of  allowable behaviors, $$B$$, and a correctness property, similarly, as a set of behaviors $$P$$ which satisfy the property, then verification (e.g. model checking) is about checking that all behaviors of $$B$$ lie within $$P$$ i.e. $$B \subseteq P$$. Alternatively, we can express this in TLA+ as 
+
+$$ Spec \Rightarrow P$$
+
+where $$Spec$$ is the specification of your system and $$P$$ is a temporal property you want to check. The goal of verification is to check the truth of the above formula.
 
 The elegant aspect of TLA+ is that there is no fundamental distinction between temporal properties used for defining the behavior of your system (specification) and stating correctness properties of your system (verification). In the abstract, they are the same conceptual objects i.e. temporal properties. We just intepret them differently depending on the context e.g. for specification versus verification.
 
