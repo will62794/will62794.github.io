@@ -42,9 +42,9 @@ as valid pairs i.e. allowed transitions. To illustrate the generality of this ma
 
 $$\begin{align}&\wedge x=0 \\ &\wedge x' \neq x\end{align}$$ 
 
-but it is unclear how you would sensibly go about enumerating the allowed transitions (e.g. there might be an infinite number of them). Nevertheless, it's a perfectly sensible mathematical question to ask if a particular pair of values satisfies the relation i.e. $$(x=0, x'=\sqrt{-1})$$ satisfies our relation, even though it might make little sense for a real system that we would want to specify or build.
+but it is unclear how you would go about enumerating the allowed transitions (e.g. there might be an infinite number of them). Nevertheless, it's a perfectly sensible mathematical question to ask if a particular pair of values satisfies the relation i.e. $$(x=0, x'=\sqrt{-1})$$ satisfies our relation, even though it might make little sense for a real system that we would want to specify or build.
 
-For the case of **verification**, you also define a temporal property (or several), but these are properties that you typically want to verify are true, given the definition of your system by the initial state and next state predicate. If you think about your system specification as a set of  allowable behaviors, $$B$$, and a correctness property, similarly, as a set of behaviors $$P$$ which satisfy the property, then verification (e.g. model checking) is about checking that all behaviors of $$B$$ lie within $$P$$ i.e. $$B \subseteq P$$. Alternatively, we can express this in TLA+ as 
+For the case of **verification**, you also define a temporal property (or several), but these are properties that you typically want to verify are true, given the definition of your system by an initial state and next state relation. If you think about your system specification as a set of  allowable behaviors, $$B$$, and a correctness property, similarly, as a set of behaviors $$P$$ which satisfy the property, then verification (e.g. model checking) is about checking that all behaviors of $$B$$ lie within $$P$$ i.e. $$B \subseteq P$$. Alternatively, we can express this in TLA+ as 
 
 $$ Spec \Rightarrow P$$
 
