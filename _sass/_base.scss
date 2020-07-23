@@ -88,11 +88,11 @@ h1, h2, h3, h4, h5, h6 {
  * Links
  */
 a {
-    text-decoration: underline;
+    text-decoration: none;
     color: lighten($brand-color, 10%);
 
     &:visited {
-        color: lighten($brand-color, 30%);
+        color: lighten($brand-color, 20%);
     }
 
     &:hover {
