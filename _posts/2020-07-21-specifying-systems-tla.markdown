@@ -34,7 +34,7 @@ And shortly after:
 
 Here's a [link](https://archive.computerhistory.org/resources/access/text/2017/07/102717246-05-01-acc.pdf) to the full transcript of the interview. If I understand Lamport's points here accurately, this speaks to the motivation behind TLA+ and why it adopted a "transition relation" approach for specifying systems, since it works well in practice, and also seems to match our intuitive understanding of how systems actually work in the real world i.e. they take discrete steps to evolve their state according to some rules.
 
-One point that's important to remember is that even though we might model a system in TLA+ as a state machine using an initial state and next state relation, a specification is just a mathematical formula. It cannot be "executed". It is simply a declaration about what behaviors are permitted by a system. This tripped me up when first learning TLA+ because I would see actions written like 
+One important point to remember is that even though we model a system in TLA+ as a state machine using an initial state and next state relation, a specification is just a mathematical formula. It cannot be "executed". It is simply a declaration about what behaviors are permitted by a system. This tripped me up when first learning TLA+ because I would see actions written like 
 
 $$\begin{align}&\wedge x=0 \\ &\wedge x' = x + 1\end{align}$$ 
 
@@ -61,7 +61,7 @@ For the case of **verification**, you also define a temporal property (or severa
 
 $$ Spec \Rightarrow P$$
 
-where $$Spec$$ is the specification of your system and $$P$$ is a temporal property you want to check. The goal of verification is to check the truth of the above formula.
+where $$Spec$$ is the specification of your system and $$P$$ is a temporal property you want to check. Generally, the goal of verification is to check the truth of the above formula.
 
 The elegant aspect of TLA+ is that there is no fundamental distinction between temporal properties used for defining the behavior of your system (specification) and stating correctness properties of your system (verification). In the abstract, they are the same conceptual objects i.e. temporal properties. We just intepret them differently depending on the context e.g. for specification versus verification.
 
