@@ -4,14 +4,16 @@ title:  "Specifications and Properties in TLA+"
 categories: tlaplus formal-methods refinement
 ---
 
-Temporal logic, which TLA+ is based on, provides a way to describe properties about behaviors, where a behavior is an infinite sequence of states. We could call these "temporal properties" or, more simply, "properties".  You can classify certain properties as "safety" or "liveness" properties, but those are just categorizations within the general space of properties you might care about. Roughly, a safety property is one that is violated by a finite behavior (a behavior prefix), and a liveness property is one that is violated by an infinite behavior. The paper [*Defining Liveness*](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf) is a bit old but I think it gives clear, formal definitions of this.
+Temporal logic, which TLA+ is based on, provides a way to describe properties about behaviors, where a behavior is an infinite sequence of states. We could call these *temporal properties* or, more simply, *properties*.  You can classify certain properties as *safety* or *liveness* properties, but those are just categorizations within the general space of properties you might care about. Roughly, a safety property is one that is violated by a finite behavior (a behavior prefix), and a liveness property is one that is violated by an infinite behavior. The paper [*Defining Liveness*](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf) is a bit old but I think it gives clear, formal definitions of this.
 
 In TLA+, there are basically two things you might use a temporal property for:
 
-1. Defining the allowed behaviors of your system (**specification**).
-2. Defining what it means for your system to be correct (**verification**). 
+1. Defining the allowed behaviors of your system (used for **specification**)
+2. Defining what it means for your system to be correct (used for **verification**) 
 
-These serve two distinct purposes but they both utilize the same conceptual tool i.e you define both of these using temporal properties. 
+These serve two distinct purposes but they both utilize the same conceptual tool i.e you define both of these using temporal properties. We might alternately refer to use case 1 as *modeling*, but we'll use the term *specification*.
+
+# Specification: Modeling Your System
 
 For the case of **specification**, you can think about defining your system as the set of all behaviors that satisfy a certain temporal property. When you write a specification as 
 
@@ -32,7 +34,7 @@ And shortly after:
 
 Here's a [link](https://archive.computerhistory.org/resources/access/text/2017/07/102717246-05-01-acc.pdf) to the full transcript of the interview. If I understand Lamport's points here accurately, this speaks to the motivation behind TLA+ and why it adopted a "transition relation" approach for specifying systems, since it works well in practice, and also seems to match our intuitive understanding of how systems actually work in the real world i.e. they take discrete steps to evolve their state according to some rules.
 
-One other point that's important to remember here is that even though we might model a system in TLA+ as a state machine using an initial state and next state relation, a specification is just a mathematical formula. It cannot be "executed". It is simply a declaration about what behaviors are permitted by a system. This tripped me up when first learning TLA+ because I would see actions written like 
+One point that's important to remember is that even though we might model a system in TLA+ as a state machine using an initial state and next state relation, a specification is just a mathematical formula. It cannot be "executed". It is simply a declaration about what behaviors are permitted by a system. This tripped me up when first learning TLA+ because I would see actions written like 
 
 $$\begin{align}&\wedge x=0 \\ &\wedge x' = x + 1\end{align}$$ 
 
@@ -40,11 +42,11 @@ and think of them like standard variable assignment in a programming language, b
 
 $$\begin{align}&\wedge x=0 \\ &\wedge x' \in \{1,2\}\end{align}$$ 
 
-where you can't apply the same mental model. Rather, you have to think about the set of all pairs $$(x,x')$$ that satisfy the given mathematical relation i.e. in the last case above we would have 
+where you can't apply the same mental model. Rather, you have to think about the set of all pairs $$(x, x')$$ that satisfy the given mathematical relation i.e. in the above case we would have 
 
 $$
-(x=0,x'=1) \\
-(x=0,x'=2)
+(x=0, x'=1) \\
+(x=0, x'=2)
 $$
 
 as valid pairs i.e. allowed transitions. To illustrate the generality of this mathematical approach, though, we can go further and consider a transition relation where it's not obvious how we would even enumerate the transitions of the relation. For example, it is valid to write a next state relation like
@@ -52,6 +54,8 @@ as valid pairs i.e. allowed transitions. To illustrate the generality of this ma
 $$\begin{align}&\wedge x=0 \\ &\wedge x' \neq x\end{align}$$ 
 
 but it is unclear how you would go about enumerating the allowed transitions (e.g. there might be an infinite number of them). Nevertheless, it's a perfectly sensible mathematical question to ask if a particular pair of values satisfies the relation i.e. $$(x=0, x'=\sqrt{-1})$$ satisfies our relation, even though it might make little sense for a real system that we would want to specify or build.
+
+# Verification: Checking Your System
 
 For the case of **verification**, you also define a temporal property (or several), but these are properties that you typically want to verify are true, given the definition of your system by an initial state and next state relation. If you think about your system specification as a set of  allowable behaviors, $$B$$, and a correctness property, similarly, as a set of behaviors $$P$$ which satisfy the property, then verification (e.g. model checking) is about checking that all behaviors of $$B$$ lie within $$P$$ i.e. $$B \subseteq P$$. Alternatively, we can express this in TLA+ as 
 
@@ -67,5 +71,5 @@ It is worth making one additional note about liveness and fairness properties. W
 
 $$Init \wedge \square[Next]_{vars} \wedge Liveness$$
 
-where $$Liveness$$ is an additional temporal property. In TLA+, however, this additional temporal property, by convention, must take on a very specific form. That is, it specifies fairness properties of your system i.e. what the system "must" do, as opposed to what it "can" do. These fairness constraints are just a temporal property with particular characteristics. If you allowed $$Liveness$$ to be an arbitrary temporal property, you could get into cases where you try to define a system that doesn’t make sense or couldn’t actually be implemented. This is discussed in the concept of "machine closure", in *[Specifying Systems](https://lamport.azurewebsites.net/tla/book.html)* and [elsewhere](https://lamport.azurewebsites.net/tla/safety-liveness.pdf). My understanding is that, in TLA+, if you always write your liveness property as a conjunction of weak/strong fairness constraints (the definitions of which are also discussed elsewhere), then your spec will always be machine closed, which means that the liveness conjunct "constrains neither the initial state nor what steps may occur" (a quote from *Specifying Systems* section 8.9.2). I think of this like a "scheduling constraint" i.e. it just says what must eventually happen, not what is allowed to happen, and it doesn't get you into trouble with making your liveness property "too strong" such that it affects the behavior of your system as specified in awkward or undesirable ways.
+where $$Liveness$$ is an additional temporal property. In TLA+, however, this additional temporal property, by convention, must take on a very specific form. That is, it specifies fairness properties of your system i.e. what the system "must" do, as opposed to what it "can" do. These fairness constraints are just a temporal property with particular characteristics. If you allowed $$Liveness$$ to be an arbitrary temporal property, you could get into cases where you try to define a system that doesn’t make sense or couldn’t actually be implemented. This is discussed in the concept of *machine closure*, in *[Specifying Systems](https://lamport.azurewebsites.net/tla/book.html)* and [elsewhere](https://lamport.azurewebsites.net/tla/safety-liveness.pdf). My understanding is that, in TLA+, if you always write your liveness property as a conjunction of weak/strong fairness constraints (the definitions of which are also discussed elsewhere), then your spec will always be machine closed, which means that the liveness conjunct "constrains neither the initial state nor what steps may occur" (a quote from *Specifying Systems* section 8.9.2). I think of this like a scheduling constraint i.e. it says what must eventually happen, not what is allowed to happen, and it doesn't get you into trouble with making your liveness property too strong such that it affects the behavior of your system as specified in awkward or undesirable ways.
 
