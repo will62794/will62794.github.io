@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Cracking Golang's PRNG For Fun and (Virtual) Profit
+title:  Cracking Go's PRNG For Fun and (Virtual) Profit
 date:   2017-06-30 12:00:00
 categories: security hacking
 ---
