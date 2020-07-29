@@ -4,7 +4,7 @@ title:  "Specifications and Properties in TLA+"
 categories: tlaplus formal-methods refinement
 ---
 
-Temporal logic, which TLA+ is based on, provides a way to describe properties about behaviors, where a behavior is an infinite sequence of states. We could call these *temporal properties* or, more simply, *properties*.  You can classify certain properties as *safety* or *liveness* properties, but those are just categorizations within the general space of properties you might care about. Roughly, a safety property is one that is violated by a finite behavior (a behavior prefix), and a liveness property is one that is violated by an infinite behavior. The paper [*Defining Liveness*](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf) is a bit old but I think it gives clear, formal definitions of this.
+Temporal logic, which TLA+ is based on, provides a way to describe properties about behaviors, where a behavior is an infinite sequence of states. We could call these *temporal properties* or, more simply, *properties*.  You can classify certain properties as *safety* or *liveness* properties, but those are just categorizations within the general space of properties you might care about. Roughly, a safety property is one that is violated by a finite behavior (a behavior prefix), and a liveness property is one that is violated by an infinite behavior. The paper [*Defining Liveness*](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf) gives clear, formal definitions of this.
 
 In TLA+, there are basically two things you might use a temporal property for:
 
@@ -15,7 +15,7 @@ These serve two distinct purposes but they both utilize the same conceptual tool
 
 # Specification: Modeling Your System
 
-For the case of **specification**, you can think about defining your system as the set of all behaviors that satisfy a certain temporal property. When you write a specification as 
+For the task of **specification**, you can think about defining your system as the set of all behaviors that satisfy a certain temporal property. When you write a specification as 
 
 $$ Init \wedge \square[Next]_{vars}$$ 
 
@@ -49,15 +49,15 @@ $$
 (x=0, x'=2)
 $$
 
-as valid pairs i.e. allowed transitions. To illustrate the generality of this mathematical approach, though, we can go further and consider a transition relation where it's not obvious how we would even enumerate the transitions of the relation. For example, it is valid to write a next state relation like
+as valid pairs i.e. allowed transitions. To illustrate the generality of this mathematical approach we can go further and, for example, consider transition relations where it's not obvious how we would even enumerate the transitions of the relation. It is valid to write a next state relation like
 
 $$\begin{align}&\wedge x=0 \\ &\wedge x' \neq x\end{align}$$ 
 
-but it is unclear how you would go about enumerating the allowed transitions (e.g. there might be an infinite number of them). Nevertheless, it's a perfectly sensible mathematical question to ask if a particular pair of values satisfies the relation i.e. $$(x=0, x'=\sqrt{-1})$$ satisfies our relation, even though it might make little sense for a real system that we would want to specify or build.
+but it is unclear how you would go about enumerating the allowed transitions. Nevertheless, it's a perfectly sensible mathematical question to ask if a particular pair of values satisfies the relation i.e. $$(x=0, x'=\sqrt{-1})$$ satisfies our relation, even though it might make little sense for a real system that we would want to specify or build.
 
 # Verification: Checking Your System
 
-For the case of **verification**, you also define a temporal property (or several), but these are properties that you typically want to verify are true, given the definition of your system by an initial state and next state relation. If you think about your system specification as a set of  allowable behaviors, $$B$$, and a correctness property, similarly, as a set of behaviors $$P$$ which satisfy the property, then verification (e.g. model checking) is about checking that all behaviors of $$B$$ lie within $$P$$ i.e. $$B \subseteq P$$. Alternatively, we can express this in TLA+ as 
+For the task of **verification**, you also define a temporal property (or several), but these are properties that you typically want to verify are true given the definition of your system by an initial state and next state relation. If you think about your system specification as a set of  allowable behaviors, $$B$$, and a correctness property, similarly, as a set of behaviors $$P$$ which satisfy the property, then verification (e.g. model checking) is about checking that all behaviors of $$B$$ lie within $$P$$ i.e. $$B \subseteq P$$. Alternatively, we can express this in TLA+ as 
 
 $$ Spec \Rightarrow P$$
 
