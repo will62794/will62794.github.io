@@ -16,7 +16,7 @@ $$
 (\sigma \nvDash P) \Rightarrow \exists i \in \mathbb{N} : (\forall \beta \in S^\omega : \sigma_i\beta \nvDash P)
 $$
 
-This captures the intuition of a safety property specifying that a "bad thing" never happens. It says that if a behavior violates $$P$$, then it must do so in some finite prefix of the behavior. In other words, the violation occurs at some discrete point. After that point, you could try to extend the behavior with any suffix $$\beta$$, but you would not be able to remedy the violation.
+This captures the intuition of a safety property specifying that a "bad thing" never happens. It says that if a behavior violates $$P$$, then it must do so in some finite prefix of the behavior. In other words, the violation occurs at some discrete point. After that point, you could try to extend the behavior with any suffix $$\beta$$, but you would not be able to remedy the violation. Note that even though a safety property is always violated at a discrete point, it may require looking at an entire behavior to determine whether the property is violated. For example, *invariants* are one class of safety property that depend only on a single state. For example, "x is never equal to 0" is an invariant, and can be checked by looking at any one state within a behavior. There are other safety properties, however, where this is not the case. For example, the property "if x=0 then x=1 three steps later". To determine the truth of this property, we must examine an entire trace, even though a violation will occur in a finite prefix.
 
 We define a **liveness** property $$P$$ as follows:
 
@@ -24,7 +24,7 @@ $$
 \forall \alpha \in S^* : (\exists \beta \in S^\omega : \alpha \beta \nvDash P) 
 $$
 
-This definition says that a property $$P$$ is a liveness property if any partial execution can be extended to satisfy $$P$$. That is, no matter how many steps we take in a finite behavior prefix, there's always hope that we can satisfy a liveness property in the future ("while there's life there's hope").
+This definition says that a property $$P$$ is a liveness property if any partial execution can be extended to satisfy $$P$$. That is, no matter how many steps we take in a finite behavior prefix, there's always hope that we can satisfy a liveness property in the future ("while there's life there's hope"). Note that the "good thing" required by a liveness property may or may not be discrete. A simple liveness requirement like "x is eventually 0" will be satisfied at a discrete point in a behavior, but a liveness condition like "x is 0 infinitely often" can only be determined by examining an infinite behavior.
 
 # The Decomposition Theorem
 
