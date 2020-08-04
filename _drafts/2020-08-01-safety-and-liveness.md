@@ -34,34 +34,42 @@ $$
 P = \overline{P} \cap L
 $$
 
-where $$\overline{P}$$ is the smallest safety property that contains $$P$$, and $$L=\neg(\overline{P}-P)$$. Note that in a slightly later paper *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987), an alternate proof of the decomposition theorem is given with arguments that resort only to first order logic. To prove the decomposition given in *Defining Liveness* we can first try to understand the result intuition behind the result. The topological arguments made there are not fully clear to me, but we can prove it without depending on those.
+where $$\overline{P}$$ is the smallest safety property that contains $$P$$, and $$L=\neg(\overline{P}-P)$$. Note that in a slightly later paper *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987), an alternate proof of the decomposition theorem is given with arguments that resort only to first order logic. To prove the decomposition given in *Defining Liveness* we can first try to understand the intuition behind the result. The topological arguments made there are not fully clear to me, but we can prove it without depending on those.
 
 If we are given an arbitrary property $$P$$, we want to come up with a safety property $$S_P$$ and a liveness property $$L_P$$ such that $$P=S_P \cap L_P$$. To find $$S_P$$, we can start thinking about the defining characteristics of safety properties. Any behavior that violates a safety property must violate it in some finite prefix. So, we can view a safety property as consisting of a set of behaviors $$B$$ such that for all $$b\in B$$, there are no "unsafe" finite prefixes of $$b$$. If a behavior $$b$$ has no unsafe finite prefixes with respect to a property $$P$$ we denote that as $$Safe_P(b)$$. So, we can start with a safety property that includes behaviors $$b$$ that satisfy $$Safe_P(b)$$ i.e. all behaviors that have only "safe" finite prefixes with respect to $$P$$. This is safety property $$S_P$$, and corresponds to the minimal safety property (denoted as $$\overline{P}$$ above) that encloses P. Intuitively, we can think about this property as approximating $$P$$ with only knowledge about finite violations of $$P$$ i.e. it doesn't take into consideration "infinite" violations.
 
 Next we need to define some liveness property such that intersecting it with $$S_P$$ will give us $$P$$. We know that $$S_P$$ consists of only those behaviors that contain no unsafe prefixes, but it is still possible that a behavior in $$S_P$$ violates $$P$$. For example, if the violation only occurs by looking at the infinite behavior. By definition, a liveness property must include all finite prefixes, since the definition states that any prefix (safe or unsafe) can always be extended to satisfy a liveness property. We know, however, that our safety property only consists of behaviors with safe prefixes, so the intersection of any liveness property with it will only include behaviors with safe prefixes. Therefore, the only remaining goal of our liveness property is to ensure that it excludes behaviors that satisfy $$Safe_P(b)$$ but violate $$P$$. We can do this by removing from $$L_P$$ behaviors in $$S_P$$ which are safe but not live, so that when we intersect $$L_P$$ and $$S_P$$ we are left with only behaviors that fully satisfy $$P$$. In other words, we just need to remove the behaviors in $$S_P-P$$ (the safe but not live behaviors), so we define take $$L_P = \neg (S_P-P)$$
 
-We can then see how the intersection of these properties gives us $$P$$:
+We can see how the intersection of these properties gives us $$P$$:
 
 $$
 \begin{aligned}
 S_P \cap L_P &= S_P \cap \neg(S_P - P) \\
-&= S_P \cap (U-(S_P - P)) \\
-&= S_P \cap (U - S_P \cup P)) \\
-&= S_P \cap (\neg S_P \cup P) \\
-&= (S_P \cap \neg S_P) \cup (S_P \cap P) \\
-&= \emptyset \cup (S_P \cap P) \\
-&= S_P \cap P \\
+&= S_P \cap (P \cup \neg S_P) \\
+&= (S_P \cap P) \cup (S_P \cap \neg S_P) \\
+&= P \cup \emptyset \\
 &= P \\
 \end{aligned}
 $$
 
-It also remains to show that $$L_P$$ is actually a liveness property. Suppose that $$L_P$$ was not a liveness property. This would mean that there exists some finite execution $$\alpha \in S^*$$ such that no extension $$\b eta$$ exists such that $$\alpha\beta \vDash L_P$$. Well, this would mean that such an execution violated the property $$L_P$$ at some finite prefix, 
+Note that in some of these derivations we go back and forth between expressing properties in logical formulas and in set notation, which may be confusing, but it's helpful to remember correspondences between common set and logical operations. For example, set intersection ($$\cap$$) corresponds to logical conjunction ($$\wedge$$), set union ($$\cup$$) corresponds to logical disjunction ($$\vee$$), and negation ($$\neg$$) corresponds to set complement.
 
-<svg width="500" height="400">
-  <rect width="400" height="150" style="fill:rgb(250,250,250);stroke-width:1;stroke:rgb(0,0,0)" />
+It remains to show that $$L_P$$ is actually a liveness property. Suppose that $$L_P$$ was not a liveness property. This would mean that there exists some finite execution $$\sigma \in S^*$$ such that no extension $$\beta$$ exists such that $$\sigma\beta \vDash L_P$$. So it must be the case that $$\sigma \notin L_P$$, and by substitution $$\sigma \notin \neg(S_P - P)$$. So it must be true that $$\sigma \in (S_P - P)$$. This cannot be true, though, since we know that $$S_P$$ consists only of traces such that all finite prefixes have extensions that satisfy $$P$$, but we assumed that the finite execution $$\sigma$$ had no extensions that satisfy $$P$$. So, it must be the case the $$L_P$$ is a liveness property.
 
-<ellipse cx="200" cy="80" rx="100" ry="50"
-  style="fill:red;stroke:black;stroke-width:1" />
-  <ellipse cx="200" cy="80" rx="60" ry="25"
-  style="fill:green;stroke:black;stroke-width:1" />
-</svg>
+<img src="/assets/safety-liveness-sets.svg"/>
+
+#### Liveness-Liveness Decomposition
+
+At a high level, the safety liveness decomposition feels somewhat intuitive, since it reflects the way we often think about the behavior of real systems. It turns out, however, that it is also possible to express any property $$P$$ as the conjunction of two liveness properties. This is an additional theorem given in *Defining Liveness*. If $$S$$ is the set of all states, and $$\mid {S} \mid > 1$$ (i.e. there are at least 2 possible system states), then we let $$L_a$$ be the set of all executions with tails that are infinite sequences of $$a$$'s and $$L_b$$ is, similarly, the set of sequences with infinite tails consisting of $$b$$'s. We then take the intersection of $$(P \cup L_a)$$ and $$(P \cup L_b$$):
+
+$$
+\begin{aligned}
+(P \cup L_a) \cap (P \cup L_b) &= (P \cap P) \cup (P \cap L_b) \cup (L_a \cap P) \cup (L_a \cap L_b) \\
+&= P \cup (P \cap L_b) \cup (P \cap L_a) \cup \emptyset \\
+&=  TODO
+\end{aligned}
+$$
+
+We have to show that $$(P \cup L_a)$$ and $$(P \cup L_b)$$ are both liveness properties. We can start with $$(P \cup L_a)$$. Let's assume that it is not a liveness property and derive a contradiction. If it's not a liveness property, there must exist some finite execution $$\sigma$$ with no extension that lies inside $$(P \cup L_a)$$. Well, it should always be possible extend a finite execution $$\sigma$$ with an infinite suffix of $$a$$'s, which would, by the definition of $$L_a$$, cause it to be contained in $$(P \cup L_a)$$. So, it must be impossible to have a finite execution where no extension falls in $$(P \cup L_a)$$. The same reasoning applies to $$(P \cup L_b)$$. So, both of these must be liveness properties.
+
+How to understand this result intuitively?
