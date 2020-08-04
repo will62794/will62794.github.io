@@ -34,10 +34,34 @@ $$
 P = \overline{P} \cap L
 $$
 
-where $$\overline{P}$$ is the smallest safety property that contains $$P$$, and $$L=\neg(\overline{P}-P)$$. I don't find this characterization and proof as intuitive, since it relies on topological concepts that may or may not be fully natural to a reader. In a slightly later paper *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987), an alternate proof is presented whose arguments resort only to first order logic. The essence of this proof is clearer to me. We can start with an intuitive sketch and then formalize it.
+where $$\overline{P}$$ is the smallest safety property that contains $$P$$, and $$L=\neg(\overline{P}-P)$$. Note that in a slightly later paper *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987), an alternate proof of the decomposition theorem is given with arguments that resort only to first order logic. To prove the decomposition given in *Defining Liveness* we can first try to understand the result intuition behind the result. The topological arguments made there are not fully clear to me, but we can prove it without depending on those.
 
-Given an arbitrary property $$P$$, we want to come up with a safety property $$S_P$$ and a liveness property $$L_P$$ such $$P=S_P \wedge L_P$$. To find the safety property, we can start thinking about the defining characteristics of safety properties. Any behavior that violates a safety property must violate it in some finite prefix. So, we can view a safety property as consisting of a set of behaviors $$B$$ such that for all $$b\in B$$, there is no "unsafe" finite prefix of $$b$$. If a behavior $$b$$ has no unsafe finite prefixes with respect to a property $$P$$ we denote that as $$Safe_P(b)$$. So, we can start with a safety property that includes behaviors $$b$$ that satisfy $$Safe_P(b)$$ i.e. all behaviors that have only "safe" finite prefixes with respect to $$P$$. This is safety property $$S_P$$.
+If we are given an arbitrary property $$P$$, we want to come up with a safety property $$S_P$$ and a liveness property $$L_P$$ such that $$P=S_P \cap L_P$$. To find $$S_P$$, we can start thinking about the defining characteristics of safety properties. Any behavior that violates a safety property must violate it in some finite prefix. So, we can view a safety property as consisting of a set of behaviors $$B$$ such that for all $$b\in B$$, there are no "unsafe" finite prefixes of $$b$$. If a behavior $$b$$ has no unsafe finite prefixes with respect to a property $$P$$ we denote that as $$Safe_P(b)$$. So, we can start with a safety property that includes behaviors $$b$$ that satisfy $$Safe_P(b)$$ i.e. all behaviors that have only "safe" finite prefixes with respect to $$P$$. This is safety property $$S_P$$, and corresponds to the minimal safety property (denoted as $$\overline{P}$$ above) that encloses P. Intuitively, we can think about this property as approximating $$P$$ with only knowledge about finite violations of $$P$$ i.e. it doesn't take into consideration "infinite" violations.
 
-Next we need to define some liveness property such that intersecting it with $$S_P$$ will give us $$P$$. We know that $$S_P$$ consists of only those behaviors that contain no unsafe prefixes, but it is still possible that a behavior which satisfies $$Safe_P(b)$$ violates $$P$$. For example, if the violation only occurs by looking at the infinite behavior. By definition, a liveness property must include all finite prefixes in the behaviors it includes, since the definition states that any prefix (safe or unsafe) can always be extended to satisfy a liveness property. We know, however, that our safety property only consists of behaviors with "safe" prefixes, so the intersection of any liveness property with it will only include behaviors with safe prefixes. Therefore, the only remaining goal of our liveness property is to ensure that it excludes behaviors that satisfy $$Safe_P(b)$$ but violate $$P$$. We can do this by removing from $$L_P$$ behaviors in $$S_P$$ which are safe but not live, so that when we intersect $$L_P$$ and $$S_P$$ we are left with only behaviors that fully satisfy $$P$$.
+Next we need to define some liveness property such that intersecting it with $$S_P$$ will give us $$P$$. We know that $$S_P$$ consists of only those behaviors that contain no unsafe prefixes, but it is still possible that a behavior in $$S_P$$ violates $$P$$. For example, if the violation only occurs by looking at the infinite behavior. By definition, a liveness property must include all finite prefixes, since the definition states that any prefix (safe or unsafe) can always be extended to satisfy a liveness property. We know, however, that our safety property only consists of behaviors with safe prefixes, so the intersection of any liveness property with it will only include behaviors with safe prefixes. Therefore, the only remaining goal of our liveness property is to ensure that it excludes behaviors that satisfy $$Safe_P(b)$$ but violate $$P$$. We can do this by removing from $$L_P$$ behaviors in $$S_P$$ which are safe but not live, so that when we intersect $$L_P$$ and $$S_P$$ we are left with only behaviors that fully satisfy $$P$$. In other words, we just need to remove the behaviors in $$S_P-P$$ (the safe but not live behaviors), so we define take $$L_P = \neg (S_P-P)$$
 
-TODO: Formalize Proof
+We can then see how the intersection of these properties gives us $$P$$:
+
+$$
+\begin{aligned}
+S_P \cap L_P &= S_P \cap \neg(S_P - P) \\
+&= S_P \cap (U-(S_P - P)) \\
+&= S_P \cap (U - S_P \cup P)) \\
+&= S_P \cap (\neg S_P \cup P) \\
+&= (S_P \cap \neg S_P) \cup (S_P \cap P) \\
+&= \emptyset \cup (S_P \cap P) \\
+&= S_P \cap P \\
+&= P \\
+\end{aligned}
+$$
+
+It also remains to show that $$L_P$$ is actually a liveness property. Suppose that $$L_P$$ was not a liveness property. This would mean that there exists some finite execution $$\alpha \in S^*$$ such that no extension $$\b eta$$ exists such that $$\alpha\beta \vDash L_P$$. Well, this would mean that such an execution violated the property $$L_P$$ at some finite prefix, 
+
+<svg width="500" height="400">
+  <rect width="400" height="150" style="fill:rgb(250,250,250);stroke-width:1;stroke:rgb(0,0,0)" />
+
+<ellipse cx="200" cy="80" rx="100" ry="50"
+  style="fill:red;stroke:black;stroke-width:1" />
+  <ellipse cx="200" cy="80" rx="60" ry="25"
+  style="fill:green;stroke:black;stroke-width:1" />
+</svg>
