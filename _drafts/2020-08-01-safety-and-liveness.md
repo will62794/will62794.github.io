@@ -4,21 +4,46 @@ title:  "Defining Safety and Liveness"
 categories: formal-methods
 ---
  
-Temporal logic properties can be broadly categorized into *safety* and *liveness* properties. Safety properties intuitively state that a "bad thing" must never happen whereas liveness properties state that a "good thing" must eventually happen. These informal definitions are made precise in the paper *[Defining Liveness](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf)* (Alpern, Schneider, 1985), and are also discussed in a later paper, *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987).
+Temporal logic properties can be broadly categorized into *safety* and *liveness* properties. Safety properties intuitively state that a "bad thing" never happens whereas liveness properties state that a "good thing" must eventually happen. These informal definitions are made precise in the paper *[Defining Liveness](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf)* (Alpern, Schneider, 1985), and are also discussed in a later paper, *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987).
 
 # Formalizing Safety and Liveness
 
-An *execution*, also referred to as  a *behavior*, $$\sigma$$ is as an infinite sequence of states $$\sigma = s_0,s_1,s_2,...$$. A *property* is a set of such sequences. We write $$\sigma \vDash P$$ if execution $$\sigma$$ satisfies property $$P$$. We can alternately say that $$\sigma$$ is contained in $$P$$. We denote the set of all infinite executions as $$S^\omega$$ and the set of all finite (partial) executions as $$S^*$$. Finally, we let $$\sigma_i$$ represent the partial execution consisting of the first $$i$$ states of an execution $$\sigma$$.
+An *execution* $$\sigma$$, which we can also refer to as  a *behavior*, is as an infinite sequence of states 
 
-We define a **safety** property $$P$$ as follows:
+$$\sigma = s_0,s_1,s_2,...$$
+
+A *property* is a set of such sequences. We write $$\sigma \vDash P$$ if execution $$\sigma$$ satisfies property $$P$$. We can alternately say that $$\sigma$$ is contained in $$P$$. We denote the set of all infinite executions as $$S^\omega$$ and the set of all finite (partial) executions as $$S^*$$. Finally, we let $$\sigma_i$$ represent the partial execution consisting of the first $$i$$ states of an execution $$\sigma$$.
+
+We say that a property $$P$$ is a **safety** property if and only if the following holds for all behaviors:
 
 $$
-(\sigma \nvDash P) \Rightarrow \exists i \in \mathbb{N} : (\forall \beta \in S^\omega : \sigma_i\beta \nvDash P)
+(\sigma \nvDash P) \iff \exists i \in \mathbb{N} : (\forall \beta \in S^\omega : \sigma_i\beta \nvDash P)
 $$
 
-This definition says that if a behavior violates a safety property $$P$$, then it must do so in some finite prefix of the behavior. In other words, the violation occurs at some discrete point. After that point, you could try to extend the behavior with any suffix $$\beta$$, but you would not be able to remedy the violation. Note that even though a safety property is always violated at a discrete point, it may require looking at an entire behavior to determine whether the property is violated. *Invariants* are one class of safety property that depend only on a single state e.g. "x is never equal to 0". This can be checked by looking at any one state of a behavior. There are other safety properties, however, where this is not the case. For example, the property "if x=0 then x=1 three steps later". To determine the truth of this property, we must examine an entire trace, even though a violation will occur in a finite prefix. Intuitively, we can think about a safety property as a property that rules out "bad" prefixes. It only includes behaviors where all prefixes are "safe".
+This definition says that if a behavior violates a safety property $$P$$, then it must do so in some finite prefix of the behavior i.e. the violation occurs at some discrete point. After that point you could try to extend the behavior with any suffix $$\beta$$ but you would not be able to remedy the violation. Note that the definition from *Defining Liveness* uses an implication ($$\Rightarrow$$) instead of an equivalence ($$\iff$$), but I think that's probably just a minor oversight or a technicality they didn't worry about much. In a technical note from 2019, *[Safety, Liveness, and Fairness](https://lamport.azurewebsites.net/tla/safety-liveness.pdf)*, Lamport gives an informal definition that says a property $$P$$ is a safety property iff for all behaviors $$b$$: $$b$$ satisfies $$P$$ iff every prefix satisfies $$P$$. This reassures me that it's valid to write the definition with a biconditional ("if and only if"), even though *Defining Liveness* didn't originally do it this way. Using the biconditional here makes sense to me, since for a safety property $$P$$, we know that any violating trace must violate $$P$$ in a finite prefix (the forward implication $$\Rightarrow$$), and, conversely, any behavior that violates $$P$$ in a finite prefix must violate the safety property (the backward implication $$\Leftarrow$$).
 
-We define a **liveness** property $$P$$ as follows:
+Note that even though a safety property is always violated at a discrete point, it may require looking at an entire behavior to determine whether the property is violated. *Invariants* are a class of safety property whose truth can be determined by looking at a single state of a behavior e.g. "x is never equal to 0". There are other safety properties, however, where this is not the case. For example, the property "if x=0 then x=1 three steps later". To determine the truth of this property, we must examine an entire trace, even though a violation will occur in a finite prefix. Intuitively, we can think about a safety property as one which rules out "bad" prefixes. It only includes behaviors where all prefixes are "safe", where a safe prefix is one that can be extended to satisfy $$P$$. We can formalize this intuition by looking at the contrapositive of the definition above:
+
+$$
+\begin{aligned}
+\neg(\exists i \in \mathbb{N} : (\forall \beta \in S^\omega : \sigma_i\beta \nvDash P)) &\iff \neg(\sigma \nvDash P) \\
+\end{aligned}
+$$
+
+From here we can derive an alternate form of the definition:
+
+$$
+\begin{aligned}
+\neg(\exists i \in \mathbb{N} : (\forall \beta \in S^\omega : \sigma_i\beta \nvDash P)) &\iff \sigma \vDash P \\
+(\forall i \in \mathbb{N} : \neg(\forall \beta \in S^\omega : \sigma_i\beta \nvDash P)) &\iff \sigma \vDash P \\
+(\forall i \in \mathbb{N} : (\exists \beta \in S^\omega : \neg(\sigma_i\beta \nvDash P)) &\iff \sigma \vDash P \\
+(\forall i \in \mathbb{N} : (\exists \beta \in S^\omega : \sigma_i\beta \vDash P)) &\iff \sigma \vDash P
+\end{aligned}
+$$
+
+The final statement expresses our intuition. That is, a safety property is a property $$P$$ where all prefixes ($$\sigma_i$$) of any behavior in $$P$$ have a safe infinite extension ($$\beta$$).
+
+We say that a property $$P$$ is a **liveness** property if and only if the following holds:
 
 $$
 \forall \alpha \in S^* : (\exists \beta \in S^\omega : \alpha \beta \vDash P) 
