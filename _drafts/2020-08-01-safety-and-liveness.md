@@ -4,7 +4,7 @@ title:  "Defining Safety and Liveness"
 categories: formal-methods
 ---
  
-Temporal logic properties can be broadly categorized into *safety* and *liveness* properties. Safety properties intuitively state that a "bad thing" never happens whereas liveness properties state that a "good thing" must eventually happen. These informal definitions are made precise in the paper *[Defining Liveness](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf)* (Alpern, Schneider, 1985), and are also discussed in a later paper, *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987).
+Temporal logic properties can be broadly categorized into *safety* and *liveness* properties. Informally, safety properties state that a "bad thing" never happens whereas liveness properties state that a "good thing" must eventually happen. These informal definitions are made precise in the paper *[Defining Liveness](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf)* (Alpern, Schneider, 1985), and are also discussed in a later paper, *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987).
 
 # Formalizing Safety and Liveness
 
