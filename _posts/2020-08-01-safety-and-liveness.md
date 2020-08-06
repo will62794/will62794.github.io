@@ -83,14 +83,11 @@ $$
 \end{aligned}
 $$
 
-<!-- 
-TODO: Add diagram.
-
-In the diagram below it's easier to see how these set operations work. The outer rectangle represents the space of all behaviors, the shaded region represents $$L=\overline{P}-P$$, and the unshaded region represents $$\overline{P}-P$$. The larger circle contains behaviors in $$\overline{P}$$ and the smaller circle contains behaviors in $$P$$.
-
-<img src="/assets/safety-liveness-1.png" width="40%" class="centerImg"> -->
-
 As a side note, in some of these formulas and derivations we go back and forth between expressing properties in logical formulas and in set notation, which may be confusing, but it's helpful to remember the correspondences between common set and logical operations. For example, set intersection ($$\cap$$) corresponds to logical conjunction ($$\wedge$$), set union ($$\cup$$) corresponds to logical disjunction ($$\vee$$), and negation ($$\neg$$) corresponds to set complement. This arises from the fact that we can think about properties either as logical formulas or sets of behaviors.
+
+It can also be helpful to understand how these set operations work by looking at a diagram. In the image below, the outer rectangle represents the space of all behaviors, the gray region represents $$L=\neg(\overline{P}-P)$$, and the red region represents $$\overline{P}-P$$. The larger oval contains the behaviors in $$\overline{P}$$ and the smaller oval contains the behaviors in $$P$$.
+
+<img src="/assets/safety-liveness.png" width="40%" class="centerImg">
 
 It remains to show that $$L$$ is actually a liveness property. We can assume that $$L$$ is not a liveness property and derive a contradiction. If $$L$$ is not a liveness property it means there exists some finite execution $$\sigma \in S^*$$ such that no extension of $$\sigma$$ satisfies $$L$$. So it must be the case that no behaviors in $$L=\neg(\overline{P} - P)$$ have $$\sigma$$ as a prefix, since this would mean there exists some extension of $$\sigma$$ that satisfies $$L$$. Since $$\neg(\overline{P} - P)$$ and $$\overline{P} - P$$ partition the space of all behaviors (one is the complement of the other), and no behavior in $$\neg(\overline{P} - P)$$ contains the prefix $$\sigma$$, it must mean that some behavior in $$\overline{P} - P$$ contains the prefix $$\sigma$$. By definition, though, we know that the prefixes in $$\overline{P} - P$$ are exactly those that have an extension in $$P$$ i.e. they are the *safe* prefixes. So, if $$\sigma \in \overline{P}-P$$ there must be an extension of $$\sigma$$ in $$P$$. Since $$P$$ is a subset of $$L$$, this implies that there is an extension of $$\sigma$$ in $$L$$, which violates our initial assumption that there is no extension of $$\sigma$$ in $$L$$. Therefore, $$L$$ must be a liveness property.
 
