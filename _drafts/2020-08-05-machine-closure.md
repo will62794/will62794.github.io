@@ -24,8 +24,11 @@ So, violation of machine closure means that there exists some safe finite prefix
 
 We can also view the concept of machine closure from the perspective of concurrent and/or distributed systems. There is an inherent trade off between safety and liveness in asynchronous, fault tolerant protocols. So, if we are given some arbitrary safety and liveness property, it makes somewhat intuitive sense that it may not be "realizable" i.e. there may be cases where it's impossible to maintain liveness while satisfying a given safety constraint, if either one is too strong.
 
-TODO: Can we transform a non machine closed spec into a machine closed one?
+#### My Remaining Questions
 
+- Can we transform a non machine closed spec into a machine closed one? How does this affect $$S$$ and $$L$$?
+- Why do we use temporal properties at all for specification? Why not just always stick with the automaton/state machine technique of specification? 
+- In what cases is it useful to write non machine closed specifications?
 
 ----
 
