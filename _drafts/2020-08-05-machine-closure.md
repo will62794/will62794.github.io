@@ -27,3 +27,34 @@ We can also think about the concept of machine closure from the perspective of d
 - Can we transform a non machine closed spec into a machine closed one? How does this affect $$S$$ and $$L$$?
 - Why do we use temporal properties at all for specification? Why not just always stick with the automaton/state machine technique of specification? 
 - In what cases is it useful to write non machine closed specifications?
+- Does the liveness property of a non machine closed spec always rule out *all* allowed behaviors, or only some? In general, it should only rule out some.
+
+----
+
+If we have a spec 
+
+$$ 
+\begin{aligned}
+S &\triangleq  x=0 \wedge \square [x'=x+1]_x \\
+L & \triangleq (x>3 \Rightarrow \Diamond x'=x-1)
+\end{aligned}
+$$
+
+this is clearly not machine closed since we have prefixes like `<<1,2,3,4>>` which are safe but cannot be extended to satisfy $$L$$. On the other hand, there are some safe prefixes like `<<1,2,3>>` which are safe and can be extended to satisfy $$L$$ i.e. by stuttering forever. So, our allowed prefixes should be those which never exceed 3 i.e.
+
+```
+<<1>>
+<<1,2>>
+<<1,2,3>>
+```
+
+So, we should be able to decompose this non machine closed spec into a different, machine closed spec $$(S',L')$$ that permits the same set of behaviors. For example:
+
+$$ 
+\begin{aligned}
+S &\triangleq  x=0 \wedge \square [x < 3 \wedge x'=x+1]_x \\
+L & \triangleq True
+\end{aligned}
+$$
+
+We've changed the safety property to prevent us ever incrementing $$x$$ beyond a value of $$3$$, and we've removed our liveness property entirely. To do this we strengthened our safety property (i.e. it allows fewer behaviors, taken on its own), and we weakened our liveness property (i.e. it allows more behaviors).
