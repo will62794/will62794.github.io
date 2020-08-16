@@ -3,8 +3,10 @@ title: Will Schultz
 email:
 description:
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "" # the base hostname & protocol for your site
+url: "https://will62794.github.io" # the base hostname & protocol for your site
 github_username:  will62794
+plugins:
+  - jekyll-sitemap
 
 # Build settings
 markdown: kramdown
@@ -13,5 +15,4 @@ collections:
   projects:
     output: true
   posts:
-      #plugins:
-      #  - jekyll-sitemap
+
