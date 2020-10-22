@@ -6,9 +6,9 @@ categories: tlaplus formal-methods
 
 An **invariant** of a transition system $$(S, S_0, R)$$ is a set of states $$ I $$ such that all reachable states are contained within $$ I $$. Semantically, an invariant is a set of states, but we commonly express invariants as state predicates i.e. a predicate $$ P(x) $$ that is true or false of a single state and gives rise to the corresponding set $$\{x \in S : P(x)\}$$. An **inductive invariant** is an invariant that is closed under the transition relation $$ R $$. That is, for any state transition $$(s, s') \in R, (s \in I \Rightarrow s' \in I)$$.
 
-Inductive invariants are fundamental to how we prove invariants of a system. 
+Inductive invariants are fundamental to how we prove invariants of a system. If we want to prove an invariant of a system, we want to prove that every reachable state cannot violate the invariant. If the system has a finite number of states, we could, for example, solve this problem with model checking, by simply exploring every reachable state and checking whether the invariant holds. If the system is too large (or infinite), we can't do this. We need an alternative that doesn't require enumeration of all reachable states. Using induction allows us to prove things about infinite behaviors and/or state spaces in a rigorous way. Rather than reasoning about an entire system behavior at once, we limit ourselves to reasoning about individual transitions of the system i.e. reasoning "locally" rather than "globally". 
 
-- Why do we need inductive invariants?
+- Why do we need inductive invariants? Why are they fundamental? Why can't we just use "behavioral reasoning"?
 - Strengthening invariants to get an inductive invariant.
 - Examples and state space visualization of reachable states and invariants/inductive invariants for several finite state protocols.
 
