@@ -4,13 +4,77 @@ title:  "Inductive Invariance"
 categories: tlaplus formal-methods 
 ---
 
-An **invariant** of a transition system $$(S, S_0, R)$$ is a set of states $$ I $$ such that all reachable states are contained within $$ I $$. Semantically, an invariant is a set of states, but we commonly express invariants as state predicates i.e. a predicate $$ P(x) $$ that is true or false of a single state and gives rise to the corresponding set $$\{x \in S : P(x)\}$$. An **inductive invariant** is an invariant that is closed under the transition relation $$ R $$. That is, for any state transition $$(s, s') \in R, (s \in I \Rightarrow s' \in I)$$.
+An **invariant** of a transition system $$(S, S_0, R)$$ is a set of states $$ I $$ such that all reachable states are contained within $$ I $$. Semantically, an invariant is a set of states, but we commonly express invariants as state predicates i.e. a predicate $$ P(x) $$ that is true or false of a single state and gives rise to the corresponding set $$\{x \in S : P(x)\}$$. An **inductive invariant** is an invariant that is closed under the transition relation $$ R $$. That is, for any transition $$(s,s') \in R$$, $$(s \in I \Rightarrow s' \in I)$$.
 
-Inductive invariants are fundamental to how we prove invariants of a system. If we want to prove an invariant of a system, we want to prove that every reachable state cannot violate the invariant. If the system has a finite number of states, we could, for example, solve this problem with model checking, by simply exploring every reachable state and checking whether the invariant holds. If the system is too large (or infinite), we can't do this. We need an alternative that doesn't require enumeration of all reachable states. Using induction allows us to prove things about infinite behaviors and/or state spaces in a rigorous way. Rather than reasoning about an entire system behavior at once, we limit ourselves to reasoning about individual transitions of the system i.e. reasoning "locally" rather than "globally". 
+Inductive invariants allow us to prove invariants of a system by reasoning about *states* of a system rather than *behaviors*. If we have a specification 
 
-- Why do we need inductive invariants? Why are they fundamental? Why can't we just use "behavioral reasoning"?
+$$Spec \triangleq Init \wedge \square [Next]_{vars}$$ 
+
+and want to prove that a state predicate $$ Inv $$ is an invariant of this system ($$Spec \Rightarrow \square Inv$$) we need to find an inductive invariant $$IndInv$$ and prove the following:
+
+$$
+\begin{align*}
+Init &\Rightarrow IndInv &(1) \\
+IndInv \wedge [Next]_{vars} &\Rightarrow IndInv' &(2)\\
+\end{align*}
+$$
+
+These two statements establish that $$IndInv$$ holds in all initial states and that, on every transition, if the invariant holds currently then it will hold in the next state. Statement (1) is commonly referred to as **initiation** and (2) as **consecution**, and together they imply that $$IndInv$$ is an invariant. If we are trying to prove $$Spec \Rightarrow \square Inv$$, though, we also need to show that $$IndInv$$ is sufficient to ensure $$Inv$$. So, we need to additionally prove that
+
+$$
+\begin{align*}
+IndInv \Rightarrow Inv
+\end{align*}
+$$
+
+Verifying these 3 statements shows that our inductive invariant is actually an invariant and that it is a subset of our desired invariant. That is, we've shown that 
+
+$$
+\begin{align*}
+Spec &\Rightarrow \square IndInv \\
+IndInv &\Rightarrow Inv
+\end{align*}
+$$
+
+which implies that $$Spec \Rightarrow \square Inv$$, which is what we set out to prove. 
+
+# Finding Inductive Invariants
+
+If we start with some invariant $$Inv$$ we want to prove, we first need to find some inductive invariant $$IndInv$$. We know that this inductive invariant must be stronger than $$Inv$$, since we need $$IndInv \Rightarrow Inv$$. This requirement suggests one strategy for finding an inductive invariant: start with $$Inv$$ and keep strengthening it until we get something that's inductive. In general, a logical formula $$X$$ is "stronger" than $$Y$$ if $$X \Rightarrow Y$$. In this context, if one invariant (or any state predicate) is stronger than another it also means that the state set satsifying the stronger invariant is a subset of the states satisfying the weaker invariant. This also raises the question of what the *strongest* possible inductive invariant is. Well, we know that an inductive invariant must be an invariant, so it cannot be smaller than the set of reachable states. The set of reachable states, however, is inductive, by nature of its definition. Any transition taken from a state in $$Reach$$ must go to another state in $$Reach$$. If it went to a state outside of $$Reach$$ that would necessarily imply the offending state must actually be in $$Reach$$. So, the set of reachable states itself is the strongest (i.e. smallest) inductive invariant. This means that any inductive invariant we try to find will fall somehwere in between the reachable state set and the invariant we are trying to prove. Formally, $$Reach \subseteq IndInv \subseteq Inv$$. This also suggests an alternative strategy to *strengthening* the original invariant. Rather, we could *weaken* the set of reachable states i.e. weaken our specification $$Spec$$ until we find a satisfactory inductive invariant.
+
+It helps to examine this by looking at an example specification and a visual representation of its state space. Let's consider this trivial PlusCal program:
+
+```tla
+(* --algorithm simple2
+variables x = 0;
+begin
+    l1: x := 0;
+    l2: while x < 2 do
+    l3:   x := x + 1;
+        end while;
+end algorithm; *)
+```
+It has a single variable $$x$$ that starts at zero and continues to increment as long as $$x < 2$$. It's clear to see that there are at least two basic invariants of this program:
+
+$$
+\begin{align*}
+I_1 &= x \geq 0 \\
+I_2 &= x \leq 2
+\end{align*}
+$$
+
+But are these invariants inductive? Well, let's look at the state space. We can generate this graph by making the set of initial states range over a subset of *all possible states*. Since our variable could range over integers, the full set is infinite, but we can explore a finite portion of it to give us intuition about its structure. In other words, we are showing a part of the complete transition relation $$R$$ as opposed to just the set of reachable states. The states in red are the invariant $$I_1$$.
+
+<img src="/assets/simple2-state-graph.svg">
+
+In this graph it's easy to spot visually why $$I_1$$ isn't inductive. We can see that state $$(\mathtt{l3},\mathtt{2})$$ has an outgoing transition that leaves $$I_1$$. This aligns with the behavior of the program i.e. if we are in program location `l3` we will take a step to increment $$x$$ regardless of the value of $$x$$. If $$x$$ happens to be 2 then this transition will violate the invariant $$I_1$$, even though it held in the current state. This can also teach us something about why the program upholds invariant $$I_1$$. Since we know that $$l3$$ can be a dangerous program point if we go there arbitrarily, there must be some restrictions the program places on when $$l3$$ can be reached. Specifically, if we've reached $$l_3$$ then it must be the case that $$x \leq 1$$, which is ensured by the condition checked at $$l_2$$. $$l_3 \Rightarrow x \leq 1$$. Turns out that this is an inductive invariant, and it implies our original invariant... (TODO: demonstrate that!)
+
+
+
+
+<!-- - Why do we need inductive invariants? Why are they fundamental? Why can't we just use "behavioral reasoning"?
 - Strengthening invariants to get an inductive invariant.
-- Examples and state space visualization of reachable states and invariants/inductive invariants for several finite state protocols.
+- Examples and state space visualization of reachable states and invariants/inductive invariants for several finite state protocols. -->
 
 
 <!-- 
