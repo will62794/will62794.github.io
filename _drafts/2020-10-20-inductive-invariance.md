@@ -54,7 +54,7 @@ begin
         end while;
 end algorithm; *)
 ```
-It has a single variable $$x$$ that starts at zero and continues to increment as long as $$x < 2$$. It's clear to see that there are at least two basic invariants of this program:
+It has a single variable $$x$$ that starts at zero and continues to increment as long as $$x < 2$$. There are at least two basic invariants of this program:
 
 $$
 \begin{align*}
@@ -63,12 +63,24 @@ I_2 &= x \leq 2
 \end{align*}
 $$
 
-But are these invariants inductive? Well, let's look at the state space. We can generate this graph by making the set of initial states range over a subset of *all possible states*. Since our variable could range over integers, the full set is infinite, but we can explore a finite portion of it to give us intuition about its structure. In other words, we are showing a part of the complete transition relation $$R$$ as opposed to just the set of reachable states. The states in red are the invariant $$I_1$$.
+But are these invariants inductive? Well, let's look at the state space. If we are using the TLC model checker, we can generate the set of reachable states along with general states of $$S$$ by letting initial states range over a subset of *all possible states* e.g.
+
+$$
+\begin{aligned}
+    InitAll \triangleq 
+    &\wedge x \in -3..6 \\
+    &\wedge pc \in \{``l1",``l2",``l3",``Done"\}
+\end{aligned}
+
+$$
+
+ Since $$x$$ could range over integers, the full set $$S$$ is infinite, but we can explore a finite portion of it to give us intuition about its structure. In other words, we are showing a part of the complete transition relation $$R$$ as opposed to just the set of reachable states. The nodes in red are the invariant $$I_1$$ and the nodes outlined in blue are the reachable states.
 
 <img src="/assets/simple2-state-graph.svg">
 
-In this graph it's easy to spot visually why $$I_1$$ isn't inductive. We can see that state $$(\mathtt{l3},\mathtt{2})$$ has an outgoing transition that leaves $$I_1$$. This aligns with the behavior of the program i.e. if we are in program location `l3` we will take a step to increment $$x$$ regardless of the value of $$x$$. If $$x$$ happens to be 2 then this transition will violate the invariant $$I_1$$, even though it held in the current state. This can also teach us something about why the program upholds invariant $$I_1$$. Since we know that $$l3$$ can be a dangerous program point if we go there arbitrarily, there must be some restrictions the program places on when $$l3$$ can be reached. Specifically, if we've reached $$l_3$$ then it must be the case that $$x \leq 1$$, which is ensured by the condition checked at $$l_2$$. $$l_3 \Rightarrow x \leq 1$$. Turns out that this is an inductive invariant, and it implies our original invariant... (TODO: demonstrate that!)
+In this graph it's clear that $$I_1$$ is an invariant i.e. every reachable state (outlined in blue) also satisfies the invariant (filled in red). It's also easy to spot visually why $$I_1$$ is, in fact, not inductive. We can see that the transition $$(l3,2) \rightarrow (l2,3)$$ leaves $$I_1$$. This make senses based on the program logic i.e. if we are at location $$l3$$ we will take a step to increment $$x$$ regardless of the value of $$x$$. If $$x$$ happens to be 2 then we we will exceed $$2$$ in the next state, violating invariant $$I_1$$, even though it holds in the current state. This can also teach us something about why the program upholds the invariant. $$l3$$ is a dangerous program point if we go there arbitrarily, so there must be some restrictions the program enforces on how $$l3$$ can be reached. Specifically, if we've reached $$l_3$$ then it must be the case that $$x \leq 1$$, which is ensured by the condition checked at $$l_2$$. $$l_3 \Rightarrow x \leq 1$$. Turns out that this is an inductive invariant, and it implies our original invariant.. (TODO: demonstrate that!)
 
+If we think about it from a higher level, a program upholds an invariant by always making "safe" steps. That is, a program should never take a step that may allow for an invariant violation to occur in the future. In this particular program, the only program location that increments our variable is $$l3$$, so that is the main point of interest that we need to make sure we reach in a safe way. Before we take any step, we need to be sure that we are not putting ourselves into harm's way of a potential invariant violation. This also motivates an intuitive understanding of inductive invariance and why it can always be used to prove invariance. If a system does satisfy an invariant, how does it do it? In other words, how does it "know" to avoid the invariant violation? Well, it must maintain some state throughout any execution that ensures the invariance property will never be violated. That is, a program can only make decisions based on its current state, not on its past states, so it must be that each state "protects" the system in a way from making a bad step that would cause it to violate an invariant.
 
 
 
