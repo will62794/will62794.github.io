@@ -74,11 +74,40 @@ $$
 
 $$
 
- Since $$x$$ could range over integers, the full set $$S$$ is infinite, but we can explore a finite portion of it to give us intuition about its structure. In other words, we are showing a part of the complete transition relation $$R$$ as opposed to just the set of reachable states. The nodes in red are the invariant $$I_1$$ and the nodes outlined in blue are the reachable states.
+ Since $$x$$ could range over integers, the full set $$S$$ is infinite, but we can explore a finite portion of it to give us intuition about its structure. In other words, we are showing a part of the complete transition relation $$R$$ as opposed to just the set of reachable states. The nodes in red are the invariant $$I_2$$ and the nodes outlined in blue are the reachable states.
 
-<img src="/assets/simple2-state-graph.svg">
+<img src="/assets/simple2/state-graph-inv.svg">
 
-In this graph it's clear that $$I_1$$ is an invariant i.e. every reachable state (outlined in blue) also satisfies the invariant (filled in red). It's also easy to spot visually why $$I_1$$ is, in fact, not inductive. We can see that the transition $$(l3,2) \rightarrow (l2,3)$$ leaves $$I_1$$. This make senses based on the program logic i.e. if we are at location $$l3$$ we will take a step to increment $$x$$ regardless of the value of $$x$$. If $$x$$ happens to be 2 then we we will exceed $$2$$ in the next state, violating invariant $$I_1$$, even though it holds in the current state. This can also teach us something about why the program upholds the invariant. $$l3$$ is a dangerous program point if we go there arbitrarily, so there must be some restrictions the program enforces on how $$l3$$ can be reached. Specifically, if we've reached $$l_3$$ then it must be the case that $$x \leq 1$$, which is ensured by the condition checked at $$l_2$$. $$l_3 \Rightarrow x \leq 1$$. Turns out that this is an inductive invariant, and it implies our original invariant.. (TODO: demonstrate that!)
+In this graph it's clear that $$I_2$$ is an invariant i.e. every reachable state (outlined in blue) satisfies the invariant (filled in red). We can also visually identify why $$I_1$$ is, in fact, not inductive. We can see that the transition $$(l3,2) \rightarrow (l2,3)$$ leaves $$I_1$$. We refer to this transition as a **counterexample to induction** i.e. it is a concrete example that demonstrates that an invariant is not inductive. This makes sense based on the program logic i.e. if we are at location $$l3$$ we will take a step to increment $$x$$ regardless of the value of $$x$$. If $$x$$ happens to be $$2$$ then we we will exceed $$2$$ in the next state, violating invariant $$I_1$$, even though it holds in the current state. This can also teach us something about why the program upholds the invariant. $$l3$$ is a dangerous program point if we end up there arbitrarily, so there must be some restrictions the program enforces on how $$l3$$ can be reached. Specifically, if we've reached $$l_3$$ then it must be the case that $$x \leq 1$$, which is ensured by the condition checked at $$l_2$$. We can formalize this in the following invariant:
+
+$$I_3 = (pc = l_3) \Rightarrow (x \leq 1)$$
+
+It turns out that this invariant is inductive, which we can see visually:
+
+<img src="/assets/simple2/state-graph-indinv.svg">
+
+It does not, however, imply our original invariant $$I_1$$ i.e. we do not have $$I_3 \Rightarrow I_1$$. This is because $$I_3$$ doesn't say anything about the allowed values of $$x$$ at program locations other than $$l3$$. We can strengthen $$I_3$$ to the following:
+
+$$
+\begin{aligned}
+I_3' = 
+    \wedge (pc = l_3) \Rightarrow (x \leq 1) \\
+    \wedge (pc \neq l_3) \Rightarrow (x \leq 2) 
+\end{aligned}
+$$
+
+and visualize this by keeping the existing states of $$I_3$$ in orange and marking the states of $$I_3'$$ in light green.
+
+<img src="/assets/simple2/state-graph-indinvp.svg">
+
+The invariant $$I_3'$$ is inductive and it implies our original invariant, so it is sufficient to prove $$I_2$$. If we compare $$I_3'$$ sidy by side with our original invariant $$I_2$$
+
+<img src="/assets/simple2/state-graph-indinvp-alone.svg" width="48%">
+<img src="/assets/simple2/state-graph-inv.svg" width="48%">
+
+we can additionally see that it is, in fact, the weakest possible inductive invariant that implies $$I_2$$. We removed only a single state, $$(l3,2)$$ from $$I_2$$ to produce $$I_3'$$. This was sufficient to make the invariant inductive and by removing states, it ensured that the new invariant was stronger than the original.
+
+
 
 If we think about it from a higher level, a program upholds an invariant by always making "safe" steps. That is, a program should never take a step that may allow for an invariant violation to occur in the future. In this particular program, the only program location that increments our variable is $$l3$$, so that is the main point of interest that we need to make sure we reach in a safe way. Before we take any step, we need to be sure that we are not putting ourselves into harm's way of a potential invariant violation. This also motivates an intuitive understanding of inductive invariance and why it can always be used to prove invariance. If a system does satisfy an invariant, how does it do it? In other words, how does it "know" to avoid the invariant violation? Well, it must maintain some state throughout any execution that ensures the invariance property will never be violated. That is, a program can only make decisions based on its current state, not on its past states, so it must be that each state "protects" the system in a way from making a bad step that would cause it to violate an invariant.
 
