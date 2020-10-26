@@ -111,7 +111,7 @@ we can additionally see that it is, in fact, the weakest possible inductive inva
 
 If we think about it from a higher level, a program upholds an invariant by always making "safe" steps. That is, a program should never take a step that may allow for an invariant violation to occur in the future. In this particular program, the only program location that increments our variable is $$l3$$, so that is the main point of interest that we need to make sure we reach in a safe way. Before we take any step, we need to be sure that we are not putting ourselves into harm's way of a potential invariant violation. This also motivates an intuitive understanding of inductive invariance and why it can always be used to prove invariance. If a system does satisfy an invariant, how does it do it? In other words, how does it "know" to avoid the invariant violation? Well, it must maintain some state throughout any execution that ensures the invariance property will never be violated. That is, a program can only make decisions based on its current state, not on its past states, so it must be that each state "protects" the system in a way from making a bad step that would cause it to violate an invariant.
 
-
+For sequential programs, does partial correctness actually rely on an inductive invariant, if we only care about being in the correct state upon termination? Why does it matter how we get there, even if we take random steps that don't satisfy some invariant. Is this possible, or do we always need to be satisfying some inductive invariant as we take steps in a sequential program?
 
 <!-- - Why do we need inductive invariants? Why are they fundamental? Why can't we just use "behavioral reasoning"?
 - Strengthening invariants to get an inductive invariant.
