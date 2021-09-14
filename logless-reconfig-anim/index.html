@@ -1,14 +1,23 @@
 <html>
 <body>
+    <style>
+        button{
+            margin:2px;
+        }
+        h3{
+            margin:2px;
+        }
+        
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <h1>Logless Reconfiguration in MongoDB - Interactive Visualization</h1>
     <div id="main" style="float:left">       
     </div>
-    <div id="next-state-interface" style="float:left;width:200px;height:500px;">
-        <b>Choose next state</b>
-        <div id="buttons"></div>
+    <div id="next-state-interface" style="float:left;width:700px;height:400px;">
+        <h3>Choose next state</h3>
+        <div id="buttons" style="padding:10px;" height=100></div>
     </div>
-    <div>Interactive visualization of logless dynamic reconfiguration in MongoDB replication. Generated from the states and behaviors of the TLA+ formal specification that can be found <a href="https://github.com/will62794/logless-reconfig">here</a>.</div>
+    <div style="display:table;clear:both;font-size:18px;width:40%">This is an interactive visualization of a simplified version of the logless dynamic reconfiguration protocol designed for the MongoDB replication system. The state graph used for this animation was generated from the TLA+ formal specification found <a href="https://github.com/will62794/logless-reconfig">here</a>, using a <a href="https://github.com/will62794/tlaplus/tree/7233ab406fe2bcde8d9ac5bed155c1ea5a8750b1">modified version</a> of the TLC model checker. The raw JSON state graph used to drive the animation can be downloaded <a href="http://127.0.0.1:4000/logless-reconfig-anim/states.json">here</a>.</div>
     <script src="./index.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
 var mysvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 mysvg.setAttribute('style', 'border: 1px solid gray');
 mysvg.setAttribute('width', '600');
-mysvg.setAttribute('height', '500');
+mysvg.setAttribute('height', '400');
 console.log(mysvg);
 var svgns = "http://www.w3.org/2000/svg";
 var main = document.getElementById("main");
@@ -14,7 +14,7 @@ main.appendChild(mysvg);
 
 var states;
 var edges;
-var last_state;
+var curr_behavior = [];
 
 fetch('states.json')
   .then(response => response.json())
@@ -39,7 +39,7 @@ function setup(state_graph){
 
     // update_view(random_state());
     update_view(states[0]);
-    last_state = states[0];
+    curr_behavior = [states[0]]
 }
 
 function random_state(){
@@ -95,6 +95,7 @@ function update_view(state){
     backbtn.id = "back-btn"
     console.log(backbtn);
     buttondiv.appendChild(backbtn);
+    buttondiv.innerHTML += "<br>";
 
     for(var nind in neighbors){
         neighbor_id = neighbors[nind];
@@ -117,19 +118,21 @@ function update_view(state){
             console.log("New state:");
             console.log("Clicked state: " + neighbor_id);
             // console.log(state_id_table[local_neighbor_id]);
-            update_view(state_id_table[neighbor_id]);
+            new_state = state_id_table[neighbor_id]
+            update_view(new_state);
+            curr_behavior.push(new_state);
         };
     }
 
     // Handler for jumping back to previous state.
-    let curr_last_state = last_state;
     document.getElementById("back-btn").onclick = function(){
         console.log("New state:");
         console.log("Clicked state: " + neighbor_id);
-        update_view(curr_last_state);
+        if(curr_behavior.length > 1){
+            curr_behavior.pop();
+            update_view(curr_behavior[curr_behavior.length-1]);
+        }
     };
-
-    last_state = state;
 }
 
 function view(state){
