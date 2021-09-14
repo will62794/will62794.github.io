@@ -62,9 +62,9 @@ function build_adj_graph(states, edges){
     return adj_list;
 }
 
-function compact_state_str(state){
+function compact_state_str(state, action_name){
     sval = state["val"];
-    lines = "" + state["fp"] + "<br>";
+    lines = "" + state["fp"] + ", <b>(" + action_name + ")</b><br>";
     for(var v in sval){
         vals = Object.values(sval[v]).join(",");
         lines += v + ":" + vals;
@@ -97,14 +97,17 @@ function update_view(state){
     buttondiv.appendChild(backbtn);
     buttondiv.innerHTML += "<br>";
 
+    let curr_state = state;
     for(var nind in neighbors){
         neighbor_id = neighbors[nind];
         var btn = document.createElement("div");
         nstate = state_id_table[neighbor_id];
         nstateval = nstate["val"];
+
+        action_name = infer_action_name(curr_state, nstate)
         btn.name = "neighbor";
         btn.classList.add("state-btn");
-        btn.innerHTML = compact_state_str(nstate);
+        btn.innerHTML = compact_state_str(nstate, action_name);
         btn.id = "neighbor-" + neighbor_id;
         buttondiv.appendChild(btn);
     }
@@ -133,6 +136,59 @@ function update_view(state){
             update_view(curr_behavior[curr_behavior.length-1]);
         }
     };
+}
+
+function forall(f, lst){
+    let istrue = false;
+    for(var i=0;i<lst.length;i++){
+        if(!f(lst[i])){
+            return false;
+        }
+    }
+    return true;
+}
+
+function exists(lst, f){
+    let negf = function(x){
+        return !f(x);
+    }
+    return !forall(negf, lst)
+}
+
+function infer_action_name(s1, s2){
+    servers = Object.keys(s1["val"]["configTerm"]);
+    console.log("servers");
+    console.log(servers);
+    function configChanged(s){
+        return s1["val"]["config"][s] !== s2["val"]["config"][s] && s1["val"]["configVersion"][s] !== s2["val"]["configVersion"][s] && s1["val"]["state"][s] === "Primary";
+    }
+    function newLeader(s){
+        return (s1["val"]["currentTerm"][s] !== s2["val"]["currentTerm"][s]) && s2["val"]["state"][s] === "Primary";
+    }
+    function configSent(s){
+        return !(s1["val"]["configVersion"][s] === s2["val"]["configVersion"][s] && s1["val"]["configTerm"][s] === s2["val"]["configTerm"][s]) && s2["val"]["state"][s] === "Secondary";
+    }
+    function termUpdate(s){
+        console.log(s1["val"])
+        return (s1["val"]["currentTerm"][s] !== s2["val"]["currentTerm"][s]) && (s2["val"]["state"][s] === "Secondary");
+    }
+    console.log(s1);
+    console.log(s2);
+
+    if(exists(servers, configChanged)){
+        return "Reconfig"
+    }
+    else if(exists(servers, newLeader)){
+        return "BecomeLeader";
+    } 
+    else if(exists(servers, configSent)){
+        return "SendConfig";
+    } 
+    else if(exists(servers, termUpdate)){
+        return "UpdateTerms";
+    }else{
+        return "Action";
+    }
 }
 
 function view(state){
