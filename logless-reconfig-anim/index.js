@@ -90,7 +90,7 @@ function update_view(state){
 
     var backbtn = document.createElement("button");
     backbtn.name = "back";
-    backbtn.style="width:100px;";
+    backbtn.style="width:270px;height:30px;";
     backbtn.innerHTML="Back";
     backbtn.id = "back-btn"
     console.log(backbtn);
@@ -99,11 +99,11 @@ function update_view(state){
 
     for(var nind in neighbors){
         neighbor_id = neighbors[nind];
-        var btn = document.createElement("button");
+        var btn = document.createElement("div");
         nstate = state_id_table[neighbor_id];
         nstateval = nstate["val"];
         btn.name = "neighbor";
-        btn.style="width:300px;";
+        btn.classList.add("state-btn");
         btn.innerHTML = compact_state_str(nstate);
         btn.id = "neighbor-" + neighbor_id;
         buttondiv.appendChild(btn);
@@ -154,7 +154,7 @@ function view(state){
         // console.log("----")
         // console.log(X);
         // console.log(Y);
-        server_R = 20
+        server_R = 30
         circle.setAttributeNS(svgns, 'cx', X);
         circle.setAttributeNS(svgns, 'cy', Y);
         circle.setAttributeNS(svgns, 'r', server_R);
@@ -166,7 +166,7 @@ function view(state){
         configtext.innerHTML = state_str;
         configtext.setAttributeNS(svgns, 'x', X);
         configtext.setAttributeNS(svgns, 'y', Y-server_R/2 - 20);
-        configtext.setAttributeNS(svgns, 'style', "font-size:12px;font-family:courier;text-anchor:middle;");
+        configtext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
 
         configmembertext = document.createElementNS(svgns, 'text');
         state_str = "{" + state["config"][server] + "}";
@@ -174,21 +174,21 @@ function view(state){
         console.log(state["config"][server]);
         configmembertext.innerHTML = state_str;
         configmembertext.setAttributeNS(svgns, 'x', X);
-        configmembertext.setAttributeNS(svgns, 'y', Y-server_R/2 + 45);
-        configmembertext.setAttributeNS(svgns, 'style', "font-size:12px;font-family:courier;text-anchor:middle;");
+        configmembertext.setAttributeNS(svgns, 'y', Y - server_R/2 + 65);
+        configmembertext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
 
         statetext = document.createElementNS(svgns, 'text');
         state_str = state["state"][server][0] + state["currentTerm"][server]
         statetext.innerHTML = state_str;
         statetext.setAttributeNS(svgns, 'x', X);
-        statetext.setAttributeNS(svgns, 'y', Y+ 12);
-        statetext.setAttributeNS(svgns, 'style', "font-size:10px;font-family:courier;text-anchor:middle;");
+        statetext.setAttributeNS(svgns, 'y', Y+server_R/2+ 8);
+        statetext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
 
         idtext = document.createElementNS(svgns, 'text');
         idtext.innerHTML = server;
         idtext.setAttributeNS(svgns, 'x', X);
         idtext.setAttributeNS(svgns, 'y', Y);
-        idtext.setAttributeNS(svgns, 'style', "font-size:12px;font-family:courier;text-anchor:middle;");
+        idtext.setAttributeNS(svgns, 'style', "font-size:16px;font-family:courier;text-anchor:middle;");
 
 
         if(state["state"][server] === "Primary"){
