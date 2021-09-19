@@ -11,55 +11,25 @@ var svgns = "http://www.w3.org/2000/svg";
 var main = document.getElementById("main");
 main.appendChild(mysvg);
 
-
 var states;
 var edges;
 var curr_behavior = [];
 
-fetch('states.json')
-  .then(response => response.json())
-  .then(data => setup(data));
-
-function setup(state_graph){
-    states = state_graph["states"];
-    console.log("Loaded " + states.length + " states from JSON state graph.");
-    edges = state_graph["edges"];
-    console.log("Loaded " + edges.length + " transitions from JSON state graph.");
-
-    adj_list = build_adj_graph(states, edges);
-    console.log("Built adjacency graph.");
-
-    // Build table to look up states by their ids.
-    state_id_table = {}
-    for(var i=0;i<states.length;i++){
-        state_id_table[states[i]["fp"]] = states[i];
-    }
-    console.log("Built state lookup table.");
-    console.log(adj_list);
-
-    // update_view(random_state());
-    update_view(states[0]);
-    curr_behavior = [states[0]]
-}
-
-function random_state(){
-    var rand_state = states[Math.floor(Math.random() * states.length)];
-    return rand_state;
-}
-
-function build_adj_graph(states, edges){
-    adj_list = {}
-    for(var i=0;i<edges.length;i++){
-        edge = edges[i];
-        if(!adj_list.hasOwnProperty(edge[0])){
-            adj_list[edge[0]] = [edge[1]]
-        } else{
-            if(!adj_list[edge[0]].includes(edge[1])){
-                adj_list[edge[0]].push(edge[1]);
-            }
+function forall(f, lst){
+    let istrue = false;
+    for(var i=0;i<lst.length;i++){
+        if(!f(lst[i])){
+            return false;
         }
-    }   
-    return adj_list;
+    }
+    return true;
+}
+
+function exists(lst, f){
+    let negf = function(x){
+        return !f(x);
+    }
+    return !forall(negf, lst)
 }
 
 function compact_state_str(state, action_name){
@@ -73,6 +43,9 @@ function compact_state_str(state, action_name){
     return lines;
 }
 
+/**
+ * Update the current view to show the given state.
+ */
 function update_view(state){
     // console.log(state);
     sid = state["fp"];
@@ -138,23 +111,9 @@ function update_view(state){
     };
 }
 
-function forall(f, lst){
-    let istrue = false;
-    for(var i=0;i<lst.length;i++){
-        if(!f(lst[i])){
-            return false;
-        }
-    }
-    return true;
-}
-
-function exists(lst, f){
-    let negf = function(x){
-        return !f(x);
-    }
-    return !forall(negf, lst)
-}
-
+/**
+ * Given a state transition (s1, s2), infer the name of the action associated with this transition.
+ */
 function infer_action_name(s1, s2){
     servers = Object.keys(s1["val"]["configTerm"]);
     console.log("servers");
@@ -191,6 +150,11 @@ function infer_action_name(s1, s2){
     }
 }
 
+/**
+ * View function. 
+ * 
+ * Takes a protocol state and returns an SVG object that is a visual representation of that state.
+ */
 function view(state){
     var group = document.createElementNS(svgns, 'g');
     // console.log(state["configTerm"])
@@ -263,7 +227,58 @@ function view(state){
     return group;
 }
 
-// view("something")
+function random_state(){
+    var rand_state = states[Math.floor(Math.random() * states.length)];
+    return rand_state;
+}
+
+function build_adj_graph(states, edges){
+    adj_list = {}
+    for(var i=0;i<edges.length;i++){
+        edge = edges[i];
+        if(!adj_list.hasOwnProperty(edge[0])){
+            adj_list[edge[0]] = [edge[1]]
+        } else{
+            if(!adj_list[edge[0]].includes(edge[1])){
+                adj_list[edge[0]].push(edge[1]);
+            }
+        }
+    }   
+    return adj_list;
+}
+
+/**
+ * Set up the visualization.
+ */
+function setup(state_graph){
+    states = state_graph["states"];
+    console.log("Loaded " + states.length + " states from JSON state graph.");
+    edges = state_graph["edges"];
+    console.log("Loaded " + edges.length + " transitions from JSON state graph.");
+
+    adj_list = build_adj_graph(states, edges);
+    console.log("Built adjacency graph.");
+
+    // Build table to look up states by their ids.
+    state_id_table = {}
+    for(var i=0;i<states.length;i++){
+        state_id_table[states[i]["fp"]] = states[i];
+    }
+    console.log("Built state lookup table.");
+    console.log(adj_list);
+
+    // update_view(random_state());
+    update_view(states[0]);
+    curr_behavior = [states[0]]
+}
+
+//
+// Download the state graph and set up the visualization.
+//
+fetch('states.json')
+  .then(response => response.json())
+  .then(data => setup(data));
+
 
 
 // var circle = document.createElementNS(svgns, 'circle');
