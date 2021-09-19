@@ -3,9 +3,11 @@
 //
 
 var mysvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-mysvg.setAttribute('style', 'border: 1px solid gray');
-mysvg.setAttribute('width', '600');
-mysvg.setAttribute('height', '400');
+var svgWidth = 500;
+var svgHeight = 330;
+mysvg.setAttribute('style', 'border: 0px solid gray');
+mysvg.setAttribute('width', svgWidth);
+mysvg.setAttribute('height', svgHeight);
 console.log(mysvg);
 var svgns = "http://www.w3.org/2000/svg";
 var main = document.getElementById("main");
@@ -34,7 +36,8 @@ function exists(lst, f){
 
 function compact_state_str(state, action_name){
     sval = state["val"];
-    lines = "" + state["fp"] + ", <b>(" + action_name + ")</b><br>";
+    // lines = "" + state["fp"] + ", <b>(" + action_name + ")</b><br>";
+    lines = "<b>(" + action_name + ")</b><br>";
     for(var v in sval){
         vals = Object.values(sval[v]).join(",");
         lines += v + ":" + vals;
@@ -166,15 +169,17 @@ function view(state){
         // console.log(server)
         // console.log(state)
         circle = document.createElementNS(svgns, 'circle');
-        R = 120;
+        R = 110;
         div = ind / num_servers;
         // console.log(div);
-        X = R*Math.cos(div*2*Math.PI)+200;
-        Y = R*Math.sin(div*2*Math.PI) + 200;
+        cx = svgWidth/2
+        cy = svgHeight/2
+        X = R*Math.cos(div*2*Math.PI)+cx;
+        Y = R*Math.sin(div*2*Math.PI)+cy;
         // console.log("----")
         // console.log(X);
         // console.log(Y);
-        server_R = 30
+        server_R = 28
         circle.setAttributeNS(svgns, 'cx', X);
         circle.setAttributeNS(svgns, 'cy', Y);
         circle.setAttributeNS(svgns, 'r', server_R);
@@ -194,26 +199,41 @@ function view(state){
         console.log(state["config"][server]);
         configmembertext.innerHTML = state_str;
         configmembertext.setAttributeNS(svgns, 'x', X);
-        configmembertext.setAttributeNS(svgns, 'y', Y - server_R/2 + 65);
+        configmembertext.setAttributeNS(svgns, 'y', Y - server_R/2 + 60);
         configmembertext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
 
         statetext = document.createElementNS(svgns, 'text');
         state_str = state["state"][server][0] + state["currentTerm"][server]
+        // if(state["state"][server][0]==="P"){
+        //     state_str += "♕"
+        // }
         statetext.innerHTML = state_str;
         statetext.setAttributeNS(svgns, 'x', X);
-        statetext.setAttributeNS(svgns, 'y', Y+server_R/2+ 8);
+        statetext.setAttributeNS(svgns, 'y', Y+server_R/2 + 4);
         statetext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
+
+        primarysymbtext = document.createElementNS(svgns, 'text');
+        state_str = ""
+        if(state["state"][server][0]==="P"){
+            state_str += "♕"
+        }
+        primarysymbtext.innerHTML = state_str;
+        primarysymbtext.setAttributeNS(svgns, 'x', X);
+        primarysymbtext.setAttributeNS(svgns, 'y', Y+server_R/2 - 27);
+        primarysymbtext.setAttributeNS(svgns, 'style', "font-size:16px;font-family:courier;text-anchor:middle;");
 
         idtext = document.createElementNS(svgns, 'text');
         idtext.innerHTML = server;
         idtext.setAttributeNS(svgns, 'x', X);
         idtext.setAttributeNS(svgns, 'y', Y);
-        idtext.setAttributeNS(svgns, 'style', "font-size:16px;font-family:courier;text-anchor:middle;");
+        idtext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;font-weight:bold;");
 
 
         if(state["state"][server] === "Primary"){
             circle.setAttributeNS(svgns, 'stroke', "green");
-            circle.setAttributeNS(svgns, 'stroke-width', "2");
+            circle.setAttributeNS(svgns, 'stroke-width', "3");
+            circle.setAttributeNS(svgns, 'fill', "green");
+            circle.setAttributeNS(svgns, 'fill-opacity', "0.2");
         }
 
         ind += 1;
@@ -221,6 +241,7 @@ function view(state){
         group.appendChild(configtext);
         group.appendChild(configmembertext);
         group.appendChild(statetext);
+        group.appendChild(primarysymbtext);
         group.appendChild(idtext);
     }
 
