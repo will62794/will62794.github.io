@@ -180,8 +180,8 @@ function view(state){
         // console.log(div);
         cx = svgWidth/2
         cy = svgHeight/2
-        X = R*Math.cos(div*2*Math.PI)+cx;
-        Y = R*Math.sin(div*2*Math.PI)+cy;
+        X = -R*Math.cos(div*2*Math.PI)+cx;
+        Y = -R*Math.sin(div*2*Math.PI)+cy;
         // console.log("----")
         // console.log(X);
         // console.log(Y);
@@ -304,7 +304,7 @@ function setup(state_graph){
 //
 // Download the state graph and set up the visualization.
 //
-fetch('states.json')
+fetch('states-no-symmetry-compact.json')
   .then(response => response.json())
   .then(data => setup(data));
 
