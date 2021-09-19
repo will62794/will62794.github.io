@@ -36,11 +36,17 @@ function exists(lst, f){
 
 function compact_state_str(state, action_name){
     sval = state["val"];
-    // lines = "" + state["fp"] + ", <b>(" + action_name + ")</b><br>";
-    lines = "<b>(" + action_name + ")</b><br>";
-    for(var v in sval){
-        vals = Object.values(sval[v]).join(",");
-        lines += v + ":" + vals;
+    var servers = Object.keys(sval["configTerm"]);
+    lines = "<b>" + action_name + "</b><br>";
+    console.log("Will")
+    console.log(servers);
+    for(var i=0;i<servers.length;i++){
+        let server = servers[i];
+        let CV = "(" + sval["configVersion"][server] + "," + sval["configTerm"][server] + ")";
+        let stateTerm = sval["state"][server][0] + sval["currentTerm"][server];
+        let memberSet = "{" + sval["config"][server] + "}"
+        lines += server + ": "
+        lines += CV + ", " + stateTerm + " " + memberSet
         lines += "<br>";
     }
     return lines;
@@ -66,7 +72,7 @@ function update_view(state){
 
     var backbtn = document.createElement("button");
     backbtn.name = "back";
-    backbtn.style="width:270px;height:30px;";
+    backbtn.style="width:200px;height:35px;";
     backbtn.innerHTML="Back";
     backbtn.id = "back-btn"
     console.log(backbtn);
@@ -185,6 +191,8 @@ function view(state){
         circle.setAttributeNS(svgns, 'r', server_R);
         circle.setAttributeNS(svgns, 'fill', "none");
         circle.setAttributeNS(svgns, 'stroke', "black");
+        circle.setAttributeNS(svgns, 'stroke-width', "2");
+
 
         configtext = document.createElementNS(svgns, 'text');
         state_str = "(" + state["configVersion"][server] + "," + state["configTerm"][server] + ")"

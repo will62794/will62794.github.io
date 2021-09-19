@@ -13,18 +13,23 @@
         .state-btn{
             font-family: courier;
             font-size: 12px;
-            width:270px;
+            width:190px;
             background-color:lightgray;
             border:solid;
+            border-radius: 5px;
+            border-width: 2px;
             border-color:black;
             padding:4px;
             margin-bottom:3px;
             margin-right:3px;
             display: inline-block;
+            text-align: left;
+            padding-left:10px;
         }
         .state-btn:hover{
-            border-color:steelblue;
+            /* border-color:steelblue; */
             cursor: pointer;
+            background-color: rgb(127, 157, 182);
         }
 
         .column {
@@ -45,15 +50,16 @@
         <h1>MongoRaftReconfig Logless Reconfiguration Protocol</h1>
     </div>
     <div style="display:table;clear:both;font-size:14px;width:600px;margin:auto;text-align:left;">
-        This is an interactive visualization of a simplified version of the logless dynamic reconfiguration protocol designed for the MongoDB replication system. The state graph used for this animation was generated from the TLA+ formal specification found <a href="https://github.com/will62794/logless-reconfig">here</a>, using a <a href="https://github.com/will62794/tlaplus/tree/7233ab406fe2bcde8d9ac5bed155c1ea5a8750b1">modified version</a> of the TLC model checker. The raw JSON state graph used to drive the animation can be downloaded <a href="http://127.0.0.1:4000/logless-reconfig-anim/states.json">here</a>.
+        This is an interactive visualization of a simplified version of the logless dynamic reconfiguration protocol designed for the MongoDB replication system. The state graph used for this animation was generated from the TLA+ formal specification found <a href="https://github.com/will62794/logless-reconfig">here</a>.The raw JSON state graph used to drive the animation can be downloaded <a href="http://127.0.0.1:4000/logless-reconfig-anim/states.json">here</a>.
     </div>
+    <!-- , using a <a href="https://github.com/will62794/tlaplus/tree/7233ab406fe2bcde8d9ac5bed155c1ea5a8750b1">modified version</a> of the TLC model checker.  -->
     <br>
     
     <div id="main" style="float:none;text-align:center;" class="">       
     </div>
 
-    <div id="next-state-interface" style="width:1000px;margin:auto;text-align:center;" class="">
-        <h3>Choose next state</h3>
+    <div id="next-state-interface" style="width:800px;margin:auto;text-align:center;" class="">
+        <h3>Choose next state:</h3>
         <div id="buttons" style="padding:10px;" height=100></div>
     </div>
 
