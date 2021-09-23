@@ -14,6 +14,7 @@ var main = document.getElementById("main");
 main.appendChild(mysvg);
 
 var states;
+var initial_states;
 var edges;
 var curr_behavior = [];
 
@@ -53,23 +54,33 @@ function compact_state_str(state, action_name){
 }
 
 /**
- * Update the current view to show the given state.
+ * Update the current view to show the given state, or initial states, if 'state' is null.
  */
-function update_view(state){
-    // console.log(state);
-    sid = state["fp"];
-    sval = state["val"];
-    mysvg.innerHTML = "";
+function update_view(state, initstates){
     svg = $("svg");
-    svg.empty();
-    svg.append(view(sval));
-    document.getElementById("main").innerHTML += "";
+    console.log(initstates)
 
-    neighbors = adj_list[sid];
-    // console.log(neighbors);
+    var neighbors;
+    // Initial states case.
+    if(state===null){
+        neighbors = initstates.map((s) => s["fp"]);
+        $("#choose-state-title").html("Choose initial state:");
+    } else{
+        $("#choose-state-title").html("Choose next state:");
+        sid = state["fp"];
+        sval = state["val"];
+        mysvg.innerHTML = "";
+        svg.empty();
+        svg.append(view(sval));
+        document.getElementById("main").innerHTML += "";
+        neighbors = adj_list[sid];
+    }
+
+    console.log(neighbors);
     var buttondiv = document.getElementById("buttons");
     buttondiv.innerHTML = "";
 
+    // Create the 'back' button for going back to previous state.
     var backbtn = document.createElement("button");
     backbtn.name = "back";
     backbtn.style="width:200px;height:35px;";
@@ -82,8 +93,10 @@ function update_view(state){
     let curr_state = state;
     for(var nind in neighbors){
         neighbor_id = neighbors[nind];
+        console.log(neighbor_id);
         var btn = document.createElement("div");
         nstate = state_id_table[neighbor_id];
+        console.log(nstate)
         nstateval = nstate["val"];
 
         action_name = infer_action_name(curr_state, nstate)
@@ -109,11 +122,18 @@ function update_view(state){
         };
     }
 
+    var backbtn = document.getElementById("back-btn");
     // Handler for jumping back to previous state.
-    document.getElementById("back-btn").onclick = function(){
+    backbtn.onclick = function(){
         console.log("New state:");
         console.log("Clicked state: " + neighbor_id);
-        if(curr_behavior.length > 1){
+        if(curr_behavior.length === 2){
+            console.log("Return to initial states.");
+            curr_behavior.pop();
+            update_view(null, initial_states);
+            svg.empty();
+        }
+        else if(curr_behavior.length > 2){
             curr_behavior.pop();
             update_view(curr_behavior[curr_behavior.length-1]);
         }
@@ -121,9 +141,21 @@ function update_view(state){
 }
 
 /**
+ * Determines if a given state is an initial state.
+ */
+function initial_state(state){
+    let servers = Object.keys(state["val"]["configTerm"]);
+    return forall((sid) => state["val"]["configTerm"][sid]==0 && state["val"]["configVersion"][sid]==1, servers)
+}
+
+/**
  * Given a state transition (s1, s2), infer the name of the action associated with this transition.
  */
 function infer_action_name(s1, s2){
+    // Initial states are not a transition.
+    if(s1===null){
+        return "";
+    }
     servers = Object.keys(s1["val"]["configTerm"]);
     console.log("servers");
     console.log(servers);
@@ -285,6 +317,9 @@ function setup(state_graph){
     edges = state_graph["edges"];
     console.log("Loaded " + edges.length + " transitions from JSON state graph.");
 
+    initial_states = states.filter(initial_state)
+    console.log("Total initial states: " + initial_states.length);
+
     adj_list = build_adj_graph(states, edges);
     console.log("Built adjacency graph.");
 
@@ -297,7 +332,7 @@ function setup(state_graph){
     console.log(adj_list);
 
     // update_view(random_state());
-    update_view(states[0]);
+    update_view(null, initial_states);
     curr_behavior = [states[0]]
 }
 
