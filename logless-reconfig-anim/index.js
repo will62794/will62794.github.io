@@ -65,13 +65,17 @@ function update_view(state, initstates){
     if(state===null){
         neighbors = initstates.map((s) => s["fp"]);
         $("#choose-state-title").html("Choose initial state:");
+        mysvg.innerHTML = "";
+        svg.empty();
+        svg.append(view(initstates[0]["val"], true));
+        document.getElementById("main").innerHTML += "";
     } else{
         $("#choose-state-title").html("Choose next state:");
         sid = state["fp"];
         sval = state["val"];
         mysvg.innerHTML = "";
         svg.empty();
-        svg.append(view(sval));
+        svg.append(view(sval, false));
         document.getElementById("main").innerHTML += "";
         neighbors = adj_list[sid];
     }
@@ -195,8 +199,10 @@ function infer_action_name(s1, s2){
  * View function. 
  * 
  * Takes a protocol state and returns an SVG object that is a visual representation of that state.
+ * 
+ * With the 'skeleton' option, it just draws the nodes and their names, without details of their values.
  */
-function view(state){
+function view(state, skeleton){
     var group = document.createElementNS(svgns, 'g');
     // console.log(state["configTerm"])
     var servers = Object.keys(state["configTerm"]);
@@ -217,7 +223,7 @@ function view(state){
         // console.log("----")
         // console.log(X);
         // console.log(Y);
-        server_R = 28
+        server_R = 30
         circle.setAttributeNS(svgns, 'cx', X);
         circle.setAttributeNS(svgns, 'cy', Y);
         circle.setAttributeNS(svgns, 'r', server_R);
@@ -225,64 +231,65 @@ function view(state){
         circle.setAttributeNS(svgns, 'stroke', "black");
         circle.setAttributeNS(svgns, 'stroke-width', "2");
 
-
-        configtext = document.createElementNS(svgns, 'text');
-        state_str = "(" + state["configVersion"][server] + "," + state["configTerm"][server] + ")"
-        configtext.innerHTML = state_str;
-        configtext.setAttributeNS(svgns, 'x', X);
-        configtext.setAttributeNS(svgns, 'y', Y-server_R/2 - 20);
-        configtext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
-
-        configmembertext = document.createElementNS(svgns, 'text');
-        state_str = "{" + state["config"][server] + "}";
-        // .join(",")
-        console.log(state["config"][server]);
-        configmembertext.innerHTML = state_str;
-        configmembertext.setAttributeNS(svgns, 'x', X);
-        configmembertext.setAttributeNS(svgns, 'y', Y - server_R/2 + 60);
-        configmembertext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
-
-        statetext = document.createElementNS(svgns, 'text');
-        state_str = state["state"][server][0] + state["currentTerm"][server]
-        // if(state["state"][server][0]==="P"){
-        //     state_str += "♕"
-        // }
-        statetext.innerHTML = state_str;
-        statetext.setAttributeNS(svgns, 'x', X);
-        statetext.setAttributeNS(svgns, 'y', Y+server_R/2 + 4);
-        statetext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
-
-        primarysymbtext = document.createElementNS(svgns, 'text');
-        state_str = ""
-        if(state["state"][server][0]==="P"){
-            state_str += "♕"
-        }
-        primarysymbtext.innerHTML = state_str;
-        primarysymbtext.setAttributeNS(svgns, 'x', X);
-        primarysymbtext.setAttributeNS(svgns, 'y', Y+server_R/2 - 27);
-        primarysymbtext.setAttributeNS(svgns, 'style', "font-size:16px;font-family:courier;text-anchor:middle;");
-
         idtext = document.createElementNS(svgns, 'text');
         idtext.innerHTML = server;
         idtext.setAttributeNS(svgns, 'x', X);
         idtext.setAttributeNS(svgns, 'y', Y);
-        idtext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;font-weight:bold;");
+        idtext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;font-weight:bold;dominant-baseline:middle;");
+        group.appendChild(idtext);
+        group.appendChild(circle);
 
+        if(!skeleton){
+            configtext = document.createElementNS(svgns, 'text');
+            state_str = "(" + state["configVersion"][server] + "," + state["configTerm"][server] + ")"
+            configtext.innerHTML = state_str;
+            configtext.setAttributeNS(svgns, 'x', X);
+            configtext.setAttributeNS(svgns, 'y', Y-server_R/2 - 20);
+            configtext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
 
-        if(state["state"][server] === "Primary"){
-            circle.setAttributeNS(svgns, 'stroke', "green");
-            circle.setAttributeNS(svgns, 'stroke-width', "3");
-            circle.setAttributeNS(svgns, 'fill', "green");
-            circle.setAttributeNS(svgns, 'fill-opacity', "0.2");
+            configmembertext = document.createElementNS(svgns, 'text');
+            state_str = "{" + state["config"][server] + "}";
+            // .join(",")
+            console.log(state["config"][server]);
+            configmembertext.innerHTML = state_str;
+            configmembertext.setAttributeNS(svgns, 'x', X);
+            configmembertext.setAttributeNS(svgns, 'y', Y - server_R/2 + 60);
+            configmembertext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
+
+            statetext = document.createElementNS(svgns, 'text');
+            state_str = state["state"][server][0] + state["currentTerm"][server]
+            // if(state["state"][server][0]==="P"){
+            //     state_str += "♕"
+            // }
+            statetext.innerHTML = state_str;
+            statetext.setAttributeNS(svgns, 'x', X);
+            statetext.setAttributeNS(svgns, 'y', Y+server_R/2 + 4);
+            statetext.setAttributeNS(svgns, 'style', "font-size:14px;font-family:courier;text-anchor:middle;");
+
+            primarysymbtext = document.createElementNS(svgns, 'text');
+            state_str = ""
+            if(state["state"][server][0]==="P"){
+                state_str += "♕"
+            }
+            primarysymbtext.innerHTML = state_str;
+            primarysymbtext.setAttributeNS(svgns, 'x', X);
+            primarysymbtext.setAttributeNS(svgns, 'y', Y+server_R/2 - 27);
+            primarysymbtext.setAttributeNS(svgns, 'style', "font-size:16px;font-family:courier;text-anchor:middle;");
+
+            if(state["state"][server] === "Primary"){
+                circle.setAttributeNS(svgns, 'stroke', "green");
+                circle.setAttributeNS(svgns, 'stroke-width', "3");
+                circle.setAttributeNS(svgns, 'fill', "green");
+                circle.setAttributeNS(svgns, 'fill-opacity', "0.2");
+            }
+
+            group.appendChild(configtext);
+            group.appendChild(configmembertext);
+            group.appendChild(statetext);
+            group.appendChild(primarysymbtext);
         }
 
         ind += 1;
-        group.appendChild(circle);
-        group.appendChild(configtext);
-        group.appendChild(configmembertext);
-        group.appendChild(statetext);
-        group.appendChild(primarysymbtext);
-        group.appendChild(idtext);
     }
 
     return group;
