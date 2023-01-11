@@ -4,29 +4,36 @@ layout: default
 
 <div class="home">
 
+    <!-- Personal bio. -->
     <div>
         <!-- <div>
-            <img src="assets/headshot-tiny-cropped.jpg" alt="" width="200">
-        </div> -->
+                <img src="assets/headshot-tiny-cropped.jpg" alt="" width="200">
+            </div> -->
         <div style="padding-bottom:10px">
             <table>
-            <tr>
-            <td>
-                <h1 style="">William Schultz</h1>
-                <div>schultz (dot) w (at) northeastern (dot) edu</div>
-                <p style="padding-right:20px;">
-                I am a third-year PhD student in the <a href="https://pmanolios.gitlab.io/nu-fm/">formal methods group</a> at Northeastern University where I am advised by Prof. <a href="http://www.ccs.neu.edu/~stavros/#__utma=72955916.526793266.1616636078.1631200574.1631203811.75&__utmb=72955916.2.10.1631203811&__utmc=72955916&__utmx=-&__utmz=72955916.1631203811.75.60.utmcsr=127.0.0.1:4000|utmccn=(referral)|utmcmd=referral|utmcct=/&__utmv=-&__utmk=246264322">Stavros Tripakis</a>. My research interests are in formal methods and distributed systems broadly.
-                </p>
-                <p>
-                Previously I worked as a software engineer at MongoDB on their distributed database replication system. Before that I was an undergraduate at Cornell University, where I studied Math and Computer Science and graduated in 2016. 
-                </p>
-            </td>
-            <td style="vertical-align:top;">
-                <img src="assets/headshot-tiny-cropped.jpg" alt="" width="500px" style="padding-left:5px;margin-top:10%;">
-            </td>
-        </tr>
-        </table>
-
+                <tr>
+                    <td>
+                        <h1 style="">William Schultz</h1>
+                        <div>schultz (dot) w (at) northeastern (dot) edu</div>
+                        <p style="padding-right:20px;">
+                            I am a third-year PhD student in the <a href="https://pmanolios.gitlab.io/nu-fm/">formal methods
+                                group</a> at Northeastern University where I am advised by Prof. <a
+                                href="http://www.ccs.neu.edu/~stavros/#__utma=72955916.526793266.1616636078.1631200574.1631203811.75&__utmb=72955916.2.10.1631203811&__utmc=72955916&__utmx=-&__utmz=72955916.1631203811.75.60.utmcsr=127.0.0.1:4000|utmccn=(referral)|utmcmd=referral|utmcct=/&__utmv=-&__utmk=246264322">Stavros
+                                Tripakis</a>. My research interests are in formal methods and distributed systems broadly.
+                        </p>
+                        <p>
+                            Previously I worked as a software engineer at MongoDB on their distributed database replication
+                            system. Before that I was an undergraduate at Cornell University, where I studied Math and
+                            Computer Science and graduated in 2016.
+                        </p>
+                    </td>
+                    <td style="vertical-align:top;">
+                        <img src="assets/headshot-tiny-cropped.jpg" alt="" width="500px"
+                            style="padding-left:5px;margin-top:10%;">
+                    </td>
+                </tr>
+            </table>
+    
         </div>
     </div>
     
@@ -40,101 +47,115 @@ layout: default
         <br>
     </div> -->
 
+    
+    <!-- Publication List -->
     <div>
         <h2 style="font-weight:bold;">Publications</h2>
-        <div>
-            <b><a href="./assets/papers/fmcad22-tla-dist-invariant-inference.pdf">Plain and Simple Inductive Invariant Inference for Distributed Protocols in TLA+</a></b> 
-            <br>
-            <span class="authorme">William Schultz</span>, Ian Dardik, and Stavros Tripakis. <i>FMCAD 2022</i>
+    
+        <ul id="pub-list" class="item-list">
+            <li>
+                <b><a href="./assets/papers/fmcad22-tla-dist-invariant-inference.pdf">Plain and Simple Inductive Invariant
+                        Inference for Distributed Protocols in TLA+</a></b>
+                <br>
+                <span class="authorme">William Schultz</span>, Ian Dardik, and Stavros Tripakis. <i>FMCAD 2022</i>
+                <!-- <br> -->
+                <!-- <i>Accepted for publication at FMCAD 2022</i>. -->
+                <br>
+                <a href="./assets/papers/fmcad22-tla-dist-invariant-inference.pdf">[pdf]</a>
+                <a href="https://github.com/will62794/endive">[code]</a>
+                <!-- <a href="https://arxiv.org/abs/2205.06360">[arXiv:2205.06360]</a>  -->
+                <!-- <a href="https://github.com/will62794/logless-reconfig/tree/master/proofs">[code]</a> -->
+                <br>
+            </li>
             <!-- <br> -->
-            <!-- <i>Accepted for publication at FMCAD 2022</i>. -->
-            <br>
-            <a href="./assets/papers/fmcad22-tla-dist-invariant-inference.pdf">[pdf]</a> 
-            <a href="https://github.com/will62794/endive">[code]</a> 
-            <!-- <a href="https://arxiv.org/abs/2205.06360">[arXiv:2205.06360]</a>  -->
-            <!-- <a href="https://github.com/will62794/logless-reconfig/tree/master/proofs">[code]</a> -->
-            <br>
-        </div>
-        <br>
-
-        <div>
-            <b><a href="./assets/papers/cpp22-formal-verification-reconfig.pdf">Formal Verification of a Distributed Dynamic Reconfiguration Protocol</a></b> 
-            <br>
-            <span class="authorme">William Schultz</span>, Ian Dardik, and Stavros Tripakis. <i>CPP 2022</i>
-            <br>
-            <!-- <a href="https://popl22.sigplan.org/home/CPP-2022">CPP 2022</a>. -->
+    
+            <li>
+                <b><a href="./assets/papers/cpp22-formal-verification-reconfig.pdf">Formal Verification of a Distributed
+                        Dynamic Reconfiguration Protocol</a></b>
+                <br>
+                <span class="authorme">William Schultz</span>, Ian Dardik, and Stavros Tripakis. <i>CPP 2022</i>
+                <br>
+                <!-- <a href="https://popl22.sigplan.org/home/CPP-2022">CPP 2022</a>. -->
+                <!-- <br> -->
+                <!-- <a href="https://arxiv.org/abs/2109.11987">[arXiv:2109.11987]</a>  -->
+                <a href="https://github.com/will62794/logless-reconfig/tree/master/proofs">[code]</a>
+                <a href="https://youtu.be/VwCBlmS7XEA"> [video]</a>
+                <br>
+            </li>
             <!-- <br> -->
-            <!-- <a href="https://arxiv.org/abs/2109.11987">[arXiv:2109.11987]</a>  -->
-            <a href="https://github.com/will62794/logless-reconfig/tree/master/proofs">[code]</a>
-            <a href="https://youtu.be/VwCBlmS7XEA"> [video]</a>
-            <br>
-        </div>
-        <br>
-
-        <div>
-            <b><a href="./assets/papers/LIPIcs-OPODIS-2021-26.pdf">Design And Analysis of a Logless Dynamic Reconfiguration Protocol</a></b> 
-            <br>
-            <span class="authorme">William Schultz</span>, Siyuan Zhou, Ian Dardik, and Stavros Tripakis. <i>OPODIS 2021</i>
-            <br>
-            <!-- <a href="https://opodis2021.unistra.fr/"><i>OPODIS 2021</i></a>. -->
-            <!-- arXiv Preprint 2021. Brief Announcement to appear at <i><a href="http://www.disc-conference.org/wp/disc2021/accepted-papers-2021/">DISC 2021</a></i>. -->
+    
+            <li>
+                <b><a href="./assets/papers/LIPIcs-OPODIS-2021-26.pdf">Design And Analysis of a Logless Dynamic
+                        Reconfiguration Protocol</a></b>
+                <br>
+                <span class="authorme">William Schultz</span>, Siyuan Zhou, Ian Dardik, and Stavros Tripakis. <i>OPODIS
+                    2021</i>
+                <br>
+                <!-- <a href="https://opodis2021.unistra.fr/"><i>OPODIS 2021</i></a>. -->
+                <!-- arXiv Preprint 2021. Brief Announcement to appear at <i><a href="http://www.disc-conference.org/wp/disc2021/accepted-papers-2021/">DISC 2021</a></i>. -->
+                <!-- <br> -->
+                <!-- a href="http://www.disc-conference.org/wp/disc2021/accepted-papers-2021/">DISC 2021</a> -->
+                <a href="https://arxiv.org/abs/2102.11960">[full version]</a>
+                <a href="https://github.com/will62794/logless-reconfig">[code]</a>
+                <a href="https://youtu.be/545A0YRv01M?t=2091"> [video]</a>
+                <a href="logless-reconfig-anim/"> [protocol visualization]</a>
+                <br>
+    
+            </li>
             <!-- <br> -->
-            <!-- a href="http://www.disc-conference.org/wp/disc2021/accepted-papers-2021/">DISC 2021</a> -->
-            <a href="https://arxiv.org/abs/2102.11960">[full version]</a> 
-            <a href="https://github.com/will62794/logless-reconfig">[code]</a>
-            <a href="https://youtu.be/545A0YRv01M?t=2091"> [video]</a>
-            <a href="logless-reconfig-anim/"> [protocol visualization]</a>
-            <br>
-            
-        </div>
-        <br>
-
-        <div>
-            <b><a href="http://www.vldb.org/pvldb/vol12/p2071-schultz.pdf">Tunable Consistency in MongoDB</a></b>
-            <br>
-            <span class="authorme">William Schultz</span>, Tess Avitabile, and Alyson Cabral. <i>VLDB 2019</i>
-            <br>
-            <!-- <a href="https://vldb.org/2019/"><i>VLDB 2019</i></a>. -->
-        </div>
-        <br>
+    
+            <li>
+                <b><a href="http://www.vldb.org/pvldb/vol12/p2071-schultz.pdf">Tunable Consistency in MongoDB</a></b>
+                <br>
+                <span class="authorme">William Schultz</span>, Tess Avitabile, and Alyson Cabral. <i>VLDB 2019</i>
+                <br>
+                <!-- <a href="https://vldb.org/2019/"><i>VLDB 2019</i></a>. -->
+            </li>
+            <!-- <br> -->
+        </ul>
     </div>
 
     <div>
         <h2 style="font-weight:bold;">Talks</h2>
-        <div>
+        <ul>
+        <li>
             <b><a href="https://svd.csail.mit.edu/2022/">Inductive Invariant Inference in TLA+</a></b>
             <br>
-            William Schultz.
-            <br>
-            <i>New England Systems Verification Day 2022.</i>
-        </div>
+            William Schultz. <i>New England Systems Verification Day 2022.</i>
+            <!-- <br> -->
+            <!-- <i>New England Systems Verification Day 2022.</i> -->
+        </li>
         <br>
-        <div>
+        <li>
             <b><a href="https://conf.tlapl.us/2019/williamschultz/">A Bug's Life: Fixing a MongoDB Replication Protocol Bug with TLA+</a></b>
             <br>
-            William Schultz and Siyuan Zhou.
-            <br>
-            <i>TLA+ Conference 2019.</i>
+            William Schultz and Siyuan Zhou. <i>TLA+ Conference 2019.</i>
+            <!-- <br> -->
+            <!-- <i>TLA+ Conference 2019.</i> -->
             <br>
             <a href="https://www.youtube.com/watch?v=x9zSynTfLDE">[video]</a>  <a href="https://conf.tlapl.us/07_-_TLAConf19_-_William_Schultz_-_Fixing_a_MongoDB_Replication_Protocol_Bug_with_TLA.pdf">[slides]</a>
-        </div>
+        </li>
         <br>
 
-        <div>
-            <b><a href="http://tla2018.loria.fr/program.html">An Animation Module for TLA+</a></b>
+        <li>
+            <b><a href="https://www.youtube.com/watch?v=mLF220fPrP4">An Animation Module for TLA+</a></b>
             <br>
-            William Schultz.
+            William Schultz. <i>TLA+ Community Event 2018.</i>
             <br>
-            <i>TLA+ Community Event 2018.</i>
-            <br>
-            <a href="https://www.youtube.com/watch?v=mLF220fPrP4">[video]</a>  <a href="http://tla2018.loria.fr/contrib/schultz-slides.pdf">[slides]</a>
-        </div>
+            <!-- <i>TLA+ Community Event 2018.</i> -->
+            <!-- <br> -->
+            <a href="https://www.youtube.com/watch?v=mLF220fPrP4">[video]</a>  
+            <!-- <a href="http://tla2018.loria.fr/contrib/schultz-slides.pdf">[slides]</a> -->
+        </li>
         <br>
+        </ul>
     </div>
 
+
+    
     <div>
         <h2 style="font-weight:bold;">Experience</h2>
-
+    
         <div>
             <b>Applied Scientist Intern, Amazon Web Services (AWS)</b>
             <br>
@@ -145,7 +166,7 @@ layout: default
             <!-- <a href="https://ntrs.nasa.gov/citations/20210020643">[exit presentation]</a> -->
         </div>
         <br>
-
+    
         <div>
             <b>Research Intern, NASA Langley Research Center</b>
             <br>
@@ -153,10 +174,10 @@ layout: default
             <br>
             Summer 2021
             <br>
-            <a href="https://ntrs.nasa.gov/citations/20210020643">[exit presentation]</a>
+            <a href="https://ntrs.nasa.gov/citations/20210020643">[presentation]</a>
         </div>
         <br>
-
+    
         <div>
             <b>Software Engineer, MongoDB</b>
             <br>
@@ -164,7 +185,6 @@ layout: default
             <br>
             2016 - 2020
         </div>
-
     </div>
 </div>
   
