@@ -279,11 +279,13 @@
 	max-width:800px;
 }
 .post-list {
-	margin-left: 0;
-	list-style: none;
+	margin-left: 20px;
+	// list-style: square;
 
 	> li {
-		margin-bottom: $spacing-unit;
+		// margin-bottom: $spacing-unit;
+		margin-bottom: 5px;
+        line-height:1.3em;
 	}
 }
 
@@ -294,10 +296,19 @@
 
 .post-link {
 	display: block;
-	font-size: 20px;
+	font-size: 18px;
 	font-weight: normal;
 }
 
+.exp-date{
+    display: block;
+    float:left;
+    width:105px;
+    color:#666;
+    // border-right: solid 1px gray;
+    // margin-right:10px;
+    // height:18px;
+}
 
 
 /**
