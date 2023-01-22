@@ -303,11 +303,16 @@
 .exp-date{
     display: block;
     float:left;
-    width:105px;
-    color:#666;
+    width:100px;
+    // color:#666;
     // border-right: solid 1px gray;
-    // margin-right:10px;
-    // height:18px;
+    // margin-right:4px;
+    // margin-bottom:1px;
+    // height:12px;
+}
+
+#exp-list li{
+    margin-bottom:2px;
 }
 
 
