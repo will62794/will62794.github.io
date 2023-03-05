@@ -551,6 +551,10 @@
 
 }
 
+.confname{
+    font-weight: bold;
+}
+
 // .postBox{
 // 	font-size:20px;
 // 	color:#222;
@@ -598,11 +602,13 @@
 
 
 .authorme{
-    // /* color:blue; */
-    font-weight:bold;
+    // color:blue;
+    // font-weight:bold;
     // color:red;
     // color:$brand-color;
-    // color: lighten($brand-color, 35%);
+    color: lighten($brand-color, 15%);
+    // font-
+    // text-decoration: underline;;
     // color:red;
 
 }
