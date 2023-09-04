@@ -167,7 +167,7 @@ To find the reseed points within the sequence, I tried to use prefixes of random
 </svg>
 </p>
 
- Even if there were prefix collisions between sequences (which I deemed very unlikely), the sequences with colliding prefixes could easily be distinguished by looking at a longer sequence prefix. With this in mind, I decided to create a lookup table that mapped length 31 sequence prefixes to the seeds that produced them. The final table looked something like the following:
+ Even if there were prefix collisions between sequences (which I deemed very unlikely), the sequences with colliding prefixes could easily be distinguished by looking at a longer sequence prefix. With this in mind, I created a lookup table that mapped length 31 sequence prefixes to the seeds that produced them. The final table looked something like the following:
 
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
@@ -428,7 +428,7 @@ I could observe partial contiguous runs of random numbers, but there would be sk
 
 #### Subsequence Fingerprints
 
-The core of my approach still involved finding the latest reseed point and its seed value. Instead of looking for prefixes of generated sequences, though, as I had tried before, I decided on something slightly different. I figured that, if I could observe a contiguous subsequence of considerable length, say 64 elements, this could also act as a fingerprint for a random sequence, even if it wasn't the prefix. My thought was that it is very unlikely for two different random sequences (of some finite, non-astronomical length) to contain exactly the same 64-element subsequence. There are $$2^{64}$$ possible binary sequences of length 64, but, in a random binary sequence of say, length 5000, there are only around 5000 different subsequences that appear (think of sliding a 64-element window along the 5000 element sequence). So, in any one length $$N$$ sequence you only see around $$N$$ of the $$2^{64}$$ possible length 64 subsequences. This means the probability of a specific length 64 subsequence appearing in a length $$N$$ sequence should be extremely low ($$\approx \frac{N}{2^{64}}$$), as long as $$N << 2^{64}$$.
+The core of my approach still involved finding the latest reseed point and its seed value. Instead of looking for prefixes of generated sequences, though, I figured that if I could observe a contiguous subsequence of considerable length (e.g. ~64 elements), this could also act as a fingerprint for a random sequence, even if it wasn't the prefix. My thought was that it would be very unlikely for two different random sequences (of some reasonable finite length) to contain exactly the same 64-element subsequence. There are $$2^{64}$$ possible binary sequences of length 64, but, in a random binary sequence of say, length 5000, there are only around 5000 different subsequences that appear (think of sliding a 64-element window along the 5000 element sequence). So, in any one length $$N$$ sequence you only see around $$N$$ of the $$2^{64}$$ possible length 64 subsequences. This means the probability of a specific length 64 subsequence appearing in a length $$N$$ sequence should be extremely low ($$\approx \frac{N}{2^{64}}$$), as long as $$N << 2^{64}$$.
 
 <!-- #### Seed Search Approach
 
