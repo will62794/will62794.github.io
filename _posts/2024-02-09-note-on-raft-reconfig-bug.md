@@ -7,12 +7,12 @@ categories: formal-methods model-checking
 
 Below is a high level overview of the Raft reconfiguration bug cases laid out in Diego Ongaro's [group post](https://groups.google.com/g/raft-dev/c/t4xj6dJTP6E/m/d2D9LrWRza8J), which described the problematic scenarios in Raft's single server reconfiguration (i.e. membership change) algorithm. Configurations are annotated with their terms i.e., a config $$X$$ in term $$t$$ is shown as $$X^t$$.
 
-- **Two adds**
+- **One add, one remove**
     
     <div style="text-align:center;">
         <img width=600px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.001.png">
     </div>
-- **One add, one remove**
+- **Two adds** 
   
     <div style="text-align:center;">
         <img width=600px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.002.png">
