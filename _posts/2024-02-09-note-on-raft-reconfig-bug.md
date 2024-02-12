@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Notes on Raft's Reconfiguration Bug"
-categories: formal-methods model-checking
+categories: distributed-systems
 ---
 
 
