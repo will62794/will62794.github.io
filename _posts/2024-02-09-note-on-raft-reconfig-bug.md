@@ -88,7 +88,7 @@ For example, moving between $$\{s_1,s_2\}$$, $$\{s_2,s_3\}$$, or $$\{s_1,s_3\}$$
 With 4 servers, even more additional reconfigurations are allowed.
 
 <div style="text-align:center">
-<img width="510px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n4.png?raw=true" >
+<img width="530px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n4.png?raw=true" >
 </div>
 
 Notably, we can observe the ability to move from any 4-node config to any 2-node config in one step, since 4 node configs have quorums of size 3, which always intersects with the size 2 quorums of any 2 node config. Some 2 node configs can still also move directly between each other, even without a single node difference, as in the 3 server setting.
