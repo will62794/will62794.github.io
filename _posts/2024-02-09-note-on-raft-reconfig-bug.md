@@ -62,14 +62,14 @@ $$
 
 then this is an explicit way to ensure reconfiguration safety by ensuring quorum overlap, without relying on the overly restrictive single node change condition.
 
-We can compare this generalized condition and the single node change condition explicitly by observing the space of possible reconfigurations under each, for varying numbers of global servers. In the following transition graphs, blue edges represent normal single node change reconfigurations, and green edges represent reconfigurations that are possible under the generalized condition but not under the single node change condition. Note also that we always explicitly disallow empty configs.
+We can compare this generalized condition and the single node change condition explicitly by observing the space of possible reconfigurations under each, for varying numbers of global servers. In the reconfiguration transition graphs below, blue edges represent single node change reconfigurations, and green edges represent reconfigurations that are possible under the generalized condition but not under the single node change condition. Note also that we always explicitly disallow starting in or moving to empty configs.
 
 #### 2 Servers
 
-With only 2 servers, the single node change condition is equivalent to the generalized condition above (note the absence of green edges): 
+With only 2 servers, the single node change condition is equivalent to the generalized condition (note the absence of green edges): 
 
 <div style="text-align:center">
-<img width="150px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2.png?raw=true" >
+<img width="130px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2.png?raw=true" >
 </div>
 
 #### 3 Servers
