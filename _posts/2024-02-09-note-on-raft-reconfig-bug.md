@@ -10,17 +10,17 @@ Below is a high level overview of the Raft reconfiguration bug cases laid out in
 - **One add, one remove**
     
     <div style="text-align:center;">
-        <img width=630px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.001.png">
+        <img width=620px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.001.png">
     </div>
 - **Two adds** 
   
     <div style="text-align:center;">
-        <img width=630px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.002.png">
+        <img width=620px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.002.png">
     </div>
 - **Two removes**
   
     <div style="text-align:center;">
-        <img width=630px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.003.png">
+        <img width=620px src="/assets/diagrams/raft_reconfig_bug/raft_reconfig_bug.003.png">
     </div>
 
 
