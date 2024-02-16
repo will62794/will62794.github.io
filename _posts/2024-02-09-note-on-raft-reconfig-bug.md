@@ -74,7 +74,7 @@ With only 2 servers, the single node change condition is equivalent to the gener
 
 #### 3 Servers
 
-Even with 3 servers, though, the generalized condition admits more possible reconfigurations:
+Even with 3 servers the generalized condition admits more possible reconfigurations:
 
 <div style="text-align:center">
 <img width="450px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n3.png?raw=true" >
