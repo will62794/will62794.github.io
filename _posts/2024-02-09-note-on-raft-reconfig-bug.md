@@ -40,9 +40,11 @@ So, upon election, before doing any reconfiguration, you actually need to be sur
 
 Similarly to Diego's proposal, this fix is achieved in [MongoDB's reconfiguration protocol](https://arxiv.org/pdf/2102.11960.pdf) by [rewriting the config term on primary election](https://github.com/will62794/logless-reconfig/blob/5b1d0f3bfd93c4d78470689a56959d1dcc5297a2/MongoLoglessDynamicRaft.tla#L90-L91), which then requires this config in the new term to become committed before further reconfigs can occur on that elected primary.
 
-### A Note on Relaxation of Single Node Change
+### A Note on Relaxing the Single Node Change Condition
 
-The single node change condition (i.e. reconfigurations can only add or remove a single node) proposed in the original Raft dissertation is a sufficient condition to ensure that all quorums overlap between any two configurations $$C_{old}$$ and $$C_{new}$$. Note that even before resorting to joint consensus, though, this condition can be relaxed slightly, to permit additional, safe reconfigurations that are more permissive than the strict single node change. If, for a reconfiguration from $$C_{old}$$ to $$C_{new}$$, we simply enforce that 
+The single node change condition (i.e. reconfigurations can only add or remove a single node) proposed in the original Raft dissertation is a sufficient condition to ensure that all quorums overlap between any two configurations $$C_{old}$$ and $$C_{new}$$. Note that even without resorting to the joint consensus approach, though, this condition can be relaxed slightly, to permit additional, safe reconfigurations that would not be allowed under the strict single node change rule. 
+
+If, for a reconfiguration from $$C_{old}$$ to $$C_{new}$$, we simply enforce that 
 
 $$
 QuorumsOverlap(C_{old}, C_{new})
@@ -58,9 +60,9 @@ $$
 \end{aligned}
 $$
 
-then this is an explicit way to ensure reconfiguration safety without emplying the joint consensus machinery. 
+then this is an explicit way to ensure reconfiguration safety by ensuring quorum overlap, without relying on the overly restrictive single node change condition.
 
-We can compare the generalized and single node change condition explicitly by observing the space of possible reconfigurations under each, for varying numbers of global servers. In the following transition graphs, blue edges represent normal single node change reconfigurations, and green edges represent reconfigurations that are possible under the generalized condition but not under the single node change condition. Note also that we always explicitly disallow empty configs.
+We can compare this generalized condition and the single node change condition explicitly by observing the space of possible reconfigurations under each, for varying numbers of global servers. In the following transition graphs, blue edges represent normal single node change reconfigurations, and green edges represent reconfigurations that are possible under the generalized condition but not under the single node change condition. Note also that we always explicitly disallow empty configs.
 
 #### 2 Servers
 
@@ -72,7 +74,7 @@ With only 2 servers, the single node change condition is equivalent to the gener
 
 #### 3 Servers
 
-Even with 3 servers, the generalized condition admits more possible reconfigurations:
+Even with 3 servers, though, the generalized condition admits more possible reconfigurations:
 
 <div style="text-align:center">
 <img width="450px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n3.png?raw=true" >
