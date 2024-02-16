@@ -80,7 +80,7 @@ Even with 3 servers, though, the generalized condition admits more possible reco
 <img width="450px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n3.png?raw=true" >
 </div>
 
-For example, moving between $$\{s_1,s_2\}$$ and $$\{s_2,s_3\}$$ in one step is safe under the generalized condition, since quorums are of size 2 in both configs, which always intersect. Such a reconfiguration is not allowed under the single node change condition, since it requires 1 add + 1 remove.
+For example, moving between $$\{s_1,s_2\}$$, $$\{s_2,s_3\}$$, or $$\{s_1,s_3\}$$ (i.e. any size 2 config) in one step is safe under the generalized condition, since quorums are of size 2 in both configs, which always intersect. Such a reconfiguration is not allowed under the single node change condition, since it requires 1 add + 1 remove.
 
 #### 4 Servers
 
