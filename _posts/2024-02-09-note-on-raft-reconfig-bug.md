@@ -42,9 +42,9 @@ Similarly to Diego's proposal, this fix is achieved in [MongoDB's reconfiguratio
 
 ### A Note on Relaxing the Single Node Change Condition
 
-The single node change condition (i.e. reconfigurations can only add or remove a single node) proposed in the original Raft dissertation is a sufficient condition to ensure that all quorums overlap between any two configurations $$C_{old}$$ and $$C_{new}$$. Note that even without resorting to the joint consensus approach, though, this condition can be relaxed slightly, to permit additional, safe reconfigurations that would not be allowed under the strict single node change rule. 
+The single node change condition (i.e. reconfigurations can only add or remove a single node) proposed in the original Raft dissertation is a sufficient condition to ensure that all quorums overlap between any two configurations $$C_{old}$$ and $$C_{new}$$. Note that even without resorting to joint consensus, though, this condition can be relaxed slightly, to permit additional, safe reconfigurations that are not allowed under the strict single node change rule. 
 
-If, for a reconfiguration from $$C_{old}$$ to $$C_{new}$$, we simply enforce that 
+Specifically, for a reconfiguration from $$C_{old}$$ to $$C_{new}$$, if we simply enforce that 
 
 $$
 QuorumsOverlap(C_{old}, C_{new})
@@ -60,7 +60,7 @@ $$
 \end{aligned}
 $$
 
-then this is an explicit way to ensure reconfiguration safety by ensuring quorum overlap, without relying on the overly restrictive single node change condition.
+then this is an explicit way to ensure reconfiguration safety, without relying on the overly restrictive single node change condition.
 
 We can compare this generalized condition and the single node change condition explicitly by observing the space of possible reconfigurations under each, for varying numbers of global servers. In the reconfiguration transition graphs below, blue edges represent single node change reconfigurations, and green edges represent reconfigurations that are possible under the generalized condition but not under the single node change condition. Note also that we always explicitly disallow starting in or moving to empty configs.
 
