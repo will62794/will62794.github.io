@@ -69,7 +69,7 @@ We can compare this generalized condition and the single node change condition e
 With only 2 servers, the single node change condition is equivalent to the generalized condition (note the absence of green edges): 
 
 <div style="text-align:center">
-<img width="130px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2.png?raw=true" >
+<img width="380px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2_fdp.png?raw=true" >
 </div>
 
 #### 3 Servers
@@ -77,10 +77,10 @@ With only 2 servers, the single node change condition is equivalent to the gener
 Even with 3 servers the generalized condition admits more possible reconfigurations:
 
 <div style="text-align:center">
-<img width="450px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n3.png?raw=true" >
+<img width="470px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n3_fdp.png?raw=true" >
 </div>
 
-For example, moving between $$\{s_1,s_2\}$$, $$\{s_2,s_3\}$$, or $$\{s_1,s_3\}$$ (i.e. any size 2 config) in one step is safe under the generalized condition, since quorums are of size 2 in both configs, which always intersect. Such a reconfiguration is not allowed under the single node change condition, since it requires 1 add + 1 remove.
+For example, moving between $$\{s_1,s_2\}$$, $$\{s_2,s_3\}$$, or $$\{s_1,s_3\}$$ (i.e. any size 2 config) in one step is safe under the generalized condition, since quorums are of size 2 in both configs, which always intersect. These reconfigurations are not allowed under the single node change condition, though, since they require 1 add and 1 remove.
 
 #### 4 Servers
 
@@ -88,10 +88,10 @@ For example, moving between $$\{s_1,s_2\}$$, $$\{s_2,s_3\}$$, or $$\{s_1,s_3\}$$
 With 4 servers, even more additional reconfigurations are allowed.
 
 <div style="text-align:center">
-<img width="530px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n4.png?raw=true" >
+<img width="550px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n4_fdp.png?raw=true" >
 </div>
 
-Notably, we can observe the ability to move from any 4-node config to any 2-node config in one step, since 4 node configs have quorums of size 3, which always intersect with the size 2 quorums of any 2 node config. Some 2 node configs can still also move directly between each other, even without a single node difference, as in the 3 server setting.
+In particular, note the ability to move from any 4-node config to any 2-node config in one step, since 4 node configs have quorums of size 3, which always intersect with the size 2 quorums of any 2 node config. Some 2 node configs can still also move directly between each other, even without a single node difference, as in the 3 server setting.
 
 <!-- ## Exploring Bug Traces -->
 
