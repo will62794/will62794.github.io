@@ -60,9 +60,9 @@ $$
 \end{aligned}
 $$
 
-then this is an explicit way to ensure reconfiguration safety, without relying on the overly restrictive single node change condition.
+then this explicitly ensures reconfiguration safety, without relying on the single node change restriction.
 
-We can compare this generalized condition and the single node change condition explicitly by observing the space of possible reconfigurations under each, for varying numbers of global servers. In the reconfiguration transition graphs below, blue edges represent single node change reconfigurations, and green edges represent reconfigurations that are possible under the generalized condition but not under the single node change condition. Note also that we always explicitly disallow starting in or moving to empty configs.
+We can compare the above, generalized condition with the single node change condition by observing the space of possible reconfigurations under each, for varying numbers of global servers. In the reconfiguration transition graphs below, blue edges represent single node change reconfigurations, and green edges represent reconfigurations that are possible under the generalized condition but not under the single node change condition. Note also that we always explicitly disallow starting in or moving to empty configs.
 
 #### 2 Servers
 
