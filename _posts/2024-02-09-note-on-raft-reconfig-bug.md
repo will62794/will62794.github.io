@@ -69,7 +69,7 @@ We can compare the generalized condition above with the single node change condi
 With only 2 servers, the single node change condition is equivalent to the generalized condition (note the absence of green edges): 
 
 <div style="text-align:center">
-<img width="380px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2_neato.png?raw=true" >
+<img width="300px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2_neato.png?raw=true" >
 </div>
 
 #### 3 Servers
@@ -77,7 +77,7 @@ With only 2 servers, the single node change condition is equivalent to the gener
 Even with 3 servers the generalized condition admits more possible reconfigurations:
 
 <div style="text-align:center">
-<img width="470px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n3_neato.png?raw=true" >
+<img width="440px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n3_neato.png?raw=true" >
 </div>
 
 For example, moving between $$\{s_1,s_2\}$$, $$\{s_2,s_3\}$$, or $$\{s_1,s_3\}$$ (i.e. any size 2 config) in one step is safe under the generalized condition, since quorums are of size 2 in both configs, which always intersect. These reconfigurations are not allowed under the single node change condition, though, since they require 1 add and 1 remove.
