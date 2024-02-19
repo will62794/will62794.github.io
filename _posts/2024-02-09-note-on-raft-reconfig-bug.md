@@ -42,7 +42,7 @@ Similarly to Diego's proposal, this fix is achieved in [MongoDB's reconfiguratio
 
 ### A Note on Relaxing the Single Node Change Condition
 
-The single node change condition (i.e. reconfigurations can only add or remove a single node) proposed in the original Raft dissertation is a sufficient condition to ensure that all quorums overlap between any two configurations $$C_{old}$$ and $$C_{new}$$. Note that even without resorting to joint consensus, though, this condition can be relaxed slightly, to permit additional, safe reconfigurations that are not allowed under the strict single node change rule. 
+The single node change condition (i.e. reconfigurations can only add or remove a single node) proposed in the original Raft dissertation is sufficient to ensure that all quorums overlap between any two configurations $$C_{old}$$ and $$C_{new}$$. Even without resorting to the joint consensus mechanism, though, this condition can be relaxed slightly, to permit additional, safe reconfigurations that are not allowed under the single node change rule. 
 
 Specifically, for a reconfiguration from $$C_{old}$$ to $$C_{new}$$, if we simply enforce that 
 
