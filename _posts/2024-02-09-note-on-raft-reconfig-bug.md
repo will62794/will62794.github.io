@@ -69,7 +69,7 @@ We can compare the generalized condition above with the single node change condi
 With only 2 servers, the single node change condition is equivalent to the generalized condition (note the absence of green edges): 
 
 <div style="text-align:center">
-<img width="300px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2_neato.png?raw=true" >
+<img width="280px" src="https://github.com/will62794/logless-reconfig/blob/master/notes/raft_reconfig_bug/quorums_n2_neato.png?raw=true" >
 </div>
 
 #### 3 Servers
