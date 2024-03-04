@@ -1,10 +1,10 @@
 ---
 layout: post
-title:  "On Roles in Paxos"
+title:  "Paxos sans Roles"
 categories: distributed-systems
 ---
 
-In most classical descriptions of Paxos, it is assumed that agents of the system are separated into distinct *proposer*, *acceptor*, and *learner* roles. As described in Paxos Made Simple:
+In most classical descriptions of Paxos, it is assumed that agents of the system are separated into distinct *proposer*, *acceptor*, and *learner* roles. As described in [Paxos Made Simple](https://www.microsoft.com/en-us/research/publication/paxos-made-simple/):
 
 > We let the three roles in the consensus algorithm be performed by three classes of agents: proposers, acceptors, and learners. In an implementation, a single process may act as more than one agent, but the mapping from agents to processes does not concern us here.
 
