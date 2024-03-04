@@ -25,12 +25,12 @@ Here is a [formal specification of Paxos](https://github.com/will62794/mypaxos/b
 
 where the first 3 variables, `maxBal`,`maxVBal`, and `maxVal` have the standard meaning as in classic Paxos, and `chosen` is a node local variable that records that nodes decided value. The actions of the protocol are now as follows:
 
-- `Phase1b`
+- `Prepare`
 - `Phase2a`
 - `Phase2b`
 - `Learn`
 
-The `Phase1b` is more or less analogous to the `Phase1b` of Paxos, but we get rid of `Phase1a`, since proposers no longer are demarcated as distinct roles. Instead, any node can try to go ahead and `Prepare`, which simply consists of a node preparing at some ballot number `b`, provided that `b` is newer than its latest seen ballot. It simply updates it `maxBal` to that ballot and, implicitly based on our message passing style, broadcasts its updated state.
+The `Prepare` is more or less analogous to the `Prepare` of Paxos, but we get rid of `Phase1a`, since proposers no longer are demarcated as distinct roles. Instead, any node can try to go ahead and `Prepare`, which simply consists of a node preparing at some ballot number `b`, provided that `b` is newer than its latest seen ballot. It simply updates it `maxBal` to that ballot and, implicitly based on our message passing style, broadcasts its updated state.
 
 Now, the traditional `Phase2a` of Paxos for ballot `b` simply consists of checking whether a quorum of nodes are at ballot `b`. In our universal message passing model, we can basically always just directly read from any historical state of any other node, so checking this is natural, expressed as a predicate over the `msgs` set. If the precondition for `Phase2a` at ballot `b` is met (i.e. a quorum is prepared at ballot `b`), then a node should be free to go ahead and try to get a value accepted at ballot `b`. As in standard Paxos, it needs to see if any of the nodes in its ballot `b` quorum had already accepted values in an earlier ballot. It can do this by simply reading their values of `maxVBal` and `maxVal`. If so, then it is required to only propose the value for the highest such proposal. Otherwise, it is "free" and can choose any value it wants for the ballot. But, not quite. A typical requirement of Paxos is that we somehow ensure that different proposers don't re-use the same ballot number. Otherwise, two proposers could pick a different value for the same ballot number, and this naturally breaks safety. 
 
