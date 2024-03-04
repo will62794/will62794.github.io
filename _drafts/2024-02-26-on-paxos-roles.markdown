@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Paxos sans Roles"
+title:  "On Roles in Paxos"
 categories: distributed-systems
 ---
 
