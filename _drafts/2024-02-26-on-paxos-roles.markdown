@@ -4,19 +4,29 @@ title:  "On Roles in Paxos"
 categories: distributed-systems
 ---
 
-Standard descriptions of Paxos assume that agents of the system are separated into distinct *proposer*, *acceptor*, and *learner* roles. As presented in [Paxos Made Simple](https://www.microsoft.com/en-us/research/publication/paxos-made-simple/):
+Many standard descriptions of Paxos assume that agents of a system are separated into 3 distinct roles: *proposer*, *acceptor*, and *learner*. As presented in [Paxos Made Simple](https://www.microsoft.com/en-us/research/publication/paxos-made-simple/):
 
 > We let the three roles in the consensus algorithm be performed by three classes of agents: proposers, acceptors, and learners. In an implementation, a single process may act as more than one agent, but the mapping from agents to processes does not concern us here.
 
-To what extent is this role categorization fundamental? It is somewhat of an abstraction leap to go from "solve the consensus problem among a set of distributed nodes" to breaking down agent roles in the specific proposer/acceptor/learner split. Rather, when starting from the core consensus problem, it seems more natural to think about the more classic consensus problem statement i.e. we have a set of distributed nodes/processes that each need to decide on a some value and we want this decided value to be consistent across all nodes.
+Is this role categorization fundamental, though? The basic consensus problem is described earlier in Paxos Made Simple:
 
-It is useful to think about a description/model of Paxos that starts from this perspective i.e assume only some set of node local state among a set of nodes, and messages then need to be sent between nodes to achieve consensus. This feels a more natural "physical" analogy to me e.g., if a group of people were trying to achieve consensus among themselves in a distributed fashion, I don't think the proposer/acceptor role divide is necessarily natural at all, at least when first thinking about the problem. We can transform the standard Paxos models into a model that reflects this more "natural" approach, and also gives some more insight into the underlying mechanisms of the protocol. 
+> Assume a collection of processes that can propose values. A consensus algorithm ensures that a single one among the proposed values is chosen. If
+no value is proposed, then no value should be chosen. If a value has been chosen, then processes should be able to learn the chosen value. 
 
-### Paxos without Roles
+It seems a leap to go from this basic description of the consensus problem to the specific agent roles of *proposer / acceptor / learner*. 
+Rather, a more intuitive approach seems to consider a set of distributed nodes/processes that each need to decide on a some value and we want this decided value to be consistent across all nodes. A particular role breakdown doesn't seem immediately obvious.
 
-We can [specify Paxos based on this approach](https://github.com/will62794/mypaxos/blob/master/PaxosUniversal.tla), while also utilizing what we can call a "universal" message passing style. We get rid of node roles and also get rid of all message types. All protocol actions consist only of reading message and/or local state and updating a node's local state. The updated node state after taking such an action is always implicitly broadcast into the network as a new "message". We can think about this as a generalization of any message passing protocol, since broadcasting a node's entire state is a superset of any information that might be sent in a message. That is, any message of a protocol will only consist of some function of the node's current state at the time of sending. So, broadcasting its entire state doesn't "lose" any information.
 
-The local states of each node are now as follows:
+### Modeling Paxos without Roles
+
+We can consider a model of Paxos that doesn't assume any initial role separation.
+<!-- It is useful to think about a description/model of Paxos that starts from this perspective i.e  -->
+We simply assume there is a set of nodes that each store some set of local state, and communicate with each other via messages to achieve consensus. This feels a more natural "physical" analogy to me e.g., if a group of people were trying to achieve consensus among themselves in a distributed fashion, the proposer/acceptor/learner role separation seems artificial, at least when first modeling about the problem. We can transform the standard Paxos models into a model that reflects this more "natural" approach, and also gives some more insight into the underlying mechanisms of the protocol. 
+
+We [specify Paxos based on this style](https://github.com/will62794/mypaxos/blob/master/PaxosUniversal.tla), while also utilizing what we refer to as a "universal" message passing style. We get rid of node roles and also get rid of distinct message types. Protocol actions consist only of a node (1) reading message and/or its own local state and (2) updating its own local state. After any such action, updated node state such is then always broadcast into the network as a new "message". We can think about this model as a kind of generalization of any distributed, message passing protocol, since broadcast of a node's entire state will contain a superset of any information that might be sent in a typical protocol message. That is, the data sent in any traditional protocol message is simply a function of a node's current state at the time of sending. 
+<!-- So, broadcasting its entire state doesn't "lose" any information. -->
+
+In this Paxos model, the local states of each node are now as follows:
 
 <!-- Largest ballot number the node has seen. -->
 <!-- Ballot of the largest accepted proposal -->
@@ -27,10 +37,10 @@ The local states of each node are now as follows:
 - `maxVal`
 - `chosen`
 
-where the first 3 variables, `maxBal`,`maxVBal`, and `maxVal` have the standard meaning as in classic Paxos, and `chosen` is a node local variable that records that nodes decided value. The actions of our model are as follows:
+where the first 3 variables, `maxBal`,`maxVBal`, and `maxVal`, have the same meaning as in classic Paxos, and `chosen` is a node local variable that records a node's chosen value, if it has one. The actions of our model are then as follows:
 
-- **`Prepare(b, n)`**: Node `n` prepares at ballot `b`.
-- **`Phase2a(b, v, n, Q)`**: Node `n` tries to get value `v` to be accepted at ballot `b` with quorum `Q`.
+- **`Prepare(n, b)`**: Node `n` prepares at ballot `b`.
+- **`Phase2a(n, b, v, Q)`**: Node `n` tries to get value `v` to be accepted at ballot `b` with quorum `Q`.
 - **`Phase2b(n)`**: Node `n` accepts a value at some ballot, updating `maxVBal` and `maxVal` accordingly.
 - **`Learn(n, b, v, Q)`**: Node `n` learns that value `v` has been chosen at ballot `b` by quorum `Q`.
 
