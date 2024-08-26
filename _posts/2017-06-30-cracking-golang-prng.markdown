@@ -5,14 +5,14 @@ date:   2017-06-30 12:00:00
 categories: security hacking
 ---
 
-# Introduction
-
 {% highlight python linenos %}
 
 
 {% endhighlight %}
 
-A friend recently built a Golang app for fun called "Mongobucks" that allowed users to exchange a virtual currency. Every user starts with a fixed number of virtual tokens, and they could give or receive these tokens from other users. It also included a basic "gambling" feature. This feature would allow you to wager some amount of tokens, and then bet on the outcome of a virtual coin toss.  Not long before this, I had listened to [a story about Russian hackers](https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/) who were able to crack casino slot machines by exploiting their weak random number generators, and I was curious if something similar would be possible here. The application source code was publicly available, which allowed me to investigate the app internals. The gambling logic utilized Go's `math/rand` package for the generation of virtual coin toss outcomes, which got my initial interest. Of course, any application concerned with security should be using a cryptographically secure random number generator, which Go provides as part of its `crypto/rand` package. As a personal challenge, though, I wanted to see how difficult it would be to crack Go's default number generator and beat the app's gambling system. The following is an account of my exploits.
+A friend recently built *Mongobucks*, a recreational Golang app that allowed users to exchange and gamble with a virtual currency. Every user starts with a fixed number of virtual tokens, and they could give or receive these tokens from other users. It also included a basic "gambling" feature. This feature would allow you to wager some amount of tokens, and then bet on the outcome of a virtual coin toss.  Not long before this, I had listened to [a story about Russian hackers](https://www.wired.com/2017/02/russians-engineer-brilliant-slot-machine-cheat-casinos-no-fix/) who were able to crack casino slot machines by exploiting their weak random number generators, and I was curious if something similar would be possible here. 
+
+The application source code was publicly available, which allowed me to investigate the app internals. The gambling logic utilized Go's `math/rand` package for the generation of virtual coin toss outcomes, which got my initial interest. Of course, any application concerned with security should be using a cryptographically secure random number generator, which Go provides as part of its `crypto/rand` package. As a personal challenge, though, I wanted to see how difficult it would be to crack Go's default number generator and beat the app's gambling system.
 
 # Application Architecture
 
