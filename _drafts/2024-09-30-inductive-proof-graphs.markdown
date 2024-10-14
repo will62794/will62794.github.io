@@ -136,8 +136,7 @@ $$
 which ensure that, initially, no commit/abort messages can be present in the system.
 
 These proof graphs essentially make explicit the kind of backward reasoning that is applied when trying to show correctness of a safety property. That is, we work backwards via protocol actions, finding
-invariants that must be required to hold true in prior steps in order for the system to always be safe with respect to some target property in question. 
-
+invariants that must be required to hold true in prior steps in order for the system to always be safe with respect to some target property in question. In some ways, we can also view these proof graphs as a way of, to some extent, marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a proof in a PODC/DISC paper may somewhat closely resemble this kind of structure, but these proof graph structures provide a useful way to make this completely formal (and mechanizable, automatable), while also showing that these types of graph structures can be seen as ultimately equivalent to any inductive invariant. 
 
 ### Cyclic Proof Graphs
 
