@@ -41,14 +41,13 @@ if [ ! -f "$INPUT_FILE" ]; then
     exit 1
 fi
 
-# Render the graph
-dot -Tpng "$INPUT_FILE" -o "$OUTPUT_FILE"
+# Render the graph using sfdp
+dot -Ksfdp -Tpng -Goverlap=scale -Gnodesep=0.1 -Granksep=0.1 -Gdpi=300 "$INPUT_FILE" -o "$OUTPUT_FILE"
 
 # Check if rendering was successful
 if [ $? -eq 0 ]; then
-    echo "Graph rendered successfully. Output saved to $OUTPUT_FILE"
+    echo "Graph rendered successfully using sfdp. Output saved to $OUTPUT_FILE"
 else
-    echo "Error occurred while rendering the graph."
+    echo "Error occurred while rendering the graph with sfdp."
     exit 1
 fi
-

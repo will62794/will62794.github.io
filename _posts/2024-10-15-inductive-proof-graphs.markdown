@@ -27,17 +27,17 @@ $$
 \begin{align*}
 Inv73 &\triangleq \forall rm_i,rm_j \in \text{RM} : \neg(rmState[rm_i] = \stext{COMMITTED}) \lor \neg(rmState[rm_j] = \stext{WORKING}) \\
 Inv23 &\triangleq \forall rm_i \in \text{RM} :  (rmState[rm_i] = \stext{ABORTED}) \Rightarrow  (\langle \stext{Commit} \rangle \notin msgsCommit)\\
-Inv11 &\triangleq \forall rm_j \in \text{RM} : \neg(\langle \stext{Abort} \rangle \in msgsAbort) \lor \neg(rmState[rm_j] = \stext{COMMITTED}) \\
-Inv2 &\triangleq \forall rm_i \in \text{RM} : \neg(\langle {\stext{Commit}} \rangle \in msgsCommit) \lor \neg(rmState[rm_i] = \stext{WORKING}) \\
+Inv11 &\triangleq \forall rm_j \in \text{RM} : (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (rmState[rm_j] \neq \stext{COMMITTED}) \\
+Inv2 &\triangleq \forall rm_i \in \text{RM} : (\langle {\stext{Commit}} \rangle \in msgsCommit) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
 Inv1 &\triangleq (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) \\
-Inv53 &\triangleq \forall rm_i \in \text{RM} : \neg(rmState[rm_i] = \stext{COMMITTED}) \lor \neg(tmState = \text{"init"}) \\
-Inv1140 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{PREPARED}) \lor (\neg(tmPrepared = \text{RM}) \lor \neg(tmState = \text{"init"})) \\
+Inv53 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (tmState \neq \stext{INIT}) \\
+Inv1140 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{PREPARED}) \lor (\neg(tmPrepared = \text{RM}) \lor \neg(tmState = \stext{INIT})) \\
 Inv16 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{WORKING}) \Rightarrow (tmPrepared \neq \text{RM}) \\
-Inv1325 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(rm_j \in tmPrepared) \lor \neg(tmState = \text{"init"}) \\
-Inv1291 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(\langle \stext{Prepared}, rm \mapsto rm_j \rangle \in msgsPrepared) \lor \neg(tmState = \text{"init"}) \\
-Inv29 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Prepared}, rm \mapsto rm_i \rangle \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
-Inv4 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) \\
-Inv7 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
+Inv1325 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(rm_j \in tmPrepared) \lor \neg(tmState = \stext{INIT}) \\
+Inv1291 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(\langle \stext{Prepared}, rm_j \rangle \in msgsPrepared) \lor \neg(tmState = \stext{INIT}) \\
+Inv29 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Prepared}, rm_i \rangle \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
+Inv4 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) \\
+Inv7 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
 \end{align*}
 $$
 
@@ -48,24 +48,25 @@ Ind \triangleq{}& \\
   &\land TCConsistent \\
   &\land Inv73 \\
   &\land Inv23 \\
+  &\land Inv11 \\
   &\land Inv2 \\
+  &\land Inv1 \\
+  &\land Inv53 \\
+  &\land Inv1140 \\
   &\land Inv16 \\
   &\land Inv1325 \\
   &\land Inv1291 \\
   &\land Inv29 \\
-  &\land Inv11 \\
-  &\land Inv1 \\
-  &\land Inv53 \\
-  &\land Inv1140 \\
-  &\land Inv7 \\
-  &\land Inv4
+  &\land Inv4 \\
+  &\land Inv7
 \end{align*}
 $$
 
-It is relatively straightforward to observe that these individual lemmas establish various important facts/invariants about the protocol, but,
-in this form, it is still quite difficult to understand the logical structure of such an inductive invariant and how it represents the correctness argument for establishing the top-level safety property, $$TCConsistent$$.
+It is relatively straightforward to observe that these individual lemmas establish various important facts/invariants about the protocol. In this form, though, it is still quite difficult to understand the logical structure of such an inductive invariant and how it represents the correctness argument for establishing the top-level safety property, $$TCConsistent$$. 
 
-Instead we can view inductive invariants through the lens of an *inductive proof graph*, a graph structure that explicitly represents the compositional structure of an inductive invariant. We can do this by breaking down the logical structure of a monolithic inductive invariant like the one shown above, which is stated simply as a conjunction of many lemmas. Specifically, for any inductive invariant of the form 
+Instead, we can view inductive invariants through the lens of an *inductive proof graph*, a graph structure that explicitly represents the compositional structure of an inductive invariant. We can do this by breaking down the logical structure of a monolithic inductive invariant like the one shown above stated as one large a conjunction of many lemmas. 
+
+Specifically, for any inductive invariant of the form 
 
 $$
 Ind = S \wedge  L_1 \wedge \dots \wedge L_k
@@ -92,10 +93,10 @@ $$
 \end{align}
 $$
 
-For distributed and concurrent protocols, the transition relation of a system $$M=(I,T)$$ is typically a disjunction of several distinct actions i.e., $$T=A_1 \vee \dots \vee A_n$$. So, each node of a lemma support graph can be augmented with sub-nodes, one for each action of the overall transition relation. Lemma support edges in the graph then run from a lemma to a specific action node, rather than directly to a target lemma. Incorporation of this action-based decomposition now lets us define the full inductive proof graph structure. The following figure shows an abstract inductive proof graph for a system along with its corresponding inductive proof obligations at each node.
+For distributed and concurrent protocols, the transition relation of a system $$M=(I,T)$$ is typically a disjunction of several distinct actions i.e., $$T=A_1 \vee \dots \vee A_n$$. So, each node of a lemma support graph can be augmented with sub-nodes, one for each action of the overall transition relation. Lemma support edges in the graph then run from a lemma to a specific action node, rather than directly to a target lemma. Incorporation of this action-based decomposition now lets us define the full inductive proof graph structure. The following figure shows an abstract inductive proof graph for a system along with the corresponding inductive proof obligations at each node.
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/abstract-ind-proof-graph.png" alt="Abstract Inductive Proof Graph" width="500">
+  <img src="/assets/ind-proof-graphs/abstract-ind-proof-graph.png" alt="Abstract Inductive Proof Graph" width="590">
 </p>
 
 
@@ -104,10 +105,10 @@ For distributed and concurrent protocols, the transition relation of a system $$
 
 <!-- Instead, we can take advantage of the udnerlying compositional structure of an inductive invariant to develop an inductive proof graph, which is a graph structure corresponds to an inductive invariant while explicitly representing the induction relationships between protocol transitions/actions and lemmas of the invariant. -->
 
-For example,the following is an inductive proof graph for the *TwoPhase* protocol that correspons to the inductive invariant above:
+More concretely, the following is an inductive proof graph for the *TwoPhase* protocol that corresponds to the inductive invariant above:
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="700">
+  <img src="/assets/ind-proof-graphs/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
 </p>
 
 Green nodes represent individual lemma invariants, gray nodes represent protocol actions, while the edges show the dependencies between them. This visual representation helps in understanding the logical flow and compositional nature of the inductive invariant.
@@ -116,7 +117,7 @@ For example, $$Inv11$$ supports the top level safety property via the *RMRcvAbor
 
 $$
 \small
-Inv11 \triangleq \forall rm_j \in \text{RM} : (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow \neg(rmState[rm_j] = \stext{COMMITTED}) 
+Inv11 \triangleq \forall rm_j \in \text{RM} : (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (rmState[rm_j] \neq \stext{COMMITTED}) 
 $$
 
 That is, if an abort message has been sent, then no resource manager can be in a committed state. The preservation of this invariant is sufficient to prevent violation of the safety property $$TCConsistent$$ via some *RMRcvAbortMsg* action, since it ensures no abort messages can be present in the system if some resource manager has already committed. 
@@ -126,7 +127,7 @@ We can trace the lineage of this lemma logically backward, to its own two suppor
 $$
 \small
 \begin{align}
-Inv53 &\triangleq \forall rm_i \in \text{RM} : (tmState = \stext{init}) \Rightarrow \neg(rmState[rm_i] = \stext{COMMITTED}) \\
+Inv53 &\triangleq \forall rm_i \in \text{RM} : (tmState = \stext{INIT}) \Rightarrow \neg(rmState[rm_i] = \stext{COMMITTED}) \\
 Inv1 &\triangleq (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) 
 \end{align}
 $$
@@ -138,8 +139,8 @@ Finally, both of these lemmas, $$Inv53$$ and $$Inv1$$, are then supported by
 $$
 \small
 \begin{align}
-Inv7 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
-Inv4 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit)
+Inv7 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
+Inv4 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit)
 \end{align}
 $$
 
@@ -147,7 +148,7 @@ which ensure that, initially, no commit/abort messages can be present in the sys
 
 ### Variable Slices
 
-Note that an additional feature afforded by the compositional structure of these inductive proof graphs is the notion of *variable slices*. That is, at each individual node of the proof graph, we are able to statically determine a subset of state variables that are relevant for support lemmas needed to discharge that node. This variable slcie is determined based on a static analysis of the lemma and action node pair. In the graph above, action nodes are annotated with their variable slices below. For example, for the RMRcvAbortMsg action of the *Safety* lemma node, the variable slice is $$\{msgsAbort, rmState\}$$, meaning that any support lemmas required to discharge this node need only refer to those state variables. This can be seen in its single support lemma, $$Inv11$$, for example, which refers to exactly those state variables. 
+Note that an additional feature afforded by the compositional structure of these inductive proof graphs is the notion of *variable slices*. That is, at each individual node of the proof graph, we are able to statically determine a subset of state variables that are relevant for support lemmas needed to discharge that node. This variable slcie is determined based on a static analysis of the lemma and action node pair. In the graph above, action nodes are annotated with their variable slices below. For example, for the *RMRcvAbortMsg* action of the $$Safety$$ lemma node, the variable slice is $$\{msgsAbort, rmState\}$$, meaning that any support lemmas required to discharge this node need only refer to those state variables. This can be seen in its single support lemma, $$Inv11$$, for example, which refers to exactly those state variables. 
 
 These variable slices are useful both for automated inductive invariant inference and also for human guided developmnt, since they provide a formal way to focus attention on, ideally, a small subset of relevant state variables. With monolithic representations of inductive invariants as shown above, it is often unclear which variables are relevant for a given lemma/action pair, making this reasoning task burdensome. 
 
@@ -177,7 +178,7 @@ To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inducti
 
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="490">
+  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="230">
 </p>
 
 
