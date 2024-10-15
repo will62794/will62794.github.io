@@ -19,7 +19,7 @@ $$
 \end{align*}
 $$
 
-A possible inductive invariant for establishing this property (along with [its formal proof in TLAPS](https://github.com/will62794/scimitar/blob/c730a3c0dd410c70ef6ffc79a609d15e9b17fda2/benchmarks/TwoPhase_IndProofs.tla)) may look like the following conjunction of smaller, lemma invariants:
+A possible inductive invariant for establishing this property (along with [its formal proof in TLAPS](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase_IndProofs_1.tla)) may look like the following conjunction of smaller, lemma invariants:
 
 $$
 \newcommand{\stext}[1]{\small\text{#1}}
@@ -31,10 +31,10 @@ Inv11 &\triangleq \forall rm_j \in \text{RM} : (\langle \stext{Abort} \rangle \i
 Inv2 &\triangleq \forall rm_i \in \text{RM} : (\langle {\stext{Commit}} \rangle \in msgsCommit) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
 Inv1 &\triangleq (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) \\
 Inv53 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (tmState \neq \stext{INIT}) \\
-Inv1140 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{PREPARED}) \lor (\neg(tmPrepared = \text{RM}) \lor \neg(tmState = \stext{INIT})) \\
+Inv1143 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{PREPARED}) \lor \neg(tmPrepared = \text{RM}) \lor \neg(tmState = \stext{INIT})\\
 Inv16 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{WORKING}) \Rightarrow (tmPrepared \neq \text{RM}) \\
-Inv1325 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(rm_j \in tmPrepared) \lor \neg(tmState = \stext{INIT}) \\
-Inv1291 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(\langle \stext{Prepared}, rm_j \rangle \in msgsPrepared) \lor \neg(tmState = \stext{INIT}) \\
+Inv1342 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(rm_j \in tmPrepared) \lor \neg(tmState = \stext{INIT})\\
+Inv1316 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor (\langle \stext{Prepared}, rm_j \rangle \notin msgsPrepared) \lor (tmState \neq \stext{INIT})\\
 Inv29 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Prepared}, rm_i \rangle \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
 Inv4 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) \\
 Inv7 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
@@ -52,10 +52,10 @@ Ind \triangleq{}& \\
   &\land Inv2 \\
   &\land Inv1 \\
   &\land Inv53 \\
-  &\land Inv1140 \\
+  &\land Inv1143 \\
   &\land Inv16 \\
-  &\land Inv1325 \\
-  &\land Inv1291 \\
+  &\land Inv1342 \\
+  &\land Inv1316 \\
   &\land Inv29 \\
   &\land Inv4 \\
   &\land Inv7
@@ -178,7 +178,7 @@ To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inducti
 
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="230">
+  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="220">
 </p>
 
 
