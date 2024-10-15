@@ -36,8 +36,8 @@ Inv16 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{WORKING})
 Inv1325 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(rm_j \in tmPrepared) \lor \neg(tmState = \text{"init"}) \\
 Inv1291 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(\langle \stext{Prepared}, rm \mapsto rm_j \rangle \in msgsPrepared) \lor \neg(tmState = \text{"init"}) \\
 Inv29 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Prepared}, rm \mapsto rm_i \rangle \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
-Inv4 &\triangleq \neg(\langle \stext{Commit} \rangle \in msgsCommit) \lor \neg(tmState = \text{"init"}) \\
-Inv7 &\triangleq \neg(\langle \stext{Abort} \rangle \in msgsAbort) \lor \neg(tmState = \text{"init"}) \\
+Inv4 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) \\
+Inv7 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
 \end{align*}
 $$
 
@@ -138,8 +138,8 @@ Finally, both of these lemmas, $$Inv53$$ and $$Inv1$$, are then supported by
 $$
 \small
 \begin{align}
-Inv7 &\triangleq \neg(tmState = \text{"init"}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
-Inv4 &\triangleq \neg(tmState = \text{"init"}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit)
+Inv7 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
+Inv4 &\triangleq (tmState = \text{"init"}) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit)
 \end{align}
 $$
 
@@ -173,7 +173,7 @@ $$
 \end{align*}
 $$
 
-To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inductive invariant. Using $$Ind = Inv \wedge L_1 \wedge L_2$$ works for this, since it establishes that all of $$a,b,c$$ are in valid states. The inductive proof graph for this invariant, though, is a pure cycle with these 3 lemma nodes:
+To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inductive invariant. Using $$Ind = Inv \wedge L_1 \wedge L_2$$ works for this, since it establishes that all of $$a,b,c$$ are in valid states. The inductive proof graph for this invariant, though, is a pure cycle containing these 3 lemma nodes:
 
 
 <p align="center">
@@ -184,6 +184,6 @@ To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inducti
 ### Conclusions
 
 At a high level, these proof graphs essentially make explicit the kind of backward reasoning that is applied when trying to show correctness of a safety property. That is, we work backwards via protocol actions, finding
-invariants that must be required to hold true in prior steps in order for the system to always be safe with respect to some target property in question. In some ways, we can also view these proof graphs as a way of, to some extent, marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful proof in a distributed systems paper may somewhat closely resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any inductive invariant. 
+invariants that must be required to hold true in prior steps in order for the system to always be safe with respect to some target property in question. In some ways, we can also view these proof graphs as a way of, to some extent, marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful induction proof in a distributed systems paper may somewhat closely resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any inductive invariant. 
 
-We also concretely exploit these structures for automated inductive invariant inference technique in [this work](https://arxiv.org/abs/2404.18048), and to also improve the interactivity and interpretability of the inductive invariant development process.
+We also concretely exploit these structures for automated inductive invariant inference technique in [this work](https://arxiv.org/abs/2404.18048), and to improve the interactivity and interpretability of the inductive invariant development process.
