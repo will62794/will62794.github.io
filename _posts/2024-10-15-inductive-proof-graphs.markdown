@@ -111,7 +111,7 @@ More concretely, the following is an inductive proof graph for the *TwoPhase* pr
   <img src="/assets/ind-proof-graphs/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
 </p>
 
-Green nodes represent individual lemma invariants, gray nodes represent protocol actions, while the edges show the dependencies between them. This visual representation helps in understanding the logical flow and compositional nature of the inductive invariant.
+Green nodes represent individual lemma invariants, gray nodes represent [actions of the protocol](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase.tla#L103-L168), while the edges show the dependencies between them. This visual representation helps in understanding the logical flow and compositional nature of the inductive invariant.
 
 For example, $$Inv11$$ supports the top level safety property via the *RMRcvAbortMsg* action, stating that
 
@@ -154,9 +154,10 @@ These variable slices are useful both for automated inductive invariant inferenc
 
 ### Cyclic Proof Graphs
 
-Note that the definition of proof graphs do not imply any restriction on cycles in a valid inductive proof graph. A simple example of a purely cyclic proof graph is as follows. Consider a simple ring counter system with 3 state variables, $$a,b$$, and $$c$$, where a single value gets passed from 𝑎 to 𝑏 to 𝑐 and exactly one variable holds the value at any time. An inductive invariant establishing the property that 𝑎 always has a well-formed value will consist of 3 properties that form a 3-cycle, each stating that 𝑎,𝑏 and 𝑐’s state are, respectively, always well-formed.
+Note that the definition of proof graphs do not imply any restriction on cycles in a valid inductive proof graph. A simple example of a purely cyclic proof graph is as follows. Consider a simple ring counter system with 3 state variables, $$a,b$$, and $$c$$, where a single value gets passed from 𝑎 to 𝑏 to 𝑐 and exactly one variable holds the value at any time. A basic formal specification of such a system is as follows:
 
 $$
+\small
 \begin{align*}
 &\text{VARIABLES } a,b,c \\ \\
 &\text{Init }  \triangleq a = 1 \land b = 0 \land c = 0 \\
@@ -174,17 +175,19 @@ $$
 \end{align*}
 $$
 
-To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inductive invariant. Using $$Ind = Inv \wedge L_1 \wedge L_2$$ works for this, since it establishes that all of $$a,b,c$$ are in valid states. The inductive proof graph for this invariant, though, is a pure cycle containing these 3 lemma nodes:
+An inductive invariant establishing the property that 𝑎 always has a well-formed value (e.g. always either 0 or 1) will consist of 3 properties that form an induction cycle, each stating that 𝑎,𝑏 and 𝑐’s state are, respectively, always well-formed. To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inductive invariant. Using $$Ind = Inv \wedge L_1 \wedge L_2$$ works for this, since it establishes that all of $$a,b,c$$ are in valid states. The inductive proof graph for this invariant, shown below, is a pure cycle containing these 3 lemma nodes:
 
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="220">
+  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="210">
 </p>
 
 
 ### Conclusions
 
-At a high level, these proof graphs essentially make explicit the kind of backward reasoning that is applied when trying to show correctness of a safety property. That is, we work backwards via protocol actions, finding
-invariants that must be required to hold true in prior steps in order for the system to always be safe with respect to some target property in question. In some ways, we can also view these proof graphs as a way of, to some extent, marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful induction proof in a distributed systems paper may somewhat closely resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any inductive invariant. 
+At a high level, these proof graphs essentially make explicit the kind of backward, inductive reasoning that is applied when trying to show correctness of a safety property. That is, we work backwards via protocol actions, finding
+invariants that must hold true in prior steps in order for the system to always be safe with respect to some target property in question. 
 
-We also concretely exploit these structures for automated inductive invariant inference technique in [this work](https://arxiv.org/abs/2404.18048), and to improve the interactivity and interpretability of the inductive invariant development process.
+In some ways, we may also view these proof graphs as a way of marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful induction proof in a distributed systems paper may implicitly resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any (monolithic) inductive invariant. 
+
+These graph structures are also concretely exploited for automated inductive invariant inference in [this work](https://arxiv.org/abs/2404.18048), and to improve the interactivity and interpretability of the inductive invariant development process.
