@@ -4,12 +4,12 @@ title:  "Inductive Proof Graphs"
 categories: distributed-systems
 ---
 
-If we want to formally prove that a safety property (an invariant) holds of a system, we can do this by finding an *inductive invariant*. An inductive invariant is a particular type of invariant that is at least as strong as the target invariant to be proven, but it is also inductive, meaning that it is closed under all transitions of the system.
+If we want to formally prove that a system satisfies some safety property (i.e. invariant), we can do this by finding an *inductive invariant*. An inductive invariant is a particular type of invariant that is at least as strong as the target invariant to be proven, but it is also inductive, meaning that it is closed under all transitions of the system.
 
-For example, for a specification of two-phase commit like [this](https://github.com/will62794/scimitar/blob/c730a3c0dd410c70ef6ffc79a609d15e9b17fda2/benchmarks/TwoPhase.tla), we may want to establish the core safety property stating that no two RMs can end up in conflicting commit/abort states:
+For example, for a [formal specification of the two-phase commit protocol](https://github.com/will62794/scimitar/blob/c730a3c0dd410c70ef6ffc79a609d15e9b17fda2/benchmarks/TwoPhase.tla), we may want to establish the core safety property stating that no two resource managers can end up in conflicting commit/abort states:
 
 $$
-\small
+\small  
 \newcommand{\stext}[1]{\small\text{#1}}
 \begin{align*}
 &TCConsistent \triangleq{} \\
@@ -63,9 +63,9 @@ Ind \triangleq{}& \\
 $$
 
 It can be seen that these individual lemmas establish various important facts/invariants about the protocol, but,
-in this form, it is quite hard to understand the logical structure of the inductive invariant and how it represents the correctness argument for this property. Instead we can view inductive invariants through the lens of *inductive proof graphs*. These are a graph structure that explicitly represents the compositional structure of an inductive invariant. We concretely exploit these structures for automated inductive invariant inference technique in [1], and to also improve the interactivity and interpretability of the inductive invariant development process.
+in this form, it is quite hard to understand the logical structure of the inductive invariant and how it represents the correctness argument for establishing the top-level safety property. 
 
-We can do this by breaking down the logical structure of a monolithic inductive invariant like the one shown above, which is stated simply as a conjunction of many lemmas. For any inductive invariant of this form, 
+Instead we can view inductive invariants through the lens of an *inductive proof graph*, a graph structure that explicitly represents the compositional structure of an inductive invariant. We concretely exploit these structures for automated inductive invariant inference technique in [1], and to also improve the interactivity and interpretability of the inductive invariant development process. We can do this by breaking down the logical structure of a monolithic inductive invariant like the one shown above, which is stated simply as a conjunction of many lemmas. For any inductive invariant of this form, 
 
 $$
 Ind = S \wedge  L_1 \wedge \dots \wedge L_k
@@ -92,7 +92,7 @@ $$
 \end{align}
 $$
 
-For distributed and concurrent protocols, the transition relation of a system $M=(I,T)$ is typically a disjunction of several distinct actions i.e., $$T=A_1 \vee \dots \vee A_n$$.
+For distributed and concurrent protocols, the transition relation of a system $$M=(I,T)$$ is typically a disjunction of several distinct actions i.e., $$T=A_1 \vee \dots \vee A_n$$.
 
 So, each node of a lemma support graph can be augmented with sub-nodes, one for each action of the overall transition relation. Lemma support edges in the graph then run from a lemma to a specific action node, rather than directly to a target lemma. Incorporation of this action-based decomposition now lets us define the full inductive proof graph structure.
 
@@ -134,6 +134,8 @@ Inv4 &\triangleq \neg(tmState = \text{"init"}) \Rightarrow (\langle \stext{Commi
 $$
 
 which ensure that, initially, no commit/abort messages can be present in the system.
+
+An additional feature afforded by this proof graph decomposition is the aspect of *variable slices*. TODO.
 
 These proof graphs essentially make explicit the kind of backward reasoning that is applied when trying to show correctness of a safety property. That is, we work backwards via protocol actions, finding
 invariants that must be required to hold true in prior steps in order for the system to always be safe with respect to some target property in question. In some ways, we can also view these proof graphs as a way of, to some extent, marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a proof in a PODC/DISC paper may somewhat closely resemble this kind of structure, but these proof graph structures provide a useful way to make this completely formal (and mechanizable, automatable), while also showing that these types of graph structures can be seen as ultimately equivalent to any inductive invariant. 
