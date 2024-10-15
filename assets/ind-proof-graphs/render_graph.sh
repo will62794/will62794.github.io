@@ -30,3 +30,25 @@ else
     echo "Error occurred while rendering the graph."
     exit 1
 fi
+
+# Render 3cycle.dot
+INPUT_FILE="3cycle.dot"
+OUTPUT_FILE="3cycle.png"
+
+# Check if input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Input file $INPUT_FILE not found."
+    exit 1
+fi
+
+# Render the graph
+dot -Tpng "$INPUT_FILE" -o "$OUTPUT_FILE"
+
+# Check if rendering was successful
+if [ $? -eq 0 ]; then
+    echo "Graph rendered successfully. Output saved to $OUTPUT_FILE"
+else
+    echo "Error occurred while rendering the graph."
+    exit 1
+fi
+

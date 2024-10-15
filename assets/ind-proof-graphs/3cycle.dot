@@ -1,0 +1,16 @@
+digraph ThreeCycle {
+    rankdir=LR;
+    node [shape=rect, style=rounded, fillcolor=lightgreen];
+    node [fontname=Georgia]
+
+    Inv -> A [label=""];
+    A -> L1;
+    L1 -> B;
+    B -> L2;
+    L2 -> C;
+    C -> Inv;
+    
+    A [shape=box,style=filled,fillcolor=lightgray];
+    B [shape=box,style=filled,fillcolor=lightgray];
+    C [shape=box,style=filled,fillcolor=lightgray];
+}
