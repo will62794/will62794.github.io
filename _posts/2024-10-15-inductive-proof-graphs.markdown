@@ -25,7 +25,7 @@ $$
 \newcommand{\stext}[1]{\small\text{#1}}
 \small
 \begin{align*}
-Inv73 &\triangleq \forall rm_i,rm_j \in \text{RM} : \neg(rmState[rm_i] = \stext{COMMITTED}) \lor \neg(rmState[rm_j] = \stext{WORKING}) \\
+Inv73 &\triangleq \forall rm_i,rm_j \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (rmState[rm_j] \neq \stext{WORKING}) \\
 Inv23 &\triangleq \forall rm_i \in \text{RM} :  (rmState[rm_i] = \stext{ABORTED}) \Rightarrow  (\langle \stext{Commit} \rangle \notin msgsCommit)\\
 Inv11 &\triangleq \forall rm_j \in \text{RM} : (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (rmState[rm_j] \neq \stext{COMMITTED}) \\
 Inv2 &\triangleq \forall rm_i \in \text{RM} : (\langle {\stext{Commit}} \rangle \in msgsCommit) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
