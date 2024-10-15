@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Inductive Proof Graphs"
-categories: distributed-systems
+categories: distributed-systems formal-methods
 ---
 
 If we want to formally prove that a system satisfies some safety property (i.e. an invariant), we can do this by finding an *inductive invariant*. An inductive invariant is a particular type of invariant that is at least as strong as the target invariant to be proven, and is also *inductive*, meaning that it is closed under all transitions of the system.
