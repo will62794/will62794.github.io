@@ -102,7 +102,7 @@ So, each node of a lemma support graph can be augmented with sub-nodes, one for 
 
 For example, the inductive invariant for the *TwoPhase* protocol above corresponds to the following inductive proof graph:
 
-<img src="/assets/ind-proof-graphs/2pc_graph_1.png" alt="Inductive Proof Graph Example" width="700">
+<img src="/assets/ind-proof-graphs/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="680">
 
 This figure illustrates the structure of an inductive proof graph. The nodes represent individual invariants or lemmas, while the edges show the dependencies between them. This visual representation helps in understanding the logical flow and compositional nature of the inductive invariant.
 
