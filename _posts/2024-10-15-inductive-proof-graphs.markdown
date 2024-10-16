@@ -62,9 +62,9 @@ Ind \triangleq{}& \\
 \end{align*}
 $$
 
-It is relatively straightforward to observe that these individual lemmas establish various important facts/invariants about the protocol. In this form, though, it is still quite difficult to understand the logical structure of such an inductive invariant and how it represents the correctness argument for establishing the top-level safety property, $$TCConsistent$$. 
+Upon inspection, it is relatively straightforward to observe that these individual lemmas establish various important facts/invariants about the protocol. In this form, though, it is still quite difficult to understand the logical structure of such an inductive invariant and how it represents the correctness argument for establishing the top-level safety property, $$TCConsistent$$. 
 
-Instead, we can view inductive invariants through the lens of an *inductive proof graph*, a graph structure that explicitly represents the compositional structure of an inductive invariant. We can do this by breaking down the logical structure of a monolithic inductive invariant like the one shown above stated as one large a conjunction of many lemmas. 
+Instead, we can view inductive invariants through the lens of an *inductive proof graph*, a graph structure that explicitly represents the compositional dependency structure of an inductive invariant. We can do this by breaking down the logical structure of a inductive invariant like the one shown above stated as a single, monolithic conjunction of lemmas. 
 
 Specifically, for any inductive invariant of the form 
 
@@ -156,7 +156,7 @@ which ensure that, initially, no commit/abort messages can be present in the sys
 
 ### Variable Slices
 
-Note that an additional feature afforded by the compositional structure of these inductive proof graphs is the notion of *variable slices*. That is, at each individual node of the proof graph, we are able to statically determine a subset of state variables that are relevant for support lemmas needed to discharge that node. This variable slice is determined based on a static analysis of the lemma and action node pair. In the graph above, action nodes are annotated with their variable slices below. 
+Note that an additional feature afforded by the compositional structure of these inductive proof graphs is the notion of *variable slices*. That is, at each individual node of the proof graph, we can statically determine a subset of state variables that are relevant for support lemmas needed to discharge that node. This variable slice is determined based on a static analysis of the lemma and action node pair. In the graph above, action nodes are annotated with their variable slices below. 
 
 For example, for the *RMRcvAbortMsg* action of the $$Safety$$ lemma node, the variable slice is $$\{msgsAbort, rmState\}$$, meaning that any support lemmas required to discharge this node need only refer to those state variables. This can be seen in its single support lemma, $$Inv11$$, for example, which refers to exactly those state variables. 
 
@@ -185,7 +185,7 @@ $$
 \end{align*}
 $$
 
-An inductive invariant establishing the property that 𝑎 always has a well-formed value (e.g. always either 0 or 1) will consist of 3 properties that form an induction cycle, each stating that 𝑎,𝑏 and 𝑐’s state are, respectively, always well-formed. To prove the top-level invariant, $$Inv$$, we need a sufficiently strong inductive invariant. Using $$Ind = Inv \wedge L_1 \wedge L_2$$ works for this, since it establishes that all of $$a,b,c$$ are in valid states. The inductive proof graph for this invariant, shown below, is a pure cycle containing these 3 lemma nodes:
+An inductive invariant establishing the property $$Inv$$, that 𝑎 always has a well-formed value (e.g. always either 0 or 1), will consist of 3 properties that form an induction cycle, each stating that 𝑎,𝑏 and 𝑐’s state are, respectively, always well-formed. Using $$Ind = Inv \wedge L_1 \wedge L_2$$ works as such an inductive invariant, since it establishes that all of $$a,b,c$$ are in valid states. The inductive proof graph for $$Ind$$, shown below, is a pure cycle containing these 3 lemma nodes:
 
 
 <p align="center">
@@ -200,4 +200,4 @@ invariants that must hold true in prior steps in order for the system to always 
 
 In some ways, we may also view these proof graphs as a way of marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful induction proof in a distributed systems paper may implicitly resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any (monolithic) inductive invariant. 
 
-These graph structures are also concretely exploited for automated inductive invariant inference in [this work](https://arxiv.org/abs/2404.18048), and for improving the interactivity and interpretability of the inductive invariant development process.
+These graph structures are also concretely exploited for automated inductive invariant inference in [this work](https://arxiv.org/abs/2404.18048), and for improving the interpretability of the inductive invariant development process.
