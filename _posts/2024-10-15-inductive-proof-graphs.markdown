@@ -93,7 +93,15 @@ $$
 \end{align}
 $$
 
-For distributed and concurrent protocols, the transition relation of a system $$M=(I,T)$$ is typically a disjunction of several distinct actions i.e., $$T=A_1 \vee \dots \vee A_n$$. So, each node of a lemma support graph can be augmented with sub-nodes, one for each action of the overall transition relation. Lemma support edges in the graph then run from a lemma to a specific action node, rather than directly to a target lemma. Incorporation of this action-based decomposition now lets us define the full inductive proof graph structure. The following figure shows an abstract inductive proof graph for a system along with the corresponding inductive proof obligations at each node.
+With this in mind, if we define $$\mathcal{L} = \{ S, L_1, \dots, L_k\}$$ as the lemma set of $$Ind$$, we can consider the notion of a *support set* for a lemma in $$\mathcal{L}$$ as any subset $$U \subseteq \mathcal{L}$$ such that $$L$$ is inductive relative to the conjunction of lemmas in $$U$$ i.e., 
+
+$$\left( \bigwedge_{\ell \in U} \ell \right) \wedge L \wedge T \Rightarrow L'$$
+
+As shown above, $$\mathcal{L}$$ is always a support set for any lemma in $$ \mathcal{L}$$, but it may not be the smallest support set. 
+This support set notion gives rise a structure we refer to as the *lemma support graph*, which is induced by each lemma's mapping to a given support set, each of which may be much smaller than $$\mathcal{L}$$.
+
+
+For distributed and concurrent protocols, the transition relation of a system $$M=(I,T)$$ is typically a disjunction of several distinct actions i.e., $$T=A_1 \vee \dots \vee A_n$$. So, each node of a lemma support graph can be augmented with sub-nodes, one for each action of the overall transition relation. Lemma support edges in the graph then run from a lemma to a specific action node, rather than directly to a target lemma. Incorporation of this action-based decomposition now lets us define the full inductive proof graph structure. The following figure shows an example of an abstract inductive proof graph along with the corresponding inductive proof obligations at each node.
 
 <p align="center">
   <img src="/assets/ind-proof-graphs/abstract-ind-proof-graph.png" alt="Abstract Inductive Proof Graph" width="590">
@@ -105,7 +113,7 @@ For distributed and concurrent protocols, the transition relation of a system $$
 
 <!-- Instead, we can take advantage of the udnerlying compositional structure of an inductive invariant to develop an inductive proof graph, which is a graph structure corresponds to an inductive invariant while explicitly representing the induction relationships between protocol transitions/actions and lemmas of the invariant. -->
 
-More concretely, the following is an inductive proof graph for the *TwoPhase* protocol that corresponds to the inductive invariant above:
+More concretely, the following is an inductive proof graph for the two-phase commit protocol specification that corresponds to the inductive invariant for establishing $$TCConsistent$$ from above:
 
 <p align="center">
   <img src="/assets/ind-proof-graphs/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
@@ -148,13 +156,15 @@ which ensure that, initially, no commit/abort messages can be present in the sys
 
 ### Variable Slices
 
-Note that an additional feature afforded by the compositional structure of these inductive proof graphs is the notion of *variable slices*. That is, at each individual node of the proof graph, we are able to statically determine a subset of state variables that are relevant for support lemmas needed to discharge that node. This variable slcie is determined based on a static analysis of the lemma and action node pair. In the graph above, action nodes are annotated with their variable slices below. For example, for the *RMRcvAbortMsg* action of the $$Safety$$ lemma node, the variable slice is $$\{msgsAbort, rmState\}$$, meaning that any support lemmas required to discharge this node need only refer to those state variables. This can be seen in its single support lemma, $$Inv11$$, for example, which refers to exactly those state variables. 
+Note that an additional feature afforded by the compositional structure of these inductive proof graphs is the notion of *variable slices*. That is, at each individual node of the proof graph, we are able to statically determine a subset of state variables that are relevant for support lemmas needed to discharge that node. This variable slice is determined based on a static analysis of the lemma and action node pair. In the graph above, action nodes are annotated with their variable slices below. 
 
-These variable slices are useful both for automated inductive invariant inference and also for human guided developmnt, since they provide a formal way to focus attention on, ideally, a small subset of relevant state variables. With monolithic representations of inductive invariants as shown above, it is often unclear which variables are relevant for a given lemma/action pair, making this reasoning task burdensome. 
+For example, for the *RMRcvAbortMsg* action of the $$Safety$$ lemma node, the variable slice is $$\{msgsAbort, rmState\}$$, meaning that any support lemmas required to discharge this node need only refer to those state variables. This can be seen in its single support lemma, $$Inv11$$, for example, which refers to exactly those state variables. 
+
+These variable slices are useful both for automated inductive invariant inference and also for human guided development, since they provide a formal way to focus attention on, ideally, a small subset of relevant state variables. With monolithic representations of inductive invariants as shown above, it is often unclear which variables are relevant for a given lemma/action pair, making this reasoning task burdensome. 
 
 ### Cyclic Proof Graphs
 
-Note that the definition of proof graphs do not imply any restriction on cycles in a valid inductive proof graph. A simple example of a purely cyclic proof graph is as follows. Consider a simple ring counter system with 3 state variables, $$a,b$$, and $$c$$, where a single value gets passed from 𝑎 to 𝑏 to 𝑐 and exactly one variable holds the value at any time. A basic formal specification of such a system is as follows:
+Note that the definition of proof graphs do not imply any restriction on cycles in a valid inductive proof graph. As a simple example of a cyclic proof graph, consider a simple "ring counter" system with 3 state variables, $$a,b$$, and $$c$$, where a single value gets passed from 𝑎 to 𝑏 to 𝑐 and exactly one variable holds the value at any time. A basic formal specification of such a system is as follows:
 
 $$
 \small
@@ -190,4 +200,4 @@ invariants that must hold true in prior steps in order for the system to always 
 
 In some ways, we may also view these proof graphs as a way of marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful induction proof in a distributed systems paper may implicitly resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any (monolithic) inductive invariant. 
 
-These graph structures are also concretely exploited for automated inductive invariant inference in [this work](https://arxiv.org/abs/2404.18048), and to improve the interactivity and interpretability of the inductive invariant development process.
+These graph structures are also concretely exploited for automated inductive invariant inference in [this work](https://arxiv.org/abs/2404.18048), and for improving the interactivity and interpretability of the inductive invariant development process.
