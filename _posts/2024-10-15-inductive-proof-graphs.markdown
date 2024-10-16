@@ -116,7 +116,7 @@ For distributed and concurrent protocols, the transition relation of a system $$
 More concretely, the following is an inductive proof graph for the two-phase commit protocol specification that corresponds to the inductive invariant for establishing $$TCConsistent$$ from above:
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
+  <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
 </p>
 
 Green nodes represent individual lemma invariants, gray nodes represent [actions of the protocol](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase.tla#L103-L168), while the edges show the dependencies between them. This visual representation helps in understanding the logical flow and compositional nature of the inductive invariant.
