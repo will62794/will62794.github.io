@@ -218,12 +218,12 @@ These proof graphs also provide a more principled way to compare different induc
 $$
 \small
 \begin{align*}
+Inv6 &\triangleq \forall rm_i \in \text{RM} : (\neg([type \mapsto \stext{Commit}] \in msgsCommit) \lor (\neg(rmState[rm_i] = \stext{aborted}))) \\
 Inv0 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{committed}) \Rightarrow ([type \mapsto \stext{Commit}] \in msgsCommit) \\
 Inv1 &\triangleq \forall rm_i \in \text{RM} : (rm_i \in tmPrepared) \Rightarrow ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \\
 Inv8 &\triangleq \forall rm_i \in \text{RM} : ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{working}) \\
 Inv3 &\triangleq ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (tmPrepared = \text{RM}) \\
 Inv4 &\triangleq (\neg([type \mapsto \stext{Abort}] \in msgsAbort) \lor (\neg([type \mapsto \stext{Commit}] \in msgsCommit))) \\
-Inv6 &\triangleq \forall rm_i \in \text{RM} : (\neg([type \mapsto \stext{Commit}] \in msgsCommit) \lor (\neg(rmState[rm_i] = \stext{aborted}))) \\
 Inv2 &\triangleq \forall rm_i \in \text{RM} : ((rmState[rm_i] = \stext{prepared}) \lor (\neg([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \lor (\neg(tmState = \stext{init})))) \\
 Inv7 &\triangleq ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (tmState \neq \stext{init}) \\
 Inv5 &\triangleq ([type \mapsto \stext{Abort}] \in msgsAbort) \Rightarrow (tmState \neq \stext{init})
