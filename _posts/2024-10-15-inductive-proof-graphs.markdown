@@ -255,7 +255,7 @@ $$
 \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{committed}) \Rightarrow (rmState[rm_i] \neq \stext{working})
 $$
 
-In this case, it appears that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and not akin to a proof thay may be developed intuiviely by a human that was guided by this structure explicitly. 
+In this case, it seems that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and less similar to a proof thay may be developed by a human that was guided by this structure explicitly. 
 
 <!-- A similar pattern can be observed in the support lemmas for the $$(Safety,RMRcvAbortMsg)$$ node: -->
 
