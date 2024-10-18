@@ -19,12 +19,13 @@ $$
 \end{align*}
 $$
 
-A possible inductive invariant for establishing this property (along with [its formal proof in TLAPS](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase_IndProofs_1.tla)) may look like the following conjunction of smaller, lemma invariants:
+A possible inductive invariant for establishing this property (along with [its formal proof in TLAPS](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase_IndProofs_1.tla)) may look like the conjunction of the following smaller, lemma invariants and the top-level safety property:
 
 $$
 \newcommand{\stext}[1]{\small\text{#1}}
 \small
 \begin{align*}
+Safety & \triangleq TCConsistent \\
 Inv73 &\triangleq \forall rm_i,rm_j \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (rmState[rm_j] \neq \stext{WORKING}) \\
 Inv23 &\triangleq \forall rm_i \in \text{RM} :  (rmState[rm_i] = \stext{ABORTED}) \Rightarrow  (\langle \stext{Commit} \rangle \notin msgsCommit)\\
 Inv11 &\triangleq \forall rm_j \in \text{RM} : (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (rmState[rm_j] \neq \stext{COMMITTED}) \\
@@ -41,7 +42,7 @@ Inv7 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Abort} \ra
 \end{align*}
 $$
 
-$$
+<!-- $$
 \small
 \begin{align*}
 Ind \triangleq{}& \\
@@ -60,7 +61,7 @@ Ind \triangleq{}& \\
   &\land Inv4 \\
   &\land Inv7
 \end{align*}
-$$
+$$ -->
 
 Upon inspection, it is relatively straightforward to observe that these individual lemmas establish various important facts/invariants about the protocol. In this form, though, it is still quite difficult to understand the logical structure of such an inductive invariant and how it represents the correctness argument for establishing the top-level safety property, $$TCConsistent$$. 
 
@@ -69,6 +70,7 @@ Instead, we can view inductive invariants through the lens of an *inductive proo
 Specifically, for any inductive invariant of the form 
 
 $$
+
 Ind = S \wedge  L_1 \wedge \dots \wedge L_k
 $$
 
@@ -119,9 +121,7 @@ More concretely, the following is an inductive proof graph for the two-phase com
   <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
 </p>
 
-Green nodes represent individual lemma invariants, gray nodes represent [actions of the protocol](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase.tla#L103-L168), while the edges show the dependencies between them. This visual representation helps in understanding the logical flow and compositional nature of the inductive invariant.
-
-For example, $$Inv11$$ supports the top level safety property via the *RMRcvAbortMsg* action, stating that
+Green nodes represent individual lemma invariants, gray nodes represent [actions of the protocol](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase.tla#L103-L168), while edges show the induction dependencies between them. For example, $$Inv11$$ supports the top level safety property via the *RMRcvAbortMsg* action, stating that
 
 $$
 \small
@@ -218,15 +218,16 @@ These proof graphs also provide a more principled way to compare different induc
 $$
 \small
 \begin{align*}
-Inv6 &\triangleq \forall rm_i \in \text{RM} : (\neg([type \mapsto \stext{Commit}] \in msgsCommit) \lor (\neg(rmState[rm_i] = \stext{aborted}))) \\
-Inv0 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{committed}) \Rightarrow ([type \mapsto \stext{Commit}] \in msgsCommit) \\
-Inv1 &\triangleq \forall rm_i \in \text{RM} : (rm_i \in tmPrepared) \Rightarrow ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \\
-Inv8 &\triangleq \forall rm_i \in \text{RM} : ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{working}) \\
-Inv3 &\triangleq ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (tmPrepared = \text{RM}) \\
-Inv4 &\triangleq (\neg([type \mapsto \stext{Abort}] \in msgsAbort) \lor (\neg([type \mapsto \stext{Commit}] \in msgsCommit))) \\
-Inv2 &\triangleq \forall rm_i \in \text{RM} : ((rmState[rm_i] = \stext{prepared}) \lor (\neg([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \lor (\neg(tmState = \stext{init})))) \\
-Inv7 &\triangleq ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (tmState \neq \stext{init}) \\
-Inv5 &\triangleq ([type \mapsto \stext{Abort}] \in msgsAbort) \Rightarrow (tmState \neq \stext{init})
+Safety &\triangleq TCConsistent \\
+Inv6 \,\, &\triangleq \forall rm_i \in \text{RM} : ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (rmState[rm_i] \neq \stext{aborted}) \\
+Inv0 \,\, &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow ([type \mapsto \stext{Commit}] \in msgsCommit) \\
+Inv1 \,\, &\triangleq \forall rm_i \in \text{RM} : (rm_i \in tmPrepared) \Rightarrow ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \\
+Inv8 \,\, &\triangleq \forall rm_i \in \text{RM} : ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{working}) \\
+Inv3 \,\, &\triangleq ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (tmPrepared = \text{RM}) \\
+Inv4 \,\, &\triangleq (\neg([type \mapsto \stext{Abort}] \in msgsAbort) \lor (\neg([type \mapsto \stext{Commit}] \in msgsCommit))) \\
+Inv2 \,\, &\triangleq \forall rm_i \in \text{RM} : ((rmState[rm_i] = \stext{PREPARED}) \lor (\neg([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \lor (\neg(tmState = \stext{init})))) \\
+Inv7 \,\, &\triangleq ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (tmState \neq \stext{init}) \\
+Inv5 \,\, &\triangleq ([type \mapsto \stext{Abort}] \in msgsAbort) \Rightarrow (tmState \neq \stext{init})
 \end{align*}
 $$
 
@@ -234,14 +235,14 @@ $$
   <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd2.png" alt="Inductive Proof Graph Example" width="680">
 </p>
 
-This overall inductive invariant is more succinct (fewer total lemmas), and it is not immediately clear how it relates to the first inductive invariant from above. The lower level lemmas $$Inv7$$ and $$Inv5$$ correspond to the lemmas $$Inv7,Inv4$$ from above, but various other lemmas in the structure are quite different. 
+This overall inductive invariant is more succinct (fewer total lemmas), but it is not immediately clear how it relates to the first inductive invariant from above. The lower level lemmas $$Inv7$$ and $$Inv5$$ correspond to the lemmas $$Inv7,Inv4$$ from above, but various other lemmas in the structure are quite different. 
 
 Note that some aspects of these proof graphs are independent of the choice of lemmas in the graph e.g. the nontrivial incoming action nodes for $$Safety$$ will always be the same, for any possible inductive invariant. In this proof graph, though, for example, the $$(Safety,RMChooseToAbort)$$ node support is quite different, consisting of 4 supporting lemmas:
 
 $$
 \small
 \begin{align*}
-Inv0 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{committed}) \Rightarrow ([type \mapsto \stext{Commit}] \in msgsCommit) \\
+Inv0 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow ([type \mapsto \stext{Commit}] \in msgsCommit) \\
 Inv3 &\triangleq ([type \mapsto \stext{Commit}] \in msgsCommit) \Rightarrow (tmPrepared = \text{RM}) \\
 Inv1 &\triangleq \forall rm_i \in \text{RM} : (rm_i \in tmPrepared) \Rightarrow ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \\
 Inv8 &\triangleq \forall rm_i \in \text{RM} : ([type \mapsto \stext{Prepared}, rm \mapsto rm_i] \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{working}) \\
@@ -252,7 +253,7 @@ The variable slice, though, states that we need only to constrain the $$rmState$
 
 $$
 \small
-\forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{committed}) \Rightarrow (rmState[rm_i] \neq \stext{working})
+\forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (rmState[rm_i] \neq \stext{working})
 $$
 
 In this case, it seems that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and less similar to a proof thay may be developed by a human that was guided by this structure explicitly. 
@@ -273,6 +274,6 @@ In this case, it seems that even though the overall inductive invariant is small
 At a high level, these proof graphs essentially make explicit the kind of backward, inductive reasoning that is applied when trying to show correctness of a safety property. That is, we work backwards via protocol actions, finding
 invariants that must hold true in prior steps in order for the system to always be safe with respect to some target property in question. 
 
-In some ways, we may also view these proof graphs as a way of marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful induction proof in a distributed systems paper may implicitly resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any (monolithic) inductive invariant. 
+In some ways, we may also view these proof graphs as one way of marrying the inductive invariants used for formal verification with the kind of semi-formal, pen and paper proof structures often written by humans. For example, a careful induction proof in a distributed systems paper may implicitly resemble this kind of structure (e.g. see the [Raft dissertation proof](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf#page=233)). These inductive proof graph structures provide a useful way to make this formal, while also showing that these types of graph structures can be seen as ultimately equivalent to any (monolithic) inductive invariant. 
 
-These graph structures are also concretely exploited for automated inductive invariant inference in [this work](https://arxiv.org/abs/2404.18048), and for improving the interpretability of the inductive invariant development process. They also bear similarities to the *inductve data flow graphs* discussed in [here](https://www.cs.princeton.edu/~zkincaid/pub/popl13.pdf).
+These graph structures are also concretely exploited for automated inductive invariant inference in [this work](https://arxiv.org/abs/2404.18048), and for improving the interpretability of the inductive invariant development process. They also bear similarities to the *inductve data flow graphs* discussed [here](https://www.cs.princeton.edu/~zkincaid/pub/popl13.pdf).

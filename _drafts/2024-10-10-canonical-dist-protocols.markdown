@@ -13,15 +13,17 @@ Raft, for example, chooses two specific message types, *RequestVote* and *Append
 - `UpdateTerm`
 - `BecomeCandidate`
 - `GrantVote`: reads `{currentTerm, votedFor, log}`, writes `{votedFor}`
+
+    if a node has previously reached a term and its log is new enough, i can record a vote for it. So, `votedFor` is simply a record of a past state (?) but also promise about future states (?)
 - `RecordGrantedVote`: reads `{currentTerm, votedFor}`, writes `{votesGranted}`
 - `BecomeLeader`: reads `{votesGranted,state}`
 
 and the following state variables:
 
 - `state`
+- `currentTerm`
 - `votesGranted`
 - `votedFor`
-- `currentTerm`
 - `nextIndex`
 - `matchIndex`
 - `log`
@@ -30,4 +32,4 @@ Protocol actions can then all be viewed as direct reads of past states of other 
 
 So, for example, `RecordGrantedVote` is simply checking for some `votedFor` value, and recording this state into a local variable `votesGranted`. Similarly, `BecomeLeader` is simply reading the (current) `votesGranted` state and setting some `state` variable.
 
-This canonical description model also reduces the possible design space of protocols. For example, given only `state` and `currentTerm` variables, what are our possible options for implementing a protocol that ensures Election Safety?
+This canonical description model also reduces the possible design space of protocols. For example, given only `state` and `currentTerm` variables, what are our possible options for implementing a protocol that ensures Election Safety? Everyone can just become leader at term when they decide to, but to ensure safety, they must check that no one else is currently leader in the term they want to go to. 
