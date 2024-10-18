@@ -541,8 +541,8 @@
     "state_cache_duration_secs": 0,
     "invcheck_duration_secs": 0,
     "ctielimcheck_duration_secs": 0,
-    "total_duration_secs": 2.418128252029419,
+    "total_duration_secs": 2.5605952739715576,
     "num_preds": 18,
-    "date": "2024-10-16 22:58:54"
+    "date": "2024-10-17 19:51:56"
   }
 }
