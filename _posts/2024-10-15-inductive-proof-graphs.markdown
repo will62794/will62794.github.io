@@ -231,7 +231,7 @@ Inv5 &\triangleq ([type \mapsto \stext{Abort}] \in msgsAbort) \Rightarrow (tmSta
 $$
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd2.png" alt="Inductive Proof Graph Example" width="720">
+  <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd2.png" alt="Inductive Proof Graph Example" width="680">
 </p>
 
 This overall inductive invariant is more succinct (fewer total lemmas), and it is not immediately clear how it relates to the first inductive invariant from above. The lower level lemmas $$Inv7$$ and $$Inv5$$ correspond to the lemmas $$Inv7,Inv4$$ from above, but various other lemmas in the structure are quite different. 
