@@ -9,7 +9,11 @@ digraph ThreeCycle {
     L2 -> C;
     C -> Inv;
     
-    A [shape=box,style=filled,fillcolor=lightgray];
-    B [shape=box,style=filled,fillcolor=lightgray];
-    C [shape=box,style=filled,fillcolor=lightgray];
+    A [shape=box,style=filled,fillcolor=lightgray,penwidth=1];
+    B [shape=box,style=filled,fillcolor=lightgray,penwidth=1];
+    C [shape=box,style=filled,fillcolor=lightgray,penwidth=1];
+    
+    Inv [penwidth=3,fontsize=20];
+    L1 [penwidth=3,fontsize=20];
+    L2 [penwidth=3,fontsize=20];
 }

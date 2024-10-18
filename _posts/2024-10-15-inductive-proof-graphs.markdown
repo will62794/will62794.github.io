@@ -206,7 +206,7 @@ An inductive invariant establishing the property $$Inv$$, that 𝑎 always has a
 
 
 <p align="center">
-  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="210">
+  <img src="/assets/ind-proof-graphs/3cycle.png" alt="Inductive Proof Graph Example" width="190">
 </p>
 
 
@@ -257,14 +257,14 @@ $$
 
 In this case, it seems that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and less similar to a proof thay may be developed by a human that was guided by this structure explicitly. 
 
-<!-- <p align="center">
+<p align="center">
   <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd2_RMRcvAbortMsg.png" alt="Inductive Proof Graph Example" width="250">
 </p>
 
 ------------------
 <p align="center">
   <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1_RMRcvAbortMsg.png" alt="Inductive Proof Graph Example" width="340">
-</p> -->
+</p>
 
 <!-- A similar pattern can be observed in the support lemmas for the $$(Safety,RMRcvAbortMsg)$$ node: -->
 
