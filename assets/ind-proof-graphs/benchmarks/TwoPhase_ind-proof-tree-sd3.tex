@@ -1,0 +1,77 @@
+
+\begin{tikzpicture}[>=latex,line join=bevel,scale=1.2]
+
+            \Large
+            %
+\node (Safety_RMChooseToAbortAction) at (158.1bp,59.787bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMChooseToAbort$};
+  \node (Safety) at (329.1bp,7.9476bp) [draw=black,rectangle,safetynode_detailed] {$Safety$};
+  \node (Safety_RMRcvAbortMsgAction) at (536.1bp,111.63bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvAbortMsg$};
+  \node (Safety_RMRcvCommitMsgAction) at (329.1bp,59.787bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvCommitMsg$};
+  \node (Inv73_bad3_R0_0_I1) at (97.1bp,111.63bp) [draw=black,rectangle] {$Inv73$};
+  \node (Inv11_9254_R0_1_I1) at (577.1bp,215.31bp) [draw=black,rectangle] {$Inv11$};
+  \node (Inv23_b2ee_R0_2_I1) at (329.1bp,111.63bp) [draw=black,rectangle] {$Inv23$};
+  \node (Inv73_bad3_R0_0_I1_RMRcvCommitMsgAction) at (66.1bp,163.47bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvCommitMsg$};
+  \node (Inv2_6383_R1_0_I1) at (66.1bp,215.31bp) [draw=black,rectangle] {$Inv2$};
+  \node (Inv23_b2ee_R0_2_I1_RMChooseToAbortAction) at (207.1bp,163.47bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMChooseToAbort$};
+  \node (Inv11_9254_R0_1_I1_RMRcvCommitMsgAction) at (577.1bp,267.2bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvCommitMsg$};
+  \node (Inv11_9254_R0_1_I1_TMAbortAction) at (764.1bp,267.2bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$TMAbort$};
+  \node (Inv1_b34d_R2_0_I1) at (548.1bp,319.1bp) [draw=black,rectangle] {$Inv1$};
+  \node (Inv23_b2ee_R0_2_I1_RMRcvAbortMsgAction) at (442.1bp,215.31bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvAbortMsg$};
+  \node (Inv53_f69d_R2_1_I1) at (793.1bp,319.1bp) [draw=black,rectangle] {$Inv53$};
+  \node (Inv23_b2ee_R0_2_I1_TMCommitAction) at (329.1bp,163.47bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$TMCommit$};
+  \node (Inv1448_1fb0_R3_2_I2) at (298.1bp,215.31bp) [draw=black,rectangle] {$Inv1448$};
+  \node (Inv2_6383_R1_0_I1_TMCommitAction) at (50.1bp,267.2bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$TMCommit$};
+  \node (Inv15_48a9_R4_0_I1) at (44.1bp,319.1bp) [draw=black,rectangle] {$Inv15$};
+  \node (Inv1_b34d_R2_0_I1_TMAbortAction) at (705.1bp,370.99bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$TMAbort$};
+  \node (Inv1_b34d_R2_0_I1_TMCommitAction) at (519.1bp,370.99bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$TMCommit$};
+  \node (Inv4_98a2_R5_0_I1) at (660.1bp,421.86bp) [draw=black,rectangle] {$Inv4$};
+  \node (Inv53_f69d_R2_1_I1_RMRcvCommitMsgAction) at (823.1bp,370.99bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvCommitMsg$};
+  \node (Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction) at (422.1bp,319.1bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvCommitMsg$};
+  \node (Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction) at (395.1bp,370.99bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvCommitMsg$};
+  \node (Inv6_2e0f_R5_1_I1) at (258.1bp,421.86bp) [draw=black,rectangle] {$Inv6$};
+  \node (Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction) at (149.1bp,319.1bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvAbortMsg$};
+  \node (Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction) at (258.1bp,370.99bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$RMRcvAbortMsg$};
+  \node (Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction) at (268.1bp,267.2bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$TMRcvPrepared$};
+  \node (Inv1449_35cb_R7_2_I2) at (268.1bp,319.1bp) [draw=black,rectangle] {$Inv1449$};
+  \node (Inv15_48a9_R4_0_I1_TMRcvPreparedAction) at (42.1bp,370.99bp) [draw=black,rectangle,proofactionnode_detailed_raft] {$TMRcvPrepared$};
+  \node (Inv21_4f76_R8_0_I1) at (42.1bp,421.86bp) [draw=black,rectangle] {$Inv21$};
+  \draw [->,ultra thick] (Safety_RMChooseToAbortAction) ..controls (210.01bp,43.658bp) and (263.66bp,28.022bp)  .. (Safety);
+  \draw [->,ultra thick] (Safety_RMRcvAbortMsgAction) ..controls (486.69bp,86.356bp) and (400.74bp,44.136bp)  .. (Safety);
+  \draw [->,ultra thick] (Safety_RMRcvCommitMsgAction) ..controls (329.1bp,45.463bp) and (329.1bp,36.755bp)  .. (Safety);
+  \draw [->,ultra thick] (Inv73_bad3_R0_0_I1) ..controls (115.42bp,95.658bp) and (130.19bp,83.589bp)  .. (Safety_RMChooseToAbortAction);
+  \draw [->,ultra thick] (Inv11_9254_R0_1_I1) ..controls (567.74bp,191.09bp) and (552.37bp,152.98bp)  .. (Safety_RMRcvAbortMsgAction);
+  \draw [->,ultra thick] (Inv23_b2ee_R0_2_I1) ..controls (329.1bp,97.016bp) and (329.1bp,87.752bp)  .. (Safety_RMRcvCommitMsgAction);
+  \draw [->,ultra thick] (Inv73_bad3_R0_0_I1_RMRcvCommitMsgAction) ..controls (74.841bp,148.41bp) and (81.152bp,138.27bp)  .. (Inv73_bad3_R0_0_I1);
+  \draw [->,ultra thick] (Inv2_6383_R1_0_I1) ..controls (66.1bp,200.7bp) and (66.1bp,191.43bp)  .. (Inv73_bad3_R0_0_I1_RMRcvCommitMsgAction);
+  \draw [->,ultra thick] (Inv2_6383_R1_0_I1) ..controls (105.02bp,200.55bp) and (149.23bp,184.92bp)  .. (Inv23_b2ee_R0_2_I1_RMChooseToAbortAction);
+  \draw [->,ultra thick] (Inv11_9254_R0_1_I1_RMRcvCommitMsgAction) ..controls (577.1bp,252.58bp) and (577.1bp,243.3bp)  .. (Inv11_9254_R0_1_I1);
+  \draw [->,ultra thick] (Inv11_9254_R0_1_I1_TMAbortAction) ..controls (705.77bp,250.64bp) and (642.99bp,233.89bp)  .. (Inv11_9254_R0_1_I1);
+  \draw [->,ultra thick] (Inv1_b34d_R2_0_I1) ..controls (556.28bp,304.03bp) and (562.18bp,293.86bp)  .. (Inv11_9254_R0_1_I1_RMRcvCommitMsgAction);
+  \draw [->,ultra thick] (Inv1_b34d_R2_0_I1) ..controls (523.21bp,294.2bp) and (480.83bp,253.5bp)  .. (Inv23_b2ee_R0_2_I1_RMRcvAbortMsgAction);
+  \draw [->,ultra thick] (Inv53_f69d_R2_1_I1) ..controls (784.83bp,303.87bp) and (778.75bp,293.4bp)  .. (Inv11_9254_R0_1_I1_TMAbortAction);
+  \draw [->,ultra thick] (Inv23_b2ee_R0_2_I1_RMChooseToAbortAction) ..controls (242.12bp,148.16bp) and (276.23bp,134.23bp)  .. (Inv23_b2ee_R0_2_I1);
+  \draw [->,ultra thick] (Inv23_b2ee_R0_2_I1_RMRcvAbortMsgAction) ..controls (424.36bp,195.95bp) and (402.12bp,173.42bp)  .. (382.1bp,155.57bp) .. controls (370.98bp,145.66bp) and (357.99bp,135.12bp)  .. (Inv23_b2ee_R0_2_I1);
+  \draw [->,ultra thick] (Inv23_b2ee_R0_2_I1_TMCommitAction) ..controls (329.1bp,150.07bp) and (329.1bp,139.95bp)  .. (Inv23_b2ee_R0_2_I1);
+  \draw [->,ultra thick] (Inv1448_1fb0_R3_2_I2) ..controls (307.03bp,199.95bp) and (313.74bp,189.17bp)  .. (Inv23_b2ee_R0_2_I1_TMCommitAction);
+  \draw [->,ultra thick] (Inv2_6383_R1_0_I1_TMCommitAction) ..controls (54.128bp,253.64bp) and (57.477bp,243.2bp)  .. (Inv2_6383_R1_0_I1);
+  \draw [->,ultra thick] (Inv15_48a9_R4_0_I1) ..controls (45.783bp,304.11bp) and (46.985bp,294.11bp)  .. (Inv2_6383_R1_0_I1_TMCommitAction);
+  \draw [->,ultra thick] (Inv1_b34d_R2_0_I1_TMAbortAction) ..controls (656.7bp,354.61bp) and (605.5bp,338.34bp)  .. (Inv1_b34d_R2_0_I1);
+  \draw [->,ultra thick] (Inv1_b34d_R2_0_I1_TMCommitAction) ..controls (526.53bp,357.22bp) and (532.88bp,346.28bp)  .. (Inv1_b34d_R2_0_I1);
+  \draw [->,ultra thick] (Inv4_98a2_R5_0_I1) ..controls (673.27bp,406.56bp) and (683.43bp,395.52bp)  .. (Inv1_b34d_R2_0_I1_TMAbortAction);
+  \draw [->,ultra thick] (Inv4_98a2_R5_0_I1) ..controls (701.4bp,408.48bp) and (753.1bp,392.98bp)  .. (Inv53_f69d_R2_1_I1_RMRcvCommitMsgAction);
+  \draw [->,ultra thick] (Inv4_98a2_R5_0_I1) ..controls (636.15bp,401.84bp) and (603.34bp,377.37bp)  .. (572.1bp,363.05bp) .. controls (539.46bp,348.07bp) and (500.4bp,337.09bp)  .. (Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction);
+  \draw [->,ultra thick] (Inv4_98a2_R5_0_I1) ..controls (606.75bp,411.03bp) and (507.32bp,392.69bp)  .. (Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction);
+  \draw [->,ultra thick] (Inv6_2e0f_R5_1_I1) ..controls (312.95bp,410.59bp) and (417.36bp,391.04bp)  .. (Inv1_b34d_R2_0_I1_TMCommitAction);
+  \draw [->,ultra thick] (Inv6_2e0f_R5_1_I1) ..controls (228.95bp,405.98bp) and (207.65bp,393.51bp)  .. (192.1bp,378.94bp) .. controls (178.82bp,366.5bp) and (166.88bp,349.46bp)  .. (Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction);
+  \draw [->,ultra thick] (Inv6_2e0f_R5_1_I1) ..controls (258.1bp,407.59bp) and (258.1bp,398.65bp)  .. (Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction);
+  \draw [->,ultra thick] (Inv53_f69d_R2_1_I1_RMRcvCommitMsgAction) ..controls (814.69bp,356.0bp) and (808.67bp,345.99bp)  .. (Inv53_f69d_R2_1_I1);
+  \draw [->,ultra thick] (Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction) ..controls (163.52bp,298.63bp) and (182.99bp,274.45bp)  .. (204.1bp,259.25bp) .. controls (222.76bp,245.82bp) and (246.29bp,235.08bp)  .. (Inv1448_1fb0_R3_2_I2);
+  \draw [->,ultra thick] (Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction) ..controls (392.81bp,294.05bp) and (342.53bp,252.78bp)  .. (Inv1448_1fb0_R3_2_I2);
+  \draw [->,ultra thick] (Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction) ..controls (276.51bp,252.21bp) and (282.53bp,242.2bp)  .. (Inv1448_1fb0_R3_2_I2);
+  \draw [->,ultra thick] (Inv1449_35cb_R7_2_I2) ..controls (268.1bp,304.47bp) and (268.1bp,295.2bp)  .. (Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction);
+  \draw [->,ultra thick] (Inv15_48a9_R4_0_I1_TMRcvPreparedAction) ..controls (42.646bp,356.37bp) and (43.018bp,347.09bp)  .. (Inv15_48a9_R4_0_I1);
+  \draw [->,ultra thick] (Inv21_4f76_R8_0_I1) ..controls (42.1bp,407.59bp) and (42.1bp,398.65bp)  .. (Inv15_48a9_R4_0_I1_TMRcvPreparedAction);
+  \draw [->,ultra thick] (Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction) ..controls (260.85bp,356.29bp) and (262.73bp,346.87bp)  .. (Inv1449_35cb_R7_2_I2);
+  \draw [->,ultra thick] (Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction) ..controls (355.54bp,354.45bp) and (321.65bp,341.14bp)  .. (Inv1449_35cb_R7_2_I2);
+%
+\end{tikzpicture}

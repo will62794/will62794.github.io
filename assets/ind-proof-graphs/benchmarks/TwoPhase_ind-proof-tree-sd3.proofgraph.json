@@ -142,7 +142,7 @@
         "Inv23_b2ee_R0_2_I1"
       ],
       [
-        "Inv1143_5b67_R3_2_I2",
+        "Inv1448_1fb0_R3_2_I2",
         "Inv23_b2ee_R0_2_I1_TMCommitAction"
       ],
       [
@@ -158,7 +158,7 @@
         "Inv2_6383_R1_0_I1"
       ],
       [
-        "Inv16_c77c_R4_0_I1",
+        "Inv15_48a9_R4_0_I1",
         "Inv2_6383_R1_0_I1_TMCommitAction"
       ],
       [
@@ -190,7 +190,7 @@
         "Inv1_b34d_R2_0_I1"
       ],
       [
-        "Inv7_2e0f_R5_1_I1",
+        "Inv6_2e0f_R5_1_I1",
         "Inv1_b34d_R2_0_I1_TMCommitAction"
       ],
       [
@@ -210,164 +210,100 @@
         "Inv53_f69d_R2_1_I1_RMRcvCommitMsgAction"
       ],
       [
-        "Inv1143_5b67_R3_2_I2_RMRcvAbortMsgAction",
-        "Inv1143_5b67_R3_2_I2"
+        "Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv1143_5b67_R3_2_I2_RMRcvCommitMsgAction",
-        "Inv1143_5b67_R3_2_I2"
+        "Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv1143_5b67_R3_2_I2_TMRcvPreparedAction",
-        "Inv1143_5b67_R3_2_I2"
+        "Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv1143_5b67_R3_2_I2_RMRcvAbortMsgAction",
-        "Inv1143_5b67_R3_2_I2"
+        "Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv1143_5b67_R3_2_I2_RMRcvAbortMsgAction",
-        "Inv1143_5b67_R3_2_I2"
+        "Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv7_2e0f_R5_1_I1",
-        "Inv1143_5b67_R3_2_I2_RMRcvAbortMsgAction"
+        "Inv6_2e0f_R5_1_I1",
+        "Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction"
       ],
       [
-        "Inv1143_5b67_R3_2_I2_RMRcvCommitMsgAction",
-        "Inv1143_5b67_R3_2_I2"
+        "Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv1143_5b67_R3_2_I2_RMRcvCommitMsgAction",
-        "Inv1143_5b67_R3_2_I2"
-      ],
-      [
-        "Inv4_98a2_R5_0_I1",
-        "Inv1143_5b67_R3_2_I2_RMRcvCommitMsgAction"
-      ],
-      [
-        "Inv1143_5b67_R3_2_I2_TMRcvPreparedAction",
-        "Inv1143_5b67_R3_2_I2"
-      ],
-      [
-        "Inv1143_5b67_R3_2_I2_TMRcvPreparedAction",
-        "Inv1143_5b67_R3_2_I2"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2",
-        "Inv1143_5b67_R3_2_I2_TMRcvPreparedAction"
-      ],
-      [
-        "Inv1143_5b67_R3_2_I2_TMRcvPreparedAction",
-        "Inv1143_5b67_R3_2_I2"
-      ],
-      [
-        "Inv1316_eff9_R7_2_I2",
-        "Inv1143_5b67_R3_2_I2_TMRcvPreparedAction"
-      ],
-      [
-        "Inv16_c77c_R4_0_I1_TMRcvPreparedAction",
-        "Inv16_c77c_R4_0_I1"
-      ],
-      [
-        "Inv16_c77c_R4_0_I1_TMRcvPreparedAction",
-        "Inv16_c77c_R4_0_I1"
-      ],
-      [
-        "Inv16_c77c_R4_0_I1_TMRcvPreparedAction",
-        "Inv16_c77c_R4_0_I1"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2",
-        "Inv16_c77c_R4_0_I1_TMRcvPreparedAction"
-      ],
-      [
-        "Inv16_c77c_R4_0_I1_TMRcvPreparedAction",
-        "Inv16_c77c_R4_0_I1"
-      ],
-      [
-        "Inv29_4f76_R8_0_I1",
-        "Inv16_c77c_R4_0_I1_TMRcvPreparedAction"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2_RMRcvAbortMsgAction",
-        "Inv1342_1fb0_R7_2_I2"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2_RMRcvCommitMsgAction",
-        "Inv1342_1fb0_R7_2_I2"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction",
-        "Inv1342_1fb0_R7_2_I2"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2_RMRcvAbortMsgAction",
-        "Inv1342_1fb0_R7_2_I2"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2_RMRcvAbortMsgAction",
-        "Inv1342_1fb0_R7_2_I2"
-      ],
-      [
-        "Inv7_2e0f_R5_1_I1",
-        "Inv1342_1fb0_R7_2_I2_RMRcvAbortMsgAction"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2_RMRcvCommitMsgAction",
-        "Inv1342_1fb0_R7_2_I2"
-      ],
-      [
-        "Inv1342_1fb0_R7_2_I2_RMRcvCommitMsgAction",
-        "Inv1342_1fb0_R7_2_I2"
+        "Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
         "Inv4_98a2_R5_0_I1",
-        "Inv1342_1fb0_R7_2_I2_RMRcvCommitMsgAction"
+        "Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction"
       ],
       [
-        "Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction",
-        "Inv1342_1fb0_R7_2_I2"
+        "Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction",
-        "Inv1342_1fb0_R7_2_I2"
+        "Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction",
+        "Inv1448_1fb0_R3_2_I2"
       ],
       [
-        "Inv1316_eff9_R7_2_I2",
-        "Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction"
+        "Inv1449_35cb_R7_2_I2",
+        "Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction"
       ],
       [
-        "Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction",
-        "Inv1316_eff9_R7_2_I2"
+        "Inv15_48a9_R4_0_I1_TMRcvPreparedAction",
+        "Inv15_48a9_R4_0_I1"
       ],
       [
-        "Inv1316_eff9_R7_2_I2_RMRcvCommitMsgAction",
-        "Inv1316_eff9_R7_2_I2"
+        "Inv15_48a9_R4_0_I1_TMRcvPreparedAction",
+        "Inv15_48a9_R4_0_I1"
       ],
       [
-        "Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction",
-        "Inv1316_eff9_R7_2_I2"
+        "Inv15_48a9_R4_0_I1_TMRcvPreparedAction",
+        "Inv15_48a9_R4_0_I1"
       ],
       [
-        "Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction",
-        "Inv1316_eff9_R7_2_I2"
+        "Inv21_4f76_R8_0_I1",
+        "Inv15_48a9_R4_0_I1_TMRcvPreparedAction"
       ],
       [
-        "Inv7_2e0f_R5_1_I1",
-        "Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction"
+        "Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction",
+        "Inv1449_35cb_R7_2_I2"
       ],
       [
-        "Inv1316_eff9_R7_2_I2_RMRcvCommitMsgAction",
-        "Inv1316_eff9_R7_2_I2"
+        "Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction",
+        "Inv1449_35cb_R7_2_I2"
       ],
       [
-        "Inv1316_eff9_R7_2_I2_RMRcvCommitMsgAction",
-        "Inv1316_eff9_R7_2_I2"
+        "Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction",
+        "Inv1449_35cb_R7_2_I2"
+      ],
+      [
+        "Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction",
+        "Inv1449_35cb_R7_2_I2"
+      ],
+      [
+        "Inv6_2e0f_R5_1_I1",
+        "Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction"
+      ],
+      [
+        "Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction",
+        "Inv1449_35cb_R7_2_I2"
+      ],
+      [
+        "Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction",
+        "Inv1449_35cb_R7_2_I2"
       ],
       [
         "Inv4_98a2_R5_0_I1",
-        "Inv1316_eff9_R7_2_I2_RMRcvCommitMsgAction"
+        "Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction"
       ]
     ],
     "nodes": {
@@ -392,7 +328,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 64.01507067680359,
+        "time_spent": 15.547934293746948,
         "latest_elimination_iter": 2
       },
       "Safety_RMRcvAbortMsgAction": {
@@ -409,7 +345,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 62.209835052490234,
+        "time_spent": 15.265377044677734,
         "latest_elimination_iter": 2
       },
       "Safety_RMRcvCommitMsgAction": {
@@ -426,7 +362,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 66.33366084098816,
+        "time_spent": 15.712056159973145,
         "latest_elimination_iter": 2
       },
       "Inv73_bad3_R0_0_I1": {
@@ -464,7 +400,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 21.05444073677063,
+        "time_spent": 8.437948942184448,
         "latest_elimination_iter": 2
       },
       "Inv2_6383_R1_0_I1": {
@@ -489,7 +425,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 47.96168804168701,
+        "time_spent": 12.419312715530396,
         "latest_elimination_iter": 2
       },
       "Inv11_9254_R0_1_I1_TMAbortAction": {
@@ -507,7 +443,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 48.27277445793152,
+        "time_spent": 14.61911916732788,
         "latest_elimination_iter": 2
       },
       "Inv1_b34d_R2_0_I1": {
@@ -538,7 +474,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 40.972864389419556,
+        "time_spent": 11.396932125091553,
         "latest_elimination_iter": 2
       },
       "Inv23_b2ee_R0_2_I1_RMRcvAbortMsgAction": {
@@ -556,7 +492,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 39.512136697769165,
+        "time_spent": 11.371471166610718,
         "latest_elimination_iter": 2
       },
       "Inv23_b2ee_R0_2_I1_TMCommitAction": {
@@ -568,21 +504,21 @@
           "tmPrepared",
           "msgsCommit"
         ],
-        "num_grammar_preds": 15,
+        "num_grammar_preds": 14,
         "num_invs_generated_per_iter": {
-          "1": 14,
-          "2": 96,
-          "3": 2255
+          "1": 13,
+          "2": 76,
+          "3": 1722
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 67.07018423080444,
+        "time_spent": 20.130120992660522,
         "latest_elimination_iter": 3
       },
-      "Inv1143_5b67_R3_2_I2": {
+      "Inv1448_1fb0_R3_2_I2": {
         "discharged": true,
         "is_lemma": true,
-        "expr": "\\A VARRMI \\in RM : (rmState[VARRMI] = \"prepared\") \\/ (~(tmPrepared = RM) \\/ (~(tmState = \"init\")))",
+        "expr": "\\A VARRMJ \\in RM : (rmState[VARRMJ] = \"prepared\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMJ})) \\/ (~(tmState = \"init\"))",
         "order": 8,
         "depth": 2
       },
@@ -595,20 +531,20 @@
           "tmPrepared",
           "msgsCommit"
         ],
-        "num_grammar_preds": 15,
+        "num_grammar_preds": 14,
         "num_invs_generated_per_iter": {
           "1": 12,
-          "2": 24
+          "2": 20
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 21.487979412078857,
+        "time_spent": 8.847843170166016,
         "latest_elimination_iter": 2
       },
-      "Inv16_c77c_R4_0_I1": {
+      "Inv15_48a9_R4_0_I1": {
         "discharged": true,
         "is_lemma": true,
-        "expr": "\\A VARRMI \\in RM : ~(rmState[VARRMI] = \"working\") \\/ (~(tmPrepared = RM))",
+        "expr": "\\A VARRMI \\in RM : ~(rmState[VARRMI] = \"working\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMI}))",
         "order": 9,
         "depth": 3
       },
@@ -627,7 +563,7 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 21.849327564239502,
+        "time_spent": 8.62493896484375,
         "latest_elimination_iter": 2
       },
       "Inv1_b34d_R2_0_I1_TMCommitAction": {
@@ -639,14 +575,14 @@
           "msgsCommit",
           "msgsAbort"
         ],
-        "num_grammar_preds": 8,
+        "num_grammar_preds": 7,
         "num_invs_generated_per_iter": {
           "1": 4,
-          "2": 9
+          "2": 8
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 42.47816824913025,
+        "time_spent": 12.20791506767273,
         "latest_elimination_iter": 2
       },
       "Inv4_98a2_R5_0_I1": {
@@ -656,7 +592,7 @@
         "order": 10,
         "depth": 3
       },
-      "Inv7_2e0f_R5_1_I1": {
+      "Inv6_2e0f_R5_1_I1": {
         "discharged": true,
         "is_lemma": true,
         "expr": "~([type |-> \"Abort\"] \\in msgsAbort) \\/ (~(tmState = \"init\"))",
@@ -678,165 +614,100 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 21.507196187973022,
+        "time_spent": 8.562870025634766,
         "latest_elimination_iter": 2
       },
-      "Inv1143_5b67_R3_2_I2_RMRcvAbortMsgAction": {
+      "Inv1448_1fb0_R3_2_I2_RMRcvAbortMsgAction": {
         "ctis_remaining": 0,
-        "total_initial_ctis": 1,
+        "total_initial_ctis": 61,
         "coi_vars": [
           "rmState",
           "tmState",
           "tmPrepared",
           "msgsAbort"
+        ],
+        "num_grammar_preds": 14,
+        "num_invs_generated_per_iter": {
+          "1": 12
+        },
+        "is_action": true,
+        "discharged": true,
+        "time_spent": 9.393363952636719,
+        "latest_elimination_iter": 1
+      },
+      "Inv1448_1fb0_R3_2_I2_RMRcvCommitMsgAction": {
+        "ctis_remaining": 0,
+        "total_initial_ctis": 61,
+        "coi_vars": [
+          "rmState",
+          "tmState",
+          "tmPrepared",
+          "msgsCommit"
+        ],
+        "num_grammar_preds": 14,
+        "num_invs_generated_per_iter": {
+          "1": 8,
+          "2": 154
+        },
+        "is_action": true,
+        "discharged": true,
+        "time_spent": 9.569720983505249,
+        "latest_elimination_iter": 2
+      },
+      "Inv1448_1fb0_R3_2_I2_TMRcvPreparedAction": {
+        "ctis_remaining": 0,
+        "total_initial_ctis": 300,
+        "coi_vars": [
+          "rmState",
+          "tmState",
+          "tmPrepared",
+          "msgsPrepared"
         ],
         "num_grammar_preds": 15,
         "num_invs_generated_per_iter": {
           "1": 14,
-          "2": 8
+          "2": 152,
+          "3": 2901
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 38.38906121253967,
-        "latest_elimination_iter": 2
-      },
-      "Inv1143_5b67_R3_2_I2_RMRcvCommitMsgAction": {
-        "ctis_remaining": 0,
-        "total_initial_ctis": 1,
-        "coi_vars": [
-          "rmState",
-          "tmState",
-          "tmPrepared",
-          "msgsCommit"
-        ],
-        "num_grammar_preds": 15,
-        "num_invs_generated_per_iter": {
-          "1": 16,
-          "2": 12
-        },
-        "is_action": true,
-        "discharged": true,
-        "time_spent": 37.39887738227844,
-        "latest_elimination_iter": 2
-      },
-      "Inv1143_5b67_R3_2_I2_TMRcvPreparedAction": {
-        "ctis_remaining": 0,
-        "total_initial_ctis": 756,
-        "coi_vars": [
-          "rmState",
-          "tmState",
-          "tmPrepared",
-          "msgsPrepared"
-        ],
-        "num_grammar_preds": 16,
-        "num_invs_generated_per_iter": {
-          "1": 20,
-          "2": 288,
-          "3": 2151
-        },
-        "is_action": true,
-        "discharged": true,
-        "time_spent": 37.27888369560242,
+        "time_spent": 18.659057140350342,
         "latest_elimination_iter": 3
       },
-      "Inv1342_1fb0_R7_2_I2": {
+      "Inv1449_35cb_R7_2_I2": {
         "discharged": true,
         "is_lemma": true,
-        "expr": "\\A VARRMJ \\in RM : (rmState[VARRMJ] = \"prepared\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMJ})) \\/ (~(tmState = \"init\"))",
+        "expr": "\\A VARRMI \\in RM : (rmState[VARRMI] = \"prepared\") \\/ (~([type |-> \"Prepared\", rm |-> VARRMI] \\in msgsPrepared) \\/ (~(tmState = \"init\")))",
         "order": 12,
         "depth": 3
       },
-      "Inv1316_eff9_R7_2_I2": {
-        "discharged": true,
-        "is_lemma": true,
-        "expr": "\\A VARRMJ \\in RM : (rmState[VARRMJ] = \"prepared\") \\/ (~([type |-> \"Prepared\", rm |-> VARRMJ] \\in msgsPrepared)) \\/ (~(tmState = \"init\"))",
-        "order": 13,
-        "depth": 3
-      },
-      "Inv16_c77c_R4_0_I1_TMRcvPreparedAction": {
+      "Inv15_48a9_R4_0_I1_TMRcvPreparedAction": {
         "ctis_remaining": 0,
-        "total_initial_ctis": 444,
+        "total_initial_ctis": 300,
         "coi_vars": [
           "rmState",
           "tmState",
           "tmPrepared",
           "msgsPrepared"
         ],
-        "num_grammar_preds": 16,
+        "num_grammar_preds": 15,
         "num_invs_generated_per_iter": {
-          "1": 7,
-          "2": 62
+          "1": 6,
+          "2": 52
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 18.96110200881958,
+        "time_spent": 7.402755975723267,
         "latest_elimination_iter": 2
       },
-      "Inv29_4f76_R8_0_I1": {
+      "Inv21_4f76_R8_0_I1": {
         "discharged": true,
         "is_lemma": true,
         "expr": "\\A VARRMI \\in RM : ~([type |-> \"Prepared\", rm |-> VARRMI] \\in msgsPrepared) \\/ (~(rmState[VARRMI] = \"working\"))",
-        "order": 14,
+        "order": 13,
         "depth": 4
       },
-      "Inv1342_1fb0_R7_2_I2_RMRcvAbortMsgAction": {
-        "ctis_remaining": 0,
-        "total_initial_ctis": 61,
-        "coi_vars": [
-          "rmState",
-          "tmState",
-          "tmPrepared",
-          "msgsAbort"
-        ],
-        "num_grammar_preds": 15,
-        "num_invs_generated_per_iter": {
-          "1": 8,
-          "2": 70
-        },
-        "is_action": true,
-        "discharged": true,
-        "time_spent": 35.69440722465515,
-        "latest_elimination_iter": 2
-      },
-      "Inv1342_1fb0_R7_2_I2_RMRcvCommitMsgAction": {
-        "ctis_remaining": 0,
-        "total_initial_ctis": 61,
-        "coi_vars": [
-          "rmState",
-          "tmState",
-          "tmPrepared",
-          "msgsCommit"
-        ],
-        "num_grammar_preds": 15,
-        "num_invs_generated_per_iter": {
-          "1": 9,
-          "2": 67
-        },
-        "is_action": true,
-        "discharged": true,
-        "time_spent": 34.775866746902466,
-        "latest_elimination_iter": 2
-      },
-      "Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction": {
-        "ctis_remaining": 0,
-        "total_initial_ctis": 657,
-        "coi_vars": [
-          "rmState",
-          "tmState",
-          "tmPrepared",
-          "msgsPrepared"
-        ],
-        "num_grammar_preds": 16,
-        "num_invs_generated_per_iter": {
-          "1": 8,
-          "2": 62
-        },
-        "is_action": true,
-        "discharged": true,
-        "time_spent": 19.691309213638306,
-        "latest_elimination_iter": 2
-      },
-      "Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction": {
+      "Inv1449_35cb_R7_2_I2_RMRcvAbortMsgAction": {
         "ctis_remaining": 0,
         "total_initial_ctis": 61,
         "coi_vars": [
@@ -848,14 +719,14 @@
         "num_grammar_preds": 14,
         "num_invs_generated_per_iter": {
           "1": 7,
-          "2": 55
+          "2": 63
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 21.182180643081665,
+        "time_spent": 8.202808856964111,
         "latest_elimination_iter": 2
       },
-      "Inv1316_eff9_R7_2_I2_RMRcvCommitMsgAction": {
+      "Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction": {
         "ctis_remaining": 0,
         "total_initial_ctis": 61,
         "coi_vars": [
@@ -871,12 +742,12 @@
         },
         "is_action": true,
         "discharged": true,
-        "time_spent": 19.21317982673645,
+        "time_spent": 8.66926097869873,
         "latest_elimination_iter": 2
       }
     },
     "safety": "H_TCConsistent",
-    "curr_node": "Inv1316_eff9_R7_2_I2_RMRcvCommitMsgAction"
+    "curr_node": "Inv1449_35cb_R7_2_I2_RMRcvCommitMsgAction"
   },
   "strengthening_conjuncts": [
     [
@@ -910,14 +781,14 @@
       "~(rmState[VARRMI] = \"committed\") \\/ (~(tmState = \"init\"))"
     ],
     [
-      "Inv1143_5b67_R3_2_I2",
-      "\\A VARRMI \\in RM : (rmState[VARRMI] = \"prepared\") \\/ (~(tmPrepared = RM) \\/ (~(tmState = \"init\")))",
-      "(rmState[VARRMI] = \"prepared\") \\/ (~(tmPrepared = RM) \\/ (~(tmState = \"init\")))"
+      "Inv1448_1fb0_R3_2_I2",
+      "\\A VARRMJ \\in RM : (rmState[VARRMJ] = \"prepared\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMJ})) \\/ (~(tmState = \"init\"))",
+      "(rmState[VARRMJ] = \"prepared\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMJ})) \\/ (~(tmState = \"init\"))"
     ],
     [
-      "Inv16_c77c_R4_0_I1",
-      "\\A VARRMI \\in RM : ~(rmState[VARRMI] = \"working\") \\/ (~(tmPrepared = RM))",
-      "~(rmState[VARRMI] = \"working\") \\/ (~(tmPrepared = RM))"
+      "Inv15_48a9_R4_0_I1",
+      "\\A VARRMI \\in RM : ~(rmState[VARRMI] = \"working\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMI}))",
+      "~(rmState[VARRMI] = \"working\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMI}))"
     ],
     [
       "Inv4_98a2_R5_0_I1",
@@ -925,22 +796,17 @@
       "~([type |-> \"Commit\"] \\in msgsCommit) \\/ (~(tmState = \"init\"))"
     ],
     [
-      "Inv7_2e0f_R5_1_I1",
+      "Inv6_2e0f_R5_1_I1",
       "~([type |-> \"Abort\"] \\in msgsAbort) \\/ (~(tmState = \"init\"))",
       "~([type |-> \"Abort\"] \\in msgsAbort) \\/ (~(tmState = \"init\"))"
     ],
     [
-      "Inv1342_1fb0_R7_2_I2",
-      "\\A VARRMJ \\in RM : (rmState[VARRMJ] = \"prepared\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMJ})) \\/ (~(tmState = \"init\"))",
-      "(rmState[VARRMJ] = \"prepared\") \\/ (~(tmPrepared = tmPrepared \\cup {VARRMJ})) \\/ (~(tmState = \"init\"))"
+      "Inv1449_35cb_R7_2_I2",
+      "\\A VARRMI \\in RM : (rmState[VARRMI] = \"prepared\") \\/ (~([type |-> \"Prepared\", rm |-> VARRMI] \\in msgsPrepared) \\/ (~(tmState = \"init\")))",
+      "(rmState[VARRMI] = \"prepared\") \\/ (~([type |-> \"Prepared\", rm |-> VARRMI] \\in msgsPrepared) \\/ (~(tmState = \"init\")))"
     ],
     [
-      "Inv1316_eff9_R7_2_I2",
-      "\\A VARRMJ \\in RM : (rmState[VARRMJ] = \"prepared\") \\/ (~([type |-> \"Prepared\", rm |-> VARRMJ] \\in msgsPrepared)) \\/ (~(tmState = \"init\"))",
-      "(rmState[VARRMJ] = \"prepared\") \\/ (~([type |-> \"Prepared\", rm |-> VARRMJ] \\in msgsPrepared)) \\/ (~(tmState = \"init\"))"
-    ],
-    [
-      "Inv29_4f76_R8_0_I1",
+      "Inv21_4f76_R8_0_I1",
       "\\A VARRMI \\in RM : ~([type |-> \"Prepared\", rm |-> VARRMI] \\in msgsPrepared) \\/ (~(rmState[VARRMI] = \"working\"))",
       "~([type |-> \"Prepared\", rm |-> VARRMI] \\in msgsPrepared) \\/ (~(rmState[VARRMI] = \"working\"))"
     ]
@@ -948,15 +814,15 @@
   "roundi": 0,
   "num_rounds": 45,
   "num_iters": 5,
-  "seed": 1,
+  "seed": 3,
   "stats": {
-    "num_lemma_nodes": 14,
+    "num_lemma_nodes": 13,
     "num_failed_lemma_nodes": 0,
     "state_cache_duration_secs": 0,
     "invcheck_duration_secs": 0,
     "ctielimcheck_duration_secs": 0,
-    "total_duration_secs": 2.942927122116089,
+    "total_duration_secs": 2.648097038269043,
     "num_preds": 18,
-    "date": "2024-10-22 14:14:59"
+    "date": "2024-10-22 14:15:05"
   }
 }

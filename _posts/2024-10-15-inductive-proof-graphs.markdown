@@ -258,6 +258,39 @@ $$
 
 In this case, it seems that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and less similar to a proof thay may be developed by a human that was guided by this structure explicitly. 
 
+As another example, consider the following two inductive proof graphs for the same two-phase commit protocol, differing in subtle ways in the support subgraphs for core safety node:
+
+$$
+\small
+\begin{align*}
+Inv73 &\triangleq \forall rm_i, rm_j \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (rmState[rm_j] \neq \stext{WORKING}) \\
+Inv11 &\triangleq \forall rm_j \in \text{RM} : (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (rmState[rm_j] \neq \stext{COMMITTED}) \\
+Inv23 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Commit} \rangle \in msgsCommit) \Rightarrow (rmState[rm_i] \neq \stext{ABORTED}) \\
+Inv2 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Commit} \rangle \in msgsCommit) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
+Inv1 &\triangleq (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (\langle \stext{Commit} \rangle \notin msgsCommit) \\
+Inv53 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (tmState \neq \stext{INIT}) \\
+Inv1448 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor (rm_j \notin tmPrepared) \lor (tmState \neq \stext{INIT}) \\
+Inv15 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{WORKING}) \Rightarrow (rm_i \notin tmPrepared) \\
+Inv4 &\triangleq (\langle \stext{Commit} \rangle \in msgsCommit) \Rightarrow (tmState \neq \stext{INIT}) \\
+Inv6 &\triangleq (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (tmState \neq \stext{INIT}) \\
+Inv1449 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{PREPARED}) \lor (\langle \stext{Prepared}, rm_i \rangle \notin msgsPrepared) \lor (tmState \neq \stext{INIT}) \\
+Inv21 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Prepared}, rm_i \rangle \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{WORKING})
+\end{align*}
+$$
+
+
+<div style="display: flex; justify-content: center;">
+  <figure style="margin-right: 10px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3.png" alt="Inductive Proof Graph Example 1" width="380">
+    <figcaption style="text-align: center;">Figure 1: Inductive Proof Graph Example 1</figcaption>
+  </figure>
+  <figure style="margin-left: 10px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example 2" width="380">
+    <figcaption style="text-align: center;">Figure 2: Inductive Proof Graph Example 2</figcaption>
+  </figure>
+</div>
+
+
 <!-- <p align="center">
   <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd2_RMRcvAbortMsg.png" alt="Inductive Proof Graph Example" width="250">
 </p>
