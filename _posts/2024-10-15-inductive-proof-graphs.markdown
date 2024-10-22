@@ -258,9 +258,9 @@ $$
 
 In this case, it seems that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and less similar to a proof thay may be developed by a human that was guided by this structure explicitly. 
 
-As another example, consider the following two inductive proof graphs for the same two-phase commit protocol, differing in subtle ways in the support subgraphs for core safety node:
+<!-- As another example, consider the following two inductive proof graphs for the same two-phase commit protocol, differing in subtle ways in the support subgraphs for core safety node: -->
 
-$$
+<!-- $$
 \small
 \begin{align*}
 Inv73 &\triangleq \forall rm_i, rm_j \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (rmState[rm_j] \neq \stext{WORKING}) \\
@@ -288,7 +288,7 @@ $$
     <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example 2" width="380">
     <figcaption style="text-align: center;">Figure 2: Inductive Proof Graph Example 2</figcaption>
   </figure>
-</div>
+</div> -->
 
 
 <!-- <p align="center">
