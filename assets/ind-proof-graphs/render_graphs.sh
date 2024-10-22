@@ -101,9 +101,93 @@ else
     exit 1
 fi
 
+# Render TwoPhase_ind-proof-tree-sd1_RMRcvCommitMsg
+INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMRcvCommitMsg"
+OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMRcvCommitMsg.png"
+
+# Check if input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Input file $INPUT_FILE not found."
+    exit 1
+fi
+
+# Render the graph
+dot -Tpng "$INPUT_FILE" -o "$OUTPUT_FILE"
+
+# Check if rendering was successful
+if [ $? -eq 0 ]; then
+    echo "Graph rendered successfully. Output saved to $OUTPUT_FILE"
+else
+    echo "Error occurred while rendering the graph."
+    exit 1
+fi
+
+# Render TwoPhase_ind-proof-tree-sd1_RMChooseToAbort
+INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort"
+OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort.png"
+
+# Check if input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Input file $INPUT_FILE not found."
+    exit 1
+fi
+
+# Render the graph
+dot -Tpng "$INPUT_FILE" -o "$OUTPUT_FILE"
+
+# Check if rendering was successful
+if [ $? -eq 0 ]; then
+    echo "Graph rendered successfully. Output saved to $OUTPUT_FILE"
+else
+    echo "Error occurred while rendering the graph."
+    exit 1
+fi
+
 # Render TwoPhase_ind-proof-tree-sd3_RMRcvAbortMsg
 INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMRcvAbortMsg"
 OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMRcvAbortMsg.png"
+
+# Check if input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Input file $INPUT_FILE not found."
+    exit 1
+fi
+
+# Render the graph
+dot -Tpng "$INPUT_FILE" -o "$OUTPUT_FILE"
+
+# Check if rendering was successful
+if [ $? -eq 0 ]; then
+    echo "Graph rendered successfully. Output saved to $OUTPUT_FILE"
+else
+    echo "Error occurred while rendering the graph."
+    exit 1
+fi
+
+# Render TwoPhase_ind-proof-tree-sd3_RMRcvCommitMsg
+INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMRcvCommitMsg"
+OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMRcvCommitMsg.png"
+
+# Check if input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Input file $INPUT_FILE not found."
+    exit 1
+fi
+
+# Render the graph
+dot -Tpng "$INPUT_FILE" -o "$OUTPUT_FILE"
+
+# Check if rendering was successful
+if [ $? -eq 0 ]; then
+    echo "Graph rendered successfully. Output saved to $OUTPUT_FILE"
+else
+    echo "Error occurred while rendering the graph."
+    exit 1
+fi
+
+# Render TwoPhase_ind-proof-tree-sd3_RMChooseToAbort
+INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort"
+OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort.png"
 
 # Check if input file exists
 if [ ! -f "$INPUT_FILE" ]; then

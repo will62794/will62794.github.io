@@ -1,0 +1,29 @@
+// Supporting Subgraph for Safety_RMChooseToAbortAction
+strict digraph "TwoPhase-proof-graph" {
+    node [fontname=Georgia shape=box]
+
+    // Nodes
+    Safety_RMChooseToAbortAction [label=< RMChooseToAbort<BR/><FONT POINT-SIZE='8'>{rmState}</FONT><BR/>> color=black fillcolor=lightgray fontsize="14pt" penwidth=1 shape=box style=filled]
+    Safety [label=< <FONT POINT-SIZE='28'>Safety</FONT> > color=black fillcolor=lightgreen fontsize="20pt" penwidth=3 shape=rect style="filled,rounded"]
+    Inv73_bad3_R0_0_I1 [label=< <FONT POINT-SIZE='28'>Inv73</FONT> > color=black fillcolor=lightgreen fontsize="20pt" penwidth=3 shape=rect style="filled,rounded"]
+    Inv73_bad3_R0_0_I1_RMRcvCommitMsgAction [label=< RMRcvCommitMsg<BR/><FONT POINT-SIZE='8'>{msgsCommit, rmState}</FONT><BR/>> color=black fillcolor=lightgray fontsize="14pt" penwidth=1 shape=box style=filled]
+    Inv2_6383_R1_0_I1 [label=< <FONT POINT-SIZE='28'>Inv2</FONT> > color=black fillcolor=lightgreen fontsize="20pt" penwidth=3 shape=rect style="filled,rounded"]
+    Inv2_6383_R1_0_I1_TMCommitAction [label=< TMCommit<BR/><FONT POINT-SIZE='8'>{msgsCommit, rmState, tmPrepared, tmState}</FONT><BR/>> color=black fillcolor=lightgray fontsize="14pt" penwidth=1 shape=box style=filled]
+    Inv15_48a9_R4_0_I1 [label=< <FONT POINT-SIZE='28'>Inv15</FONT> > color=black fillcolor=lightgreen fontsize="20pt" penwidth=3 shape=rect style="filled,rounded"]
+    Inv15_48a9_R4_0_I1_TMRcvPreparedAction [label=< TMRcvPrepared<BR/><FONT POINT-SIZE='8'>{msgsPrepared, rmState, tmPrepared, tmState}</FONT><BR/>> color=black fillcolor=lightgray fontsize="14pt" penwidth=1 shape=box style=filled]
+    Inv21_4f76_R8_0_I1 [label=< <FONT POINT-SIZE='28'>Inv21</FONT> > color=black fillcolor=lightgreen fontsize="20pt" penwidth=3 shape=rect style="filled,rounded"]
+
+    // Edges
+    Safety_RMChooseToAbortAction -> Safety [style="ultra thick"]
+    Inv73_bad3_R0_0_I1 -> Safety_RMChooseToAbortAction [style="ultra thick"]
+    Inv73_bad3_R0_0_I1_RMRcvCommitMsgAction -> Inv73_bad3_R0_0_I1 [style="ultra thick"]
+    Inv2_6383_R1_0_I1 -> Inv73_bad3_R0_0_I1_RMRcvCommitMsgAction [style="ultra thick"]
+    Inv2_6383_R1_0_I1_TMCommitAction -> Inv2_6383_R1_0_I1 [style="ultra thick"]
+    Inv15_48a9_R4_0_I1 -> Inv2_6383_R1_0_I1_TMCommitAction [style="ultra thick"]
+    Inv15_48a9_R4_0_I1_TMRcvPreparedAction -> Inv15_48a9_R4_0_I1 [style="ultra thick"]
+    Inv21_4f76_R8_0_I1 -> Inv15_48a9_R4_0_I1_TMRcvPreparedAction [style="ultra thick"]
+
+    // Graph attributes
+    ranksep=0.5
+    nodesep=0.6
+}
