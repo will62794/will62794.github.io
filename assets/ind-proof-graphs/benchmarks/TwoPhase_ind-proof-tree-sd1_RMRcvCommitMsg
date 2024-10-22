@@ -52,8 +52,12 @@ strict digraph "TwoPhase-proof-graph" {
 
     Inv1342_1fb0_R7_2_I2 -> Inv1143_5b67_R3_2_I2_TMRcvPreparedAction [style="ultra thick"]
     Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction -> Inv1342_1fb0_R7_2_I2 [style="ultra thick"]
+    Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction [label=< TMRcvPrepared<BR/><FONT POINT-SIZE='8'>{msgsPrepared,rmState,tmPrepared,tmState}</FONT><BR/>> color=black fillcolor=lightgray fontsize="14pt" penwidth=1 shape=box style=filled]
+	Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction [label=< RMRcvAbortMsg<BR/><FONT POINT-SIZE='8'>{msgsAbort,msgsPrepared,rmState,tmState}</FONT><BR/>> color=black fillcolor=lightgray fontsize="14pt" penwidth=1 shape=box style=filled]
+
 
     Inv1316_eff9_R7_2_I2 -> Inv1342_1fb0_R7_2_I2_TMRcvPreparedAction [style="ultra thick"]
+	Inv1316_eff9_R7_2_I2_RMRcvCommitMsgAction [label=< RMRcvCommitMsg<BR/><FONT POINT-SIZE='8'>{msgsCommit,msgsPrepared,rmState,tmState}</FONT><BR/>> color=black fillcolor=lightgray fontsize="14pt" penwidth=1 shape=box style=filled]
 
     Inv7_2e0f_R5_1_I1 -> Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction [style="ultra thick"]
     Inv1316_eff9_R7_2_I2_RMRcvAbortMsgAction -> Inv1316_eff9_R7_2_I2 [style="ultra thick"]
