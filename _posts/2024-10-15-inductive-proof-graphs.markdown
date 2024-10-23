@@ -21,6 +21,7 @@ $$
 
 A possible inductive invariant for establishing this property (along with [its formal proof in TLAPS](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase_IndProofs_1.tla)) may look like the conjunction of the following smaller, lemma invariants and the top-level safety property:
 
+<figure id="figure-1"> 
 $$
 \newcommand{\stext}[1]{\small\text{#1}}
 \small
@@ -41,6 +42,8 @@ Inv4 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Commit} \r
 Inv7 &\triangleq (tmState = \stext{INIT}) \Rightarrow (\langle \stext{Abort} \rangle \notin msgsAbort) \\
 \end{align*}
 $$
+<figcaption style="text-align: center;">Figure 1: An inductive invariant for the Two-Phase Commit protocol, as a conjunction of smaller lemma invariants.</figcaption>
+</figure>
 
 <!-- $$
 \small
@@ -117,9 +120,12 @@ For distributed and concurrent protocols, the transition relation of a system $$
 
 More concretely, the following is an inductive proof graph for the two-phase commit protocol specification that corresponds to the inductive invariant for establishing $$TCConsistent$$ from above:
 
-<p align="center">
-  <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
-</p>
+<figure id="figure-2"> 
+  <p align="center">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example" width="740">
+  </p>
+  <figcaption align="center">Figure 2: An inductive proof graph for Two-Phase Commit Protocol, corresponding to the inductive invariant from <a href="#figure-1">Figure 1</a>.</figcaption>  
+</figure>
 
 Green nodes represent individual lemma invariants, gray nodes represent [actions of the protocol](https://github.com/will62794/scimitar/blob/acd2c9bd606eef549576f949aea59af896263410/benchmarks/TwoPhase.tla#L103-L168), while edges show the induction dependencies between them. For example, $$Inv11$$ supports the top level safety property via the *RMRcvAbortMsg* action, stating that
 
@@ -258,9 +264,9 @@ $$
 
 In this case, it seems that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and less similar to a proof thay may be developed by a human that was guided by this structure explicitly. 
 
-<!-- As another example, consider the following two inductive proof graphs for the same two-phase commit protocol, differing in subtle ways in the support subgraphs for core safety node: -->
+As another example, consider another alternate inductive proof graph (and its [TLAPS proof](https://github.com/will62794/scimitar/blob/137cc17cdc3209e84fb47471d4017f303c5d4b6c/benchmarks/TwoPhase_IndProofs_1_alt_b.tla)) for the two-phase commit protocol that differs slightly from the initial proof graph above in [Figure 2](#figure-2)
 
-<!-- $$
+$$
 \small
 \begin{align*}
 Inv73 &\triangleq \forall rm_i, rm_j \in \text{RM} : (rmState[rm_i] = \stext{COMMITTED}) \Rightarrow (rmState[rm_j] \neq \stext{WORKING}) \\
@@ -280,15 +286,93 @@ $$
 
 
 <div style="display: flex; justify-content: center;">
-  <figure style="margin-right: 10px;">
-    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3.png" alt="Inductive Proof Graph Example 1" width="380">
-    <figcaption style="text-align: center;">Figure 1: Inductive Proof Graph Example 1</figcaption>
+  <figure style="margin-right:10px; margin-top:20px;" id="figure-3">  
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3.png" alt="Inductive Proof Graph Example 1" width="660">
+    <figcaption style="text-align: center;">Figure 3: Alternative inductive proof graph for Two-Phase Commit Protocol</figcaption>
   </figure>
-  <figure style="margin-left: 10px;">
-    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1.png" alt="Inductive Proof Graph Example 2" width="380">
-    <figcaption style="text-align: center;">Figure 2: Inductive Proof Graph Example 2</figcaption>
+</div>
+
+
+As a relatively uniform means of comparing the two proof graphs, we can, for example, compare the support subgraphs for different action support branches (i.e. *RMRcvAbortMsg*) for the top-level safety property:
+
+<div style="display: flex; justify-content: center;margin-bottom: 20px;">
+  <figure style="margin-right: 30px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3_RMRcvAbortMsg.png" alt="Inductive Proof Graph Example 2" width="260">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-3">Figure 3</a>, <b>RMRcvAbortMsg</b></figcaption>
+  </figure>
+  <figure style="margin-left: 30px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1_RMRcvAbortMsg.png" alt="Inductive Proof Graph Example 1" width="260">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-2">Figure 2</a>, <b>RMRcvAbortMsg</b></figcaption>
+  </figure> 
+</div>
+<!-- 
+<div style="display: flex; justify-content: center;margin-bottom: 20px;">
+    <figure style="margin: 0 auto;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort.png" alt="Inductive Proof Graph Example 2" width="90">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-3">Figure 3</a>, <b>RMChooseToAbort</b></figcaption>
+    </figure>
+    <figure style="margin: 0 auto;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort.png" alt="Inductive Proof Graph Example 1" width="230">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-2">Figure 2</a>, <b>RMChooseToAbort</b></figcaption>
   </figure>
 </div> -->
+<!-- 
+<div style="display: flex; justify-content: center;margin-bottom: 30px;">
+    <figure style="margin-right: 10px;margin-top:50px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3_RMRcvCommitMsg.png" alt="Inductive Proof Graph Example 2" width="390">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-3">Figure 3</a>, <b>RMChooseToAbort</b> and <b>RMRcvCommitMsg</b></figcaption>
+  </figure>
+  <figure style="margin-left: 20px; margin-top:15px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1_RMRcvCommitMsg.png" alt="Inductive Proof Graph Example 1" width="320">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-2">Figure 2</a>, <b>RMChooseToAbort</b> and <b>RMRcvCommitMsg</b></figcaption>
+  </figure>
+</div> -->
+
+
+<!-- <div style="display: flex; justify-content: center;margin-bottom: 30px;">
+    <figure style="margin-right: 10px;margin-top:50px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort_RMRcvCommitMsg.png" alt="Inductive Proof Graph Example 2" width="390">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-3">Figure 3</a>, <b>RMChooseToAbort</b> and <b>RMRcvCommitMsg</b></figcaption>
+  </figure>
+  <figure style="margin-left: 20px; margin-top:15px;">
+    <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort_RMRcvCommitMsg.png" alt="Inductive Proof Graph Example 1" width="380">
+    <figcaption style="text-align: center;">Support subgraph for <a href="#figure-2">Figure 2</a>, <b>RMChooseToAbort</b> and <b>RMRcvCommitMsg</b></figcaption>
+  </figure>
+</div> -->
+
+
+
+
+In this case, the support subgraphs for the *RMRcvAbortMsg* branches are the same, but the support subgraph for the *RMRcvCommitMsg, RMChooseToAbort* actions differ. For example, the $$Inv15$$ and $$Inv16$$ lemmas diverge:
+
+$$
+\small
+\begin{align}
+Inv15 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \text{WORKING}) \Rightarrow (rm_i \notin tmPrepared) \\
+Inv16 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{WORKING}) \Rightarrow (tmPrepared \neq \text{RM})
+\end{align}
+$$
+
+with $$Inv16$$ stating something slightly different than $$Inv15$$, requiring 2 support lemmas
+
+$$
+\small
+\begin{align}
+Inv1342 &\triangleq \forall rm_j \in \text{RM} : (rmState[rm_j] = \stext{PREPARED}) \lor \neg(rm_j \in tmPrepared) \lor \neg(tmState = \stext{INIT})\\
+Inv29 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Prepared}, rm_i \rangle \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{WORKING}) \\
+\end{align}
+$$
+
+in contrast to the single support lemma, $$Inv21$$, needed for $$Inv15$$ in <a href="#figure-3">Figure 3</a>.
+
+
+
+
+
+
+ <!-- as are the support subgraphs for the *RMChooseToAbort* action. The support subgraph for the *RMRcvCommitMsg* action, however, is slightly different.  -->
+
+
 
 
 <!-- <p align="center">
