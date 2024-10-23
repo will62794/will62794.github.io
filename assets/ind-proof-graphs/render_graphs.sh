@@ -122,9 +122,9 @@ else
     exit 1
 fi
 
-# Render TwoPhase_ind-proof-tree-sd1_RMChooseToAbort
-INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort"
-OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort.png"
+# Render TwoPhase_ind-proof-tree-sd1_RMChooseToAbort_RMRcvCommitMsg
+INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort_RMRcvCommitMsg"
+OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd1_RMChooseToAbort_RMRcvCommitMsg.png"
 
 # Check if input file exists
 if [ ! -f "$INPUT_FILE" ]; then
@@ -185,9 +185,9 @@ else
     exit 1
 fi
 
-# Render TwoPhase_ind-proof-tree-sd3_RMChooseToAbort
-INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort"
-OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort.png"
+# Render TwoPhase_ind-proof-tree-sd3_RMChooseToAbort_RMRcvCommitMsg
+INPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort_RMRcvCommitMsg"
+OUTPUT_FILE="benchmarks/TwoPhase_ind-proof-tree-sd3_RMChooseToAbort_RMRcvCommitMsg.png"
 
 # Check if input file exists
 if [ ! -f "$INPUT_FILE" ]; then
