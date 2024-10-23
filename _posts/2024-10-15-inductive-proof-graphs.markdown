@@ -264,7 +264,7 @@ $$
 
 In this case, it seems that even though the overall inductive invariant is smaller, the structure of the proof graph is arguably less interpretable, and less similar to a proof thay may be developed by a human that was guided by this structure explicitly. 
 
-As another example, consider another alternate inductive proof graph (and its [TLAPS proof](https://github.com/will62794/scimitar/blob/137cc17cdc3209e84fb47471d4017f303c5d4b6c/benchmarks/TwoPhase_IndProofs_1_alt_b.tla)) for the two-phase commit protocol that differs slightly from the initial proof graph above in [Figure 2](#figure-2)
+<!-- As another example, consider another alternate inductive proof graph (and its [TLAPS proof](https://github.com/will62794/scimitar/blob/137cc17cdc3209e84fb47471d4017f303c5d4b6c/benchmarks/TwoPhase_IndProofs_1_alt_b.tla)) for the two-phase commit protocol that differs slightly from the initial proof graph above in [Figure 2](#figure-2)
 
 $$
 \small
@@ -282,18 +282,18 @@ Inv6 &\triangleq (\langle \stext{Abort} \rangle \in msgsAbort) \Rightarrow (tmSt
 Inv1449 &\triangleq \forall rm_i \in \text{RM} : (rmState[rm_i] = \stext{PREPARED}) \lor (\langle \stext{Prepared}, rm_i \rangle \notin msgsPrepared) \lor (tmState \neq \stext{INIT}) \\
 Inv21 &\triangleq \forall rm_i \in \text{RM} : (\langle \stext{Prepared}, rm_i \rangle \in msgsPrepared) \Rightarrow (rmState[rm_i] \neq \stext{WORKING})
 \end{align*}
-$$
+$$ -->
 
 
-<div style="display: flex; justify-content: center;">
+<!-- <div style="display: flex; justify-content: center;">
   <figure style="margin-right:10px; margin-top:20px;" id="figure-3">  
     <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd3.png" alt="Inductive Proof Graph Example 1" width="660">
     <figcaption style="text-align: center;">Figure 3: Alternative inductive proof graph for Two-Phase Commit Protocol</figcaption>
   </figure>
-</div>
+</div> -->
 
 
-As a relatively uniform means of comparing the two proof graphs, we can, for example, compare the support subgraphs for different action support branches (i.e. *RMRcvAbortMsg*) for the top-level safety property:
+<!-- As a relatively uniform means of comparing the two proof graphs, we can, for example, compare the support subgraphs for different action support branches (i.e. *RMRcvAbortMsg*) for the top-level safety property:
 
 <div style="display: flex; justify-content: center;margin-bottom: 20px;">
   <figure style="margin-right: 30px;">
@@ -304,7 +304,9 @@ As a relatively uniform means of comparing the two proof graphs, we can, for exa
     <img src="/assets/ind-proof-graphs/benchmarks/TwoPhase_ind-proof-tree-sd1_RMRcvAbortMsg.png" alt="Inductive Proof Graph Example 1" width="260">
     <figcaption style="text-align: center;">Support subgraph for <a href="#figure-2">Figure 2</a>, <b>RMRcvAbortMsg</b></figcaption>
   </figure> 
-</div>
+</div> -->
+
+
 <!-- 
 <div style="display: flex; justify-content: center;margin-bottom: 20px;">
     <figure style="margin: 0 auto;">
@@ -343,7 +345,7 @@ As a relatively uniform means of comparing the two proof graphs, we can, for exa
 
 
 
-In this case, the support subgraphs for the *RMRcvAbortMsg* branches are the same, but the support subgraph for the *RMRcvCommitMsg, RMChooseToAbort* actions differ. For example, the $$Inv15$$ and $$Inv16$$ lemmas diverge:
+<!-- In this case, the support subgraphs for the *RMRcvAbortMsg* branches are the same, but the support subgraph for the *RMRcvCommitMsg, RMChooseToAbort* actions differ. For example, the $$Inv15$$ and $$Inv16$$ lemmas diverge:
 
 $$
 \small
@@ -365,7 +367,7 @@ $$
 
 in contrast to the single support lemma, $$Inv21$$, needed for $$Inv15$$ in <a href="#figure-3">Figure 3</a>.
 
-
+ -->
 
 
 
