@@ -4,7 +4,7 @@ title:  "Compositional Verification and Interaction Preserving Abstractions"
 categories: distributed-systems verification
 ---
 
-Verifying distributed protocols that support dynamic reconfiguration presents unique challenges. While compositional verification techniques have been successful for static protocols, they often break down when dealing with reconfiguration due to the complex interactions between the reconfiguration mechanism and the base protocol. We explore an approach to compositional verification that preserves these essential interactions while allowing separate reasoning about reconfiguration safety.
+When verifying larger or more complex protocols, it is often useful to break them up into smaller components, verify each component separately, and then compose the results to verify the overall protocol. Ideally we would like to be able to break down a protocol into as small components as possible, verify each component separately, and then compose the results to verify the overall protocol. There are a few approaches to doing this for protocols, which we can do by analyzing the interactions between components, and abstracting sub-components based on these interactions.
 
 ## Decomposing a Protocol
 
@@ -75,9 +75,21 @@ We can also try to mechanically check these notions of interaction e.g. using a 
 
 If we check pairwise interactions between all actions of an original protocol, we can define a type of interaction graph, which can then serve as a basic for decomposition to be used for verification as we described above.
 
-## Compositional Verification for Reconfiguration Protocol
+For example, we can see a concrete example of such an interaction graph the basic two-phase commit protocol, based on its specification [here](https://github.com/will62794/scimitar/blob/main/benchmarks/TwoPhase.tla):
 
-Reconfiguration in distributed systems allows for dynamic changes to the set of participating nodes while maintaining safety properties of the underlying protocol. However, proving correctness of reconfigurable protocols is notably more difficult than their static counterparts for several reasons:
+<p align="center">
+  <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Action Interaction Graph" width="720">
+</p>
+
+This interaction graph, annotated with the interaction variables along its edges, allows us to reason explicitly about the logical dataflow between actions/components of the protocol. For example, we can note that the only *outgoing* dataflow from the set of actions of the resource manager is via the `msgsPrepared` variable, which is read by the transaction manager via the `TMRcvPrepare` action. The only incoming dataflow to the resource manager sub-component is the via the `msgsAbort` and `msgsCommit` variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
+
+
+Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in this case? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the `{msgsCommit, msgsAbort}` (written to by RM, read by TM) and the `msgsPrepared` (read by TM, written to by RM) variables. Well, from the perspective of the transaction manager, all it knows about is the view of the `msgsPrepared` variable, and it simply waits until it is filled up with enough resource managers.
+
+
+<!-- ## Compositional Verification for Reconfiguration Protocol -->
+
+<!-- Reconfiguration in distributed systems allows for dynamic changes to the set of participating nodes while maintaining safety properties of the underlying protocol. However, proving correctness of reconfigurable protocols is notably more difficult than their static counterparts for several reasons: -->
 
 <!-- ## Compositional Verification Approach
 
@@ -89,3 +101,6 @@ Key aspects of this approach include:
 - Defining interface properties that capture these interactions
 - Separate verification of reconfiguration safety properties
 - Composition theorem showing how local properties combine to ensure global correctness -->
+
+## Accelerating Verification
+
