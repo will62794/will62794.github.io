@@ -86,6 +86,8 @@ This interaction graph, annotated with the interaction variables along its edges
 
 Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in this case? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the `{msgsCommit, msgsAbort}` (written to by RM, read by TM) and the `msgsPrepared` (read by TM, written to by RM) variables. Well, from the perspective of the transaction manager, all it knows about is the view of the `msgsPrepared` variable, and it simply waits until it is filled up with enough resource managers.
 
+Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries?
+
 
 <!-- ## Compositional Verification for Reconfiguration Protocol -->
 
