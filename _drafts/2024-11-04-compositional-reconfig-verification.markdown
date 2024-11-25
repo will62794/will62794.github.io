@@ -131,6 +131,8 @@ Model checking the above protocol ($$Next_2$$) with TLC, produces 514 distinct r
 
 **TODO:** how exactly do we check that one abstraction is "interaction preserving" w.r.t some interaction variable, like in the consensus_epr example? just a refinement check?
 
+Note that for some interactions that are "read only", this may be even a more fine-grained distinction in the sense that the read variable may only appear in the precondition of an action, and so may only *restrict* the behavior of the component that reads from this variable.
+
 
 ## Generalized Interaction Semantics
 
