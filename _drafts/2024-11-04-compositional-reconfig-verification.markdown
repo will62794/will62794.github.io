@@ -82,11 +82,23 @@ This interaction graph, annotated with the interaction variables along its edges
 
 Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in this case? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the `{msgsCommit, msgsAbort}` (written to by RM, read by TM) and the `msgsPrepared` (read by TM, written to by RM) variables. Well, from the perspective of the transaction manager, all it knows about is the view of the `msgsPrepared` variable, and it simply waits until it is filled up with enough resource managers.
 
+We can consider this abstraction of the `RM`:
+
+$$
+\begin{align*}
+&RMAtomic(rm) \triangleq \\
+&\quad \land msgsCommit = \{\} \\
+&\quad \land msgsAbort = \{\} \\
+&\quad \land msgsPrepared' = msgsPrepared \cup \{[type \mapsto Prepared, rm \mapsto rm]\} \\
+&\quad \land \text{UNCHANGED } \langle tmState, tmPrepared, rmState, msgsCommit, msgsAbort \rangle
+\end{align*}
+$$
+
 Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries?
 
 ## Compositional Verification
 
-To take another example, we can consider [this simplified consensus protocol](https://github.com/will62794/ipa/blob/main/specs/consensus_epr/consensus_epr.tla) for selecting a value among a set of nodes via a simple leader election protocol. There are 5 actions of this protocol, related to nodes sending out votes for a leader, a leader processing those votes, getting electing leader and a leader deciding on a value. If we want to verify the core safety property of this protocol, which $$H_NoConflictingValues$$, stating that no two nodes decide on different values, we can check this with TLC using a model with 3 nodes, `Node={n1,n2,n3}` in a few seconds, generating a reachable state space of 110,464 states.
+To take another example, we can consider [this simplified consensus protocol](https://github.com/will62794/ipa/blob/main/specs/consensus_epr/consensus_epr.tla) for selecting a value among a set of nodes via a simple leader election protocol. There are 5 actions of this protocol, related to nodes sending out votes for a leader, a leader processing those votes, getting electing leader and a leader deciding on a value. If we want to verify the core safety property of this protocol, which $$NoConflictingValues$$, stating that no two nodes decide on different values, we can check this with TLC using a model with 3 nodes, `Node={n1,n2,n3}` in a few seconds, generating a reachable state space of 110,464 states.
 
 If we examine this protocol's interaction graph, though, we see the following:
 <p align="center">
