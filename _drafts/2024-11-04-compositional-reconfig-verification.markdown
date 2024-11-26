@@ -82,10 +82,10 @@ In this protocol, we can see its interaction graph admits quite a simple structu
 We can see another concrete example of an interaction graph, for the two-phase commit protocol, based on its specification [here](https://github.com/will62794/scimitar/blob/main/benchmarks/TwoPhase.tla):
 
 <p align="center">
-  <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="720">
+  <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
 </p>
 
-This interaction graph, annotated with the interaction variables along its edges, allows us to reason explicitly about the logical dataflow between actions/components of the protocol. For example, we can note that the only *outgoing* dataflow from the set of actions of the resource manager is via the `msgsPrepared` variable, which is read by the transaction manager via the `TMRcvPrepare` action. The only incoming dataflow to the resource manager sub-component is the via the `msgsAbort` and `msgsCommit` variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
+This interaction graph, annotated with the interaction variables along its edges, allows us to reason explicitly about the logical dataflow between actions/components of the protocol. For example, we can note that the only outgoing dataflow from the set of actions of the resource manager is via the `msgsPrepared` variable, which is read by the transaction manager via the `TMRcvPrepare` action. The only incoming dataflow to the resource manager sub-component is the via the `msgsAbort` and `msgsCommit` variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
 
 ## Interaction Abstraction for Compositional Verification
 
@@ -137,9 +137,13 @@ Model checking the above protocol ($$Next_2$$) with TLC, produces 514 distinct r
 ### Two Phase Commit Protocol
 
 
-Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in the two-phase commit protocol? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the `{msgsCommit, msgsAbort}` (written to by RM, read by TM) and the `msgsPrepared` (read by TM, written to by RM) variables. Well, from the perspective of the transaction manager, all it knows about is the view of the `msgsPrepared` variable, and it simply waits until it is filled up with enough resource managers.
+Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in the two-phase commit protocol? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the $$\{msgsCommit, msgsAbort\}$$ (written to by RM, read by TM) and the $$msgsPrepared$$ (read by TM, written to by RM) variables. 
 
-We can consider this abstraction of the `RM`:
+<p align="center">
+  <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_interaction_graph_partitioned.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
+</p>
+
+From the perspective of the transaction manager, all it knows about is the view of the `msgsPrepared` variable, and it simply waits until it is filled up with enough resource managers. So, we can consider this abstraction of the `RM`:
 
 $$
 \begin{align*}
@@ -151,7 +155,14 @@ $$
 \end{align*}
 $$
 
-If we model check the original two-phase commit protocol with 4 resource managers, $$RM=\{rm1,rm2,rm3,rm4\}$$, it has 1568 reachable states. If we model check the protocol under the abstracted $$RMAtomic$$ reduction
+We can model check the original two-phase commit protocol with 4 resource managers, $$RM=\{rm1,rm2,rm3,rm4\}$$, for the main $$Consistency$$ safety property,
+
+$$
+\small
+Consistency \triangleq \forall rm_1, rm_2 \in RM : \neg (rmState[rm_1] = aborted \wedge rmState[rm_2] = committed)
+$$
+
+and find that it has 1568 reachable states. If we instead model check the protocol against the $$RMAtomic$$ abstraction
 
 $$
 \begin{align*}
@@ -163,7 +174,15 @@ Next_{TwoPhase_A} &\triangleq \\
 \end{align*}
 $$
 
-we find 163 reachable states, a ~10x reduction. In this case, though, the original interaction between these two components was not as simple as the (uni-directional) dataflow in the simple consensus protocol, so just doing this model checking along is not necessarily sound. That is, we actually need to somehow show that this `RMAtomic` abstraction is actually "interaction preserving". That is, we need to prove that it would behave the same as the original component with respect to the interaction variables, $$\{msgsCommit, msgsAbort, msgsPrepared\}$$. 
+we find 163 reachable states, a ~10x reduction. 
+
+In this example, though, the original interaction between these two logical sub-components ($$RM$$ and $$TM$$) was not as simple as the acyclic dataflow of the simple consensus protocol, so just doing the above verification step is not sufficient to establish the top level safety property. That is, we actually need to show formally that this `RMAtomic` abstraction is truly "interaction preserving". That is, we need to prove that it would behave the same as the original component with respect to the interaction variables, $$\{msgsCommit, msgsAbort, msgsPrepared\}$$. In general, one way to show this would be to show that the RMAtomic component is, formally, an abstraction of the original $$RM$$ component, i.e. that $$RM$$ is a refinement of $$RMAtomic$$, roughly, that
+
+$$
+Next_{RM} \Rightarrow RMAtomic
+$$
+
+In general, though proving this refinement may be hard, and require development of auxiliary invariants to constrain the interaction variables suitably (?) to prove this step refinement condition.
 
 In this case, it is fairly easy to intuitively see why this is true. For example, we can first consider actions that write to `msgsPrepared` in the original component and the abstracted one. Only the `RMPrepare` action of the original sub-component do this, 
 
@@ -180,7 +199,45 @@ If we choose a specific decomposition of protocol actions, then we can check whe
 
 We can also try to mechanically check these notions of interaction e.g. using a symbolic verification tool or model checker.
 
+Essentially, one way to define interaction is in terms of the semantic behavior of actions i.e. can one action "observe" the effect of another action? There are two ways such an action can observe the effect of another action. Either another action can affect its precondition i.e. enable/disable it, or it can affect the new state that the action transitions to if it is taken i.e. it affects the postcondition. We can encode these two properties for generic actions $$Action1, Action2$$ as follows, written as temporal logic formulas:
 
+$$
+\begin{aligned}
+Independence &\triangleq \\
+    \wedge& \square[(({\small\text{ENABLED }} Action2) \wedge Action1 ) \Rightarrow Action2pre']_{vars} \\
+    \wedge& \square[((\neg {\small\text{ENABLED }} Action2) \wedge Action1 ) \Rightarrow ~Action2pre']_{vars}\\[0.5em]
+Commutativity &\triangleq \square[Action1 \Rightarrow (Action2PostExprs = Action2PostExprs')]_{vars}
+\end{aligned}
+$$
+
+This provides a more precise notion of interaction, for which the syntactic checks above should be an overapproximation of. For example, in the case of simple consensus protocol, its semantic interaction graph based on the above property definitions is the same as the one defined previously, since the syntactic interaction between read/write variables already reflects the semantic interaction accurately. For the two-phase commit protocol, however, its semantic interactiong graph differs, as follows:
+
+<figure id="2pc-semantic-interaction-graph">
+  <p align="center">
+    <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_semantic_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
+  </p>
+  <figcaption>Semantic interaction graph for the two-phase commit protocol, showing which actions interact with each other based on the semantic independence conditions above.</figcaption>
+</figure>
+
+We can see, for example, that the $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ actions are defined to interact based on the original, syntactic variable interaction graph, but in our semantic interaction graph, they do not interact. This makes sense if we look at the underlying actions:
+
+$$
+\small
+\begin{aligned}
+&RMRcvCommitMsg(rm) \triangleq \\
+&\quad \land \langle \text{Commit} \rangle \in msgsCommit \\
+&\quad \land rmState' = [rmState \text{ EXCEPT }![rm] = \text{committed}] \\
+&\quad \land \text{UNCHANGED } \langle tmState, tmPrepared, msgsPrepared, msgsCommit, msgsAbort \rangle \\[1em]
+&RMRcvAbortMsg(rm) \triangleq \\
+&\quad \land \langle \text{Abort} \rangle \in msgsAbort \\
+&\quad \land rmState' = [rmState \text{ EXCEPT }![rm] = \text{aborted}] \\
+&\quad \land \text{UNCHANGED } \langle tmState, tmPrepared, msgsPrepared, msgsCommit, msgsAbort \rangle
+\end{aligned}
+$$
+
+From a naive syntactic analysis, we may determine that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well. In reality, though, the updates of both actions don't actually end up depending on the value of $$rmState$$, so writes to it don't "interact with"/"affect" these actions. Thus, these actions can be considered as semantically independent. This leads to the slightly cleaner version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph).
+
+From the interaction graph [above]((#2pc-semantic-interaction-graph)), we can apply some simple rewrites to derive an interaction prerserving abstraction. If we take the $$RMChooseToAbort$$, we can try to rewrite this somehow to preserve its interactions with the rest of the components. It interacts with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ only via $$rmState$$, and similarly for $$RMPrepare$$. So, we what if we merge it with $$RMPrepare$$? If we do this, then we need to preserve this merged node's interaction with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ via $$rmState$$.
 
 ## Conditional Interaction
 
