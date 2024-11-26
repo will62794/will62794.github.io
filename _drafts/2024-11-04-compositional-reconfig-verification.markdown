@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "Protocol Interaction Graphs and Compositional Verification"
+title:  "Interaction Abstraction and Compositional Verification"
 categories: distributed-systems verification
 ---
 
-When verifying larger or more complex protocols, it is often useful to break them up into smaller components, verify each component separately, and then compose the results to verify the overall protocol. Ideally we would like to be able to break down a protocol into as small components as possible, verify each component separately, and then compose the results to verify the overall protocol. There are a few approaches to doing this for protocols, which we can do by analyzing the interactions between components, and abstracting sub-components based on these interactions.
+When verifying complex protocols, it is often useful to break them up into smaller components, verify each component separately, and then compose the results to verify the overall protocol. Ideally we would like to be able to break down a protocol into as small components as possible, verify each component separately, and then compose the results to verify the overall protocol. There are a few approaches to doing this for protocols, which we can do by analyzing the interactions between components, and abstracting sub-components based on these interactions.
 
-## Decomposing a Protocol
+## Protocol Decomposition via Interaction Graphs
 
 One way to reason about the decomposition of a protocol into subcomponents is to break up its *actions* into a set of disjoint subsets. This may not be the only way to decompose a protocol, but it is a useful starting point since actions represent the atomic units of interaction within a protocol description. We can then proceed to define notions of interactions between subcomponents of a protocol.
 
@@ -62,7 +62,7 @@ with the associated state variables associated with each module indicated alongs
 In this case, it is clear that the *interaction* between $$M_1$$ and $$M_2$$ is defined in terms of their single shared variable $$b$$. Furthermore, this interaction is "uni-directional" in terms of the data flow between components, in the sense that $$M_1$$ only reads $$b$$ and $$M_2$$ only writes to $$b$$. 
 
 <p align="center">
-  <img src="https://github.com/will62794/ipa/blob/main/specs/M_uni/M_uni_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="450">
+  <img src="https://github.com/will62794/ipa/blob/main/specs/M_uni/M_uni_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="430">
 </p>
 
 In this simple case of component interaction it is also clear that verification of $$M_1$$ behavior's can be done only via dependence on the behavior of the interaction variable $$b$$. The full behavior of $$M_2$$ is irrelevant to the behavior of $$M_1$$, so this allows for a natural type of compositional verification. That is, we can consider all behaviors of $$M_2$$, projected to the interaction variable $$b$$, and then verify $$M_1$$ against this behavior.
@@ -71,7 +71,15 @@ In this simple case of component interaction it is also clear that verification 
 
 If we check pairwise interactions between all actions of an original protocol, we can define a type of interaction graph, which can then serve as a basic for decomposition to be used for verification as we described above.
 
-For example, we can see a concrete example of such an interaction graph the basic two-phase commit protocol, based on its specification [here](https://github.com/will62794/scimitar/blob/main/benchmarks/TwoPhase.tla):
+To take another example, we can consider [this simplified consensus protocol](https://github.com/will62794/ipa/blob/main/specs/consensus_epr/consensus_epr.tla) for selecting a value among a set of nodes via a simple leader election protocol. There are 5 actions of this protocol, related to nodes sending out votes for a leader, a leader processing those votes, getting electing leader and a leader deciding on a value. If we examine this protocol's interaction graph, we obtain the following:
+<p align="center">
+  <img src="https://github.com/will62794/ipa/blob/main/specs/consensus_epr/consensus_epr_interaction_graph.png?raw=true" alt="Simple Consensus Protocol Interaction Graph" width="720">
+</p>
+
+In this protocol, we can see its interaction graph admits quite a simple structure, with nearly unidirectional dataflow between most actions. We can utilize this for accelerating verification as we discuss below.
+
+
+We can see another concrete example of an interaction graph, for the two-phase commit protocol, based on its specification [here](https://github.com/will62794/scimitar/blob/main/benchmarks/TwoPhase.tla):
 
 <p align="center">
   <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="720">
@@ -79,8 +87,57 @@ For example, we can see a concrete example of such an interaction graph the basi
 
 This interaction graph, annotated with the interaction variables along its edges, allows us to reason explicitly about the logical dataflow between actions/components of the protocol. For example, we can note that the only *outgoing* dataflow from the set of actions of the resource manager is via the `msgsPrepared` variable, which is read by the transaction manager via the `TMRcvPrepare` action. The only incoming dataflow to the resource manager sub-component is the via the `msgsAbort` and `msgsCommit` variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
 
+## Interaction Abstraction for Compositional Verification
 
-Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in this case? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the `{msgsCommit, msgsAbort}` (written to by RM, read by TM) and the `msgsPrepared` (read by TM, written to by RM) variables. Well, from the perspective of the transaction manager, all it knows about is the view of the `msgsPrepared` variable, and it simply waits until it is filled up with enough resource managers.
+The decomposition notions above based on interaction graphs provide a way to consider a protocol decomposition in terms of how its fine-grained atomic sub-components interact. But, we can take this concept further and utilize this structure for a kind of compositional verification for certain interaction graph structures that are amenable to this type of analysis.
+
+### Simple Consensus Protocol
+
+If we consider, for example, the interaction graph of the simple consensus protocol from above, its simple interaction graph makes it directly amenable to a very simple form of accelerated compositional verification. If we want to verify the core safety property of this protocol, $$NoConflictingValues$$, which states that no two nodes decide on different values, we can check this with TLC using a model with 3 nodes, `Node={n1,n2,n3}` in a few seconds, generating a reachable state space of 110,464 states.
+
+From the interaction graph, it is easy to see that the actions $$\{SendRequestVote, SendVote\}$$, operate independently from the rest of the protocol actions, interacting only via writes to the `vote_msg` variable. So, one approach to verifying this protocol is to start by verifying the $$\{SendRequestVote, SendVote\}$$ actions independently of the rest of the protocol, and then verify the rest of the protocol against this behavior. More specifically, the overall protocol only depends on the observable behavior of this $$\{SendRequestVote, SendVote\}$$ sub-component with respect to the `vote_msg` variable.
+
+For example, if we model check the protocol with the pruned transition relation of
+
+$$
+\begin{align*}
+Next_A &\triangleq \\
+&\vee SendRequestVote\\
+&\vee SendVote \\
+\end{align*}
+$$
+
+we find 16,128 distinct reachable states, a ~7x reduction from the full state space. Now, since the only "interaction variable" between this $$Next_A$$ sub-protocol and the rest of the protocol is the `vote_msg` variable, we can project the state space of $$Next_A$$ to the `vote_msg` variable, and verify the rest of the protocol against this projected state space. With an explicit state model checker, one way to do this would be to explicitly compute this projection and just use the projected state graph as the "assume" model to verify the remainder of the protocol against. Alternatively, we can come up with an *abstraction* of the $$Next_A$$ protocol that reflects this abstract behavior adequately i.e. it reflects the behavior of the `vote_msg` variable correctly. 
+
+For example, consider the following simple model that adds a new message into `vote_msg` only if no existing node has already put such a message into `vote_msg` (i.e. since nodes can't vote twice in the original protocol):
+
+$$
+\begin{align*}
+&SendRequestVote\_SendVote(src, dst) \triangleq \\
+    &\quad \land \nexists m \in vote\_msg : m[1] = src  \\
+    &\quad \land vote\_msg' = vote\_msg \cup \{\langle src,dst \rangle\} \\
+    &\quad \land \text{UNCHANGED } \langle vote\_request\_msg, voted, votes, leader, decided \rangle\\
+\end{align*}
+$$
+
+Due to the structured, acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further reduce verification time, but even if we go ahead with this initial reduction, we can see drastic improvement. For example, now we have developed an "interaction preserving" abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol, we can try verifying the rest of the protocol against this abstraction e.g.
+
+$$
+\begin{align*}
+Next_2 &\triangleq \\
+    &\vee \exists i,j \in Node : SendRequestVote\_SendVote(i,j) \\
+    &\vee \exists i,j \in Node : RecvVote(i,j) \\
+    &\vee \exists i \in Node, Q \in Quorum : BecomeLeader(i,Q) \\
+    &\vee \exists i,j \in Node, v \in Value : Decide(i,v)
+\end{align*}
+$$
+
+Model checking the above protocol ($$Next_2$$) with TLC, produces 514 distinct reachable states, a > 200x reduction from the original state space. So, in this case, with only a simple dataflow/interaction analysis, we were able to reduce the hardest model checking problem by a factor of ~10x e.g. in this case model checking of the $$Next_A$$ sub-protocol was the most expensive verification sub-problem e.g. we would need to verify that $$Next_A$$ is a valid abstraction of the `{SendRequestVote, SendVote}` sub-protocol.
+
+### Two Phase Commit Protocol
+
+
+Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in the two-phase commit protocol? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the `{msgsCommit, msgsAbort}` (written to by RM, read by TM) and the `msgsPrepared` (read by TM, written to by RM) variables. Well, from the perspective of the transaction manager, all it knows about is the view of the `msgsPrepared` variable, and it simply waits until it is filled up with enough resource managers.
 
 We can consider this abstraction of the `RM`:
 
@@ -94,65 +151,40 @@ $$
 \end{align*}
 $$
 
-Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries?
-
-## Compositional Verification
-
-To take another example, we can consider [this simplified consensus protocol](https://github.com/will62794/ipa/blob/main/specs/consensus_epr/consensus_epr.tla) for selecting a value among a set of nodes via a simple leader election protocol. There are 5 actions of this protocol, related to nodes sending out votes for a leader, a leader processing those votes, getting electing leader and a leader deciding on a value. If we want to verify the core safety property of this protocol, which $$NoConflictingValues$$, stating that no two nodes decide on different values, we can check this with TLC using a model with 3 nodes, `Node={n1,n2,n3}` in a few seconds, generating a reachable state space of 110,464 states.
-
-If we examine this protocol's interaction graph, though, we see the following:
-<p align="center">
-  <img src="https://github.com/will62794/ipa/blob/main/specs/consensus_epr/consensus_epr_interaction_graph.png?raw=true" alt="Simple Consensus Protocol Interaction Graph" width="720">
-</p>
-That is, it turns out to be quite a simple interaction graph, and in fact is amenable to a very simple form of decomposition that we can use to accelerate verification. Basically, it is easy to see that the actions `{SendRequestVote, SendVote}`, for example, operate independently from the rest of the protocol actions, interacting only via writes to the `vote_msg` variable. So, one approach to verifying this protocol is to verify the `{SendRequestVote, SendVote}` actions independently of the rest of the protocol, and then verify the rest of the protocol against this behavior. 
-
-For example, if we model check the protocol with the pruned transition relation of
+If we model check the original two-phase commit protocol with 4 resource managers, $$RM=\{rm1,rm2,rm3,rm4\}$$, it has 1568 reachable states. If we model check the protocol under the abstracted $$RMAtomic$$ reduction
 
 $$
 \begin{align*}
-Next_A &\triangleq \\
-&\vee SendRequestVote\\
-&\vee SendVote \\
+Next_{TwoPhase_A} &\triangleq \\
+    &\lor RMAtomic(rm) \triangleq \\
+    &\lor \exists rm \in RM : TMRcvPrepared(rm) \\
+    &\lor \exists rm \in RM : TMAbort(rm) \\
+    &\lor \exists rm \in RM : TMCommit(rm)
 \end{align*}
 $$
 
-we have a reachable state space of 16,128 states, which is already a ~7x reduction from the full state space. Now, since the only "interaction variable" between this sub-protocol and the rest of the protocol is the `vote_msg` variable, we can project the state space of $$Next_A$$ to the `vote_msg` variable, and verify the rest of the protocol against this projected state space. With an explicit state model checker, one way to do this would be to explicitly compute this projection and just use the projected state graph as the "assume" model to verify the remainder of the protocol against. Alternatively, we can come up with an abstraction of the $$Next_A$$ protocol that reflects this abstract behavior adequately i.e. it reflects the behavior of the `vote_msg` variable correctly. We can do this by using a simple model that basically only adds a new message into `vote_msg` if no existing node has already put such a message into `vote_msg` (i.e. since nodes can't vote twice in this model).
+we find 163 reachable states, a ~10x reduction. In this case, though, the original interaction between these two components was not as simple as the (uni-directional) dataflow in the simple consensus protocol, so just doing this model checking along is not necessarily sound. That is, we actually need to somehow show that this `RMAtomic` abstraction is actually "interaction preserving". That is, we need to prove that it would behave the same as the original component with respect to the interaction variables, $$\{msgsCommit, msgsAbort, msgsPrepared\}$$. 
 
-$$
-\begin{align*}
-&SendRequestVote\_SendVote(src, dst) \triangleq \\
-    &\quad \land \nexists m \in vote\_msg : m[1] = src  \\
-    &\quad \land vote\_msg' = vote\_msg \cup \{\langle src,dst \rangle\} \\
-    &\quad \land \text{UNCHANGED } \langle vote\_request\_msg, voted, votes, leader, decided \rangle\\
-\end{align*}
-$$
+In this case, it is fairly easy to intuitively see why this is true. For example, we can first consider actions that write to `msgsPrepared` in the original component and the abstracted one. Only the `RMPrepare` action of the original sub-component do this, 
 
-Due to the structured nature of the interaction graph, we could continue applying this compositional rule to further reduce verification time, but even if we go ahead with this initial reduction, we can see drastic improvement. For example, now we have developed an "interaction preserving" abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol, we can try verifying the rest of the protocol against this abstraction e.g.
-
-$$
-\begin{align*}
-Next_2 &\triangleq \\
-    &\vee \exists i,j \in Node : SendRequestVote\_SendVote(i,j) \\
-    &\vee \exists i,j \in Node : RecvVote(i,j) \\
-    &\vee \exists i \in Node, Q \in Quorum : BecomeLeader(i,Q) \\
-    &\vee \exists i,j \in Node, v \in Value : Decide(i,v)
-\end{align*}
-$$
-
-Model checking the above protocol ($$Next_2$$) with TLC, produces 514 distinct reachable states, a > 200x reduction from the original state space. So, in this case, with only a simple dataflow/interaction analysis, we were able to reduce the hardest model checking problem by a factor of ~10x e.g. in this case model checking of the `{SendRequestVote, SendVote}` sub-protocol was the most expensive verification sub-problem e.g. we would need to verify that $$Next_A$$ is a valid abstraction of the `{SendRequestVote, SendVote}` sub-protocol.
-
-**TODO:** how exactly do we check that one abstraction is "interaction preserving" w.r.t some interaction variable, like in the consensus_epr example? just a refinement check?
-
-Note that for some interactions that are "read only", this may be even a more fine-grained distinction in the sense that the read variable may only appear in the precondition of an action, and so may only *restrict* the behavior of the component that reads from this variable.
+- **TODO:** how exactly do we check that one abstraction is "interaction preserving" w.r.t some interaction variable, like in the consensus_epr example? just a refinement check?
+- Note that for some interactions that are "read only", this may be even a more fine-grained distinction in the sense that the read variable may only appear in the precondition of an action, and so may only *restrict* the behavior of the component that reads from this variable.
+- Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries?
 
 
 ## Generalized Interaction Semantics
+
+Note that the above notions of action interaction, which are essentially based on static, syntactic checks, are conservative, and may determine that two actions interact, even when they, in a semantic sense, do not interact. For this, we need a more precise, fine-grained notion of "interaction" (i.e. independence). This notion bears similarity to the notion of independence used in classical partial order reduction techniques, and we can in theory do these kinds of checks statically, though we may need assistance of a symbolic checker i.e. SAT/SMT solver to check these interactino conditions in general. These ideas also appear in [earlier papers](https://www-old.cs.utah.edu/docs/techreports/2003/pdf/UUCS-03-028.pdf) on SAT-based partial order reduction.
 
 If we choose a specific decomposition of protocol actions, then we can check whether they interact, but how can we define more generally whether two components interact? We can start at the level of single actions i.e. does one action "interact" with another? As an approximation to this notion of interaction, we can consider the set of shared variables and their read/write semantics as we did above, but can define a more general notion of "interaction". Intuitively, one action $$A$$ interacts with another action $$B$$ if $$A$$ can affect $$B$$ i.e. can $$A$$ enable/disable $$B$$ or change the resulting state aftere a $$B$$ action is taken? For example, even if $$A$$ writes to a variable that $$B$$ reads, this does not necessarily mean that the two actions interact. If both share variable $$x$$, and the $$A$$ action is something like $$x = 2 \wedge x' = 3$$, and $$B$$ has an action like like $$x = 0 \wedge x' = 10$$, then these two actions don't necessarily interact. In a sense, the actions of $A$ are "invisible" to $$B$$, since they have no effect on whether $$B$$ is enabled.
 
 We can also try to mechanically check these notions of interaction e.g. using a symbolic verification tool or model checker.
 
-Note that syntactic checks of action interaction are conservative, and may determine that two actions interact, even when they (semantically) do not. For this, we need a more precise, fine-grained notion of "interaction" (i.e. independence). This notion bears similarity to the notion of independence used in classical partial order reduction techniques, and we can in theory do these kinds of checks statically, though we may need assistance of a symbolic checker i.e. SAT/SMT solver to check these interactino conditions in general. These ideas also appear in [earlier papers](https://www-old.cs.utah.edu/docs/techreports/2003/pdf/UUCS-03-028.pdf) on SAT-based partial order reduction.
+
+
+## Conditional Interaction
+
+TODO.
 
 
 ## Conclusions
