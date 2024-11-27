@@ -8,7 +8,7 @@ categories: distributed-systems verification
 
 <!-- ## Protocol Decomposition via Interaction Graphs -->
 
-Concurrent and distributed protocols can be formally viewed as a set of logical *actions*, which symbolically describe the set of allowed transitions the system can take. We may want to analyze the structure of a protocol's actions, though, to understand the interaction between them and to reason about a protocol's underlying compositional structure e.g. for improving verification efficiency when possible. One approach to reasoning about the decomposition of a protocol into subcomponents is to break up its *actions* into a set of disjoint subsets. This is a useful starting point for decomposition of concurrent protocols since actions represent the atomic units of behavior within a protocol specification. We can also use this basic type of decomposition to define a formal notion of *interaction* between subcomponents of a protocol.
+Concurrent and distributed protocols can be formally viewed as a set of logical *actions*, which symbolically describe the set of allowed transitions the system can take. We may want to analyze the structure of a protocol's actions, though, to understand the interaction between them and to reason about a protocol's underlying compositional structure e.g. for improving verification efficiency when possible. One approach to reasoning about the decomposition of a protocol into subcomponents is to break up its actions into a set of disjoint subsets, and view each subset as a separate logical component. This is a useful starting point for decomposition of protocols since actions represent the atomic units of behavior within a protocol specification. We can also use this basic type of decomposition to define various formal notions of *interaction* between subcomponents of a protocol.
 
 <!-- , which illustrates the logical interaction structure of a protocol and can also be used for accelerating verification for some protocols with the adequate interaction structure. -->
 
@@ -83,7 +83,7 @@ We can see another concrete example of an interaction graph, for the two-phase c
 
 This interaction graph, annotated with the interaction variables along its edges, makes explicit the logical dataflow between actions of the protocol, and also suggests natural action groupings for decomposition. For example, we can note that the only outgoing dataflow from the set of actions of the resource manager is via the $$msgsPrepared$$ variable, which is read by the transaction manager via the $$TMRcvPrepare$$ action. The only incoming dataflow to the resource manager sub-component is the via the $$msgsAbort$$ and $$msgsCommit$$ variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
 
-## Interaction Abstraction for Compositional Verification
+## Interaction Abstraction for Verification
 
 The decomposition notions above based on interaction graphs provide a way to consider a protocol decomposition in terms of how its fine-grained atomic sub-components interact. We can take this concept further and utilize this structure for a kind of compositional verification for certain interaction graph structures that are amenable to this type of analysis.
 
