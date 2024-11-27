@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Interaction Abstraction and Compositional Verification"
+title:  "Protocol Decomposition and Interaction Abstraction"
 categories: distributed-systems verification
 ---
 
@@ -57,9 +57,9 @@ M_2 &= \{IncrementB, IncrementC\}, \, Vars(M_2)=\{b,c\}
 \end{align*}
 $$
 
-with the associated state variables associated with each module indicated alongside.
+with the state variables associated with each module indicated alongside.
 
-In this case, it is clear that the *interaction* between $$M_1$$ and $$M_2$$ is defined in terms of their single shared variable $$b$$. Furthermore, this interaction is "uni-directional" in terms of the data flow between components, in the sense that $$M_1$$ only reads $$b$$ and $$M_2$$ only writes to $$b$$. 
+In this case, it is clear that the *interaction* between $$M_1$$ and $$M_2$$ can be defined in terms of their single shared variable, $$b$$. Furthermore, this interaction is "uni-directional" in terms of the data flow between components, in the sense that only $$M_1$$ reads from $$b$$ and only $$M_2$$ writes to $$b$$. 
 
 <p align="center">
   <img src="https://github.com/will62794/ipa/blob/main/specs/M_uni/M_uni_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="430">
@@ -83,7 +83,7 @@ We can see another concrete example of an interaction graph, for the two-phase c
 
 This interaction graph, annotated with the interaction variables along its edges, makes explicit the logical dataflow between actions of the protocol, and also suggests natural action groupings for decomposition. For example, we can note that the only outgoing dataflow from the set of actions of the resource manager is via the $$msgsPrepared$$ variable, which is read by the transaction manager via the $$TMRcvPrepare$$ action. The only incoming dataflow to the resource manager sub-component is the via the $$msgsAbort$$ and $$msgsCommit$$ variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
 
-## Interaction Abstraction for Verification
+## Interaction Abstraction and Compositional Verification
 
 The decomposition notions above based on interaction graphs provide a way to consider a protocol decomposition in terms of how its fine-grained atomic sub-components interact. We can take this concept further and utilize this structure for a kind of compositional verification for certain interaction graph structures that are amenable to this type of analysis.
 
@@ -128,7 +128,9 @@ Next_2 &\triangleq \\
 \end{align*}
 $$
 
-Model checking the above protocol ($$Next_2$$) with TLC, produces 514 distinct reachable states, a > 200x reduction from the original state space. So, in this case, with only a simple dataflow/interaction analysis, we were able to reduce the hardest model checking problem by a factor of ~10x e.g. in this case model checking of the $$Next_A$$ sub-protocol was the most expensive verification sub-problem e.g. we would need to verify that $$Next_A$$ is a valid abstraction of the `{SendRequestVote, SendVote}` sub-protocol.
+Model checking the above protocol ($$Next_2$$) with TLC, produces 514 distinct reachable states, a > 200x reduction from the original state space. 
+
+So, in this case, with only a simple dataflow/interaction analysis, we were able to reduce the hardest model checking problem by a factor of ~10x e.g. in this case model checking of the $$Next_A$$ sub-protocol was the most expensive verification sub-problem e.g. we would need to verify that $$Next_A$$ is a valid abstraction of the `{SendRequestVote, SendVote}` sub-protocol.
 
 ### Two Phase Commit Protocol
 
