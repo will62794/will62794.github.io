@@ -184,42 +184,64 @@ $$
 
 In general, though proving this refinement may be hard, and require development of auxiliary invariants to constrain the interaction variables suitably (?) to prove this step refinement condition.
 
-In this case, it is fairly easy to intuitively see why this is true. For example, we can first consider actions that write to `msgsPrepared` in the original component and the abstracted one. Only the `RMPrepare` action of the original sub-component do this, 
-
-- **TODO:** how exactly do we check that one abstraction is "interaction preserving" w.r.t some interaction variable, like in the consensus_epr example? just a refinement check?
-- Note that for some interactions that are "read only", this may be even a more fine-grained distinction in the sense that the read variable may only appear in the precondition of an action, and so may only *restrict* the behavior of the component that reads from this variable.
-- Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries?
-
+<!-- In this case, it is fairly easy to intuitively see why this is true. For example, we can first consider actions that write to `msgsPrepared` in the original component and the abstracted one. Only the `RMPrepare` action of the original sub-component do this,  -->
 
 ## Generalized Interaction Semantics
 
-Note that the above notions of action interaction, which are essentially based on static, syntactic checks, are conservative, and may determine that two actions interact, even when they, in a semantic sense, do not interact. For this, we need a more precise, fine-grained notion of "interaction" (i.e. independence). This notion bears similarity to the notion of independence used in classical partial order reduction techniques, and we can in theory do these kinds of checks statically, though we may need assistance of a symbolic checker i.e. SAT/SMT solver to check these interactino conditions in general. These ideas also appear in [earlier papers](https://www-old.cs.utah.edu/docs/techreports/2003/pdf/UUCS-03-028.pdf) on SAT-based partial order reduction.
+Note that the above notions of action interaction are essentially based on static, syntactic checks, and so are in fact conservative. That is, they may determine that two actions interact, even when they, in a semantic sense, do not. For this, we need a more general notion of "interaction" (i.e. independence). 
 
-If we choose a specific decomposition of protocol actions, then we can check whether they interact, but how can we define more generally whether two components interact? We can start at the level of single actions i.e. does one action "interact" with another? As an approximation to this notion of interaction, we can consider the set of shared variables and their read/write semantics as we did above, but can define a more general notion of "interaction". Intuitively, one action $$A$$ interacts with another action $$B$$ if $$A$$ can affect $$B$$ i.e. can $$A$$ enable/disable $$B$$ or change the resulting state aftere a $$B$$ action is taken? For example, even if $$A$$ writes to a variable that $$B$$ reads, this does not necessarily mean that the two actions interact. If both share variable $$x$$, and the $$A$$ action is something like $$x = 2 \wedge x' = 3$$, and $$B$$ has an action like like $$x = 0 \wedge x' = 10$$, then these two actions don't necessarily interact. In a sense, the actions of $A$ are "invisible" to $$B$$, since they have no effect on whether $$B$$ is enabled.
+The notion of interaction/independence we can use bears similarity to the independence notions that appear classical partial order reduction techniques. 
+<!-- and we can in theory do these kinds of checks statically, though we may need assistance of a symbolic checker i.e. SAT/SMT solver to check these interactino conditions in general.  -->
+Related ideas also appear in [earlier papers](https://www-old.cs.utah.edu/docs/techreports/2003/pdf/UUCS-03-028.pdf) on SAT-based partial order reduction, which use SAT solvers to check these symbolic independence conditions.
 
-We can also try to mechanically check these notions of interaction e.g. using a symbolic verification tool or model checker.
+<!-- If we choose a specific decomposition of protocol actions, then we can check whether they interact, but how can we define more generally whether two components interact? We can start at the level of single actions i.e. does one action "interact" with another? As an approximation to this notion of interaction, we can consider the set of shared variables and their read/write semantics as we did above, but can define a more general notion of "interaction".  -->
+Intuitively, we can say that one action $$A$$ "interacts" with another action $$B$$ if $$A$$ can affect $$B$$. That is, $$A$$ can either enable/disable $$B$$ or it could change the resulting state after a $$B$$ action is taken. This gives more rise to a more precise notion of interaction compared to our read/write static analysis above. For example, even if $$A$$ writes to a variable that $$B$$ reads, this does not necessarily mean that the two actions interact. If both share variable $$x$$, and $$A$$ is defined as something like 
 
-Essentially, one way to define interaction is in terms of the semantic behavior of actions i.e. can one action "observe" the effect of another action? There are two ways such an action can observe the effect of another action. Either another action can affect its precondition i.e. enable/disable it, or it can affect the new state that the action transitions to if it is taken i.e. it affects the postcondition. We can encode these two properties for generic actions $$Action1, Action2$$ as follows, written as temporal logic formulas:
+$$ 
+\begin{aligned}
+&A \triangleq \\
+&\quad \wedge x = 1 \\
+&\quad \wedge x' = 2
+\end{aligned}
+$$
+
+and $$B$$ as something like like 
+
+$$
+\begin{aligned}
+&B \triangleq \\
+&\quad \wedge x = 0 \\
+&\quad \wedge x' = 3
+\end{aligned}
+$$
+
+then these two actions don't "truly" interact. In a sense, the actions of $$A$$ will always be "invisible" to $$B$$, since they have no effect on whether $$B$$ is enabled or on the outcome after a $$B$$ action is taken.
+
+<!-- We can also try to mechanically check these notions of interaction e.g. using a symbolic verification tool or model checker. -->
+
+Essentially, one way to define interaction is in terms of the semantic behavior of actions i.e. can one action "observe" the effect of another action? As we stated, there are two ways such an action can functionally observe the effect of another action. It can either (1) affect its precondition i.e. enable/disable it, or it can (2) affect the outcome of that action transition i.e. it affects the action's postcondition. We can encode these two properties for generic actions $$Action1, Action2$$ as follows, written as temporal logic formulas stating whether $$Action1$$ interacts with/affects $$Action2$$:
 
 $$
 \begin{aligned}
 Independence &\triangleq \\
-    \wedge& \square[(({\small\text{ENABLED }} Action2) \wedge Action1 ) \Rightarrow Action2pre']_{vars} \\
-    \wedge& \square[((\neg {\small\text{ENABLED }} Action2) \wedge Action1 ) \Rightarrow ~Action2pre']_{vars}\\[0.5em]
-Commutativity &\triangleq \square[Action1 \Rightarrow (Action2PostExprs = Action2PostExprs')]_{vars}
+    \wedge& \square[(({\small\text{ENABLED }} Action2) \wedge Action1 ) \Rightarrow Action2_{Pre}']_{vars} \\
+    \wedge& \square[((\neg {\small\text{ENABLED }} Action2) \wedge Action1 ) \Rightarrow ~Action2_{Pre}']_{vars}\\[0.5em]
+Commutativity &\triangleq \square[Action1 \Rightarrow (Action2_{PostExprs} = Action2_{PostExprs}')]_{vars}
 \end{aligned}
 $$
 
-This provides a more precise notion of interaction, for which the syntactic checks above should be an overapproximation of. For example, in the case of simple consensus protocol, its semantic interaction graph based on the above property definitions is the same as the one defined previously, since the syntactic interaction between read/write variables already reflects the semantic interaction accurately. For the two-phase commit protocol, however, its semantic interactiong graph differs, as follows:
+and $$Action2_{Pre}$$ and $$Action2_{PostExprs}$$ represent the formula of $$Action2$$'s precondition and postcondition/update variables, respectively.
+
+This definition provides a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. For example, in the case of the simple consensus protocol, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. For the two-phase commit protocol, however, its semantic interaction graph differs, as follows:
 
 <figure id="2pc-semantic-interaction-graph">
   <p align="center">
     <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_semantic_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
   </p>
-  <figcaption>Semantic interaction graph for the two-phase commit protocol, showing which actions interact with each other based on the semantic independence conditions above.</figcaption>
+  <figcaption>Semantic interaction graph for the two-phase commit protocol, based on the independence conditions above.</figcaption>
 </figure>
 
-We can see, for example, that the $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ actions are defined to interact based on the original, syntactic variable interaction graph, but in our semantic interaction graph, they do not interact. This makes sense if we look at the underlying actions:
+We can see, for example, that the $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ actions are determined as interacting in the original, read/write interaction graph, but in the refined, semantic interaction graph, they do not interact. This is clear if we look at the underlying actions:
 
 $$
 \small
@@ -235,14 +257,28 @@ $$
 \end{aligned}
 $$
 
-From a naive syntactic analysis, we may determine that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well. In reality, though, the updates of both actions don't actually end up depending on the value of $$rmState$$, so writes to it don't "interact with"/"affect" these actions. Thus, these actions can be considered as semantically independent. This leads to the slightly cleaner version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph).
+From a naive syntactic analysis, we may determine that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well. In reality, though, the updates of both actions don't actually end up depending on the value of $$rmState$$, so writes to it don't "interact with"/"affect" these actions. Thus, these actions can be considered as semantically independent. This leads to the slightly refined version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph).
 
-From the interaction graph [above]((#2pc-semantic-interaction-graph)), we can apply some simple rewrites to derive an interaction prerserving abstraction. If we take the $$RMChooseToAbort$$, we can try to rewrite this somehow to preserve its interactions with the rest of the components. It interacts with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ only via $$rmState$$, and similarly for $$RMPrepare$$. So, we what if we merge it with $$RMPrepare$$? If we do this, then we need to preserve this merged node's interaction with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ via $$rmState$$.
+<!-- From the interaction graph [above](#2pc-semantic-interaction-graph), we can apply some simple rewrites to derive an interaction prerserving abstraction. If we take the $$RMChooseToAbort$$, we can try to rewrite this somehow to preserve its interactions with the rest of the components. It interacts with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ only via $$rmState$$, and similarly for $$RMPrepare$$, which is in fact the only action that can observe its transitions. So, we what if we merge it with $$RMPrepare$$? If we do this, then we need to preserve this merged node's interaction with $$RMPrepare$$.  -->
+
+<!-- We know that $$RMChooseToAbort$$ transitions a resource manager to state `"aborted"` if that resource manager's state is currently `"working"`, so we need to preserve these externally visible transitions. The only way that $$RMChooseToAbort$$ can affect $$RMPrepare$$ -->
+
+<!-- $$
+\small
+RMChooseToAbort(rm) \triangleq \neg \langle \text{Commit} \rangle \in msgsCommit \Rightarrow RMChooseToAbort(rm)
+$$ -->
+
+Note that there is a practical tradeoff between the read/write interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis i.e. to check the independence conditions properly may require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly, especially since these conditions can be produced automatically, without any kind of special synthesis procedure needed (e.g. in the case of inductive/loop invariant synthesis).
 
 ## Conditional Interaction
 
 TODO.
 
+## Questions
+
+- **TODO:** how exactly do we check that one abstraction is "interaction preserving" w.r.t some interaction variable, like in the consensus_epr example? just a refinement check?
+- Note that for some interactions that are "read only", this may be even a more fine-grained distinction in the sense that the read variable may only appear in the precondition of an action, and so may only *restrict* the behavior of the component that reads from this variable.
+- Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries?
 
 ## Conclusions
 
