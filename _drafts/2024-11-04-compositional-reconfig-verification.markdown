@@ -4,13 +4,13 @@ title:  "Interaction Abstraction and Compositional Verification"
 categories: distributed-systems verification
 ---
 
-When verifying complex protocols, it is often useful to break them up into smaller components, verify each component separately, and then compose the results to verify the overall protocol. Ideally we would like to be able to break down a protocol into as small components as possible, verify each component separately, and then compose the results to verify the overall protocol. There are a few approaches to doing this for protocols, which we can do by analyzing the interactions between components, and abstracting sub-components based on these interactions.
+<!-- When verifying complex protocols, it is often useful to break them up into smaller components, verify each component separately, and then compose the results to verify the overall protocol. Ideally we would like to be able to break down a protocol into as small components as possible, verify each component separately, and then compose the results to verify the overall protocol. There are a few approaches to doing this for protocols, which we can do by analyzing the interactions between components, and abstracting sub-components based on these interactions. -->
 
-## Protocol Decomposition via Interaction Graphs
+<!-- ## Protocol Decomposition via Interaction Graphs -->
 
-One way to reason about the decomposition of a protocol into subcomponents is to break up its *actions* into a set of disjoint subsets. This may not be the only way to decompose a protocol, but it is a useful starting point since actions represent the atomic units of interaction within a protocol description. We can then proceed to define notions of interactions between subcomponents of a protocol.
+Concurrent and distributed protocols can be formally viewed as a set of logical *actions*, which symbolically describe the set of allowed transitions the system can take. We may want to analyze the structure of a protocol's actions, though, to understand the interaction between them and to reason about a protocol's underlying compositional structure e.g. for improving verification efficiency when possible. One approach to reasoning about the decomposition of a protocol into subcomponents is to break up its *actions* into a set of disjoint subsets. This is a useful starting point for decomposition of concurrent protocols since actions represent the atomic units of behavior within a protocol specification. We can also use this basic type of decomposition to define a formal notion of *interaction* between subcomponents of a protocol.
 
-
+<!-- , which illustrates the logical interaction structure of a protocol and can also be used for accelerating verification for some protocols with the adequate interaction structure. -->
 
 As a simple example, consider the following protocol specification:
 
@@ -65,11 +65,7 @@ In this case, it is clear that the *interaction* between $$M_1$$ and $$M_2$$ is 
   <img src="https://github.com/will62794/ipa/blob/main/specs/M_uni/M_uni_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="430">
 </p>
 
-In this simple case of component interaction it is also clear that verification of $$M_1$$ behavior's can be done only via dependence on the behavior of the interaction variable $$b$$. The full behavior of $$M_2$$ is irrelevant to the behavior of $$M_1$$, so this allows for a natural type of compositional verification. That is, we can consider all behaviors of $$M_2$$, projected to the interaction variable $$b$$, and then verify $$M_1$$ against this behavior.
-
-
-
-If we check pairwise interactions between all actions of an original protocol, we can define a type of interaction graph, which can then serve as a basic for decomposition to be used for verification as we described above.
+In this simple case of component interaction it is also clear that verification of $$M_1$$ behavior's can be done only via dependence on the behavior of the interaction variable $$b$$. The full behavior of $$M_2$$ is irrelevant to the behavior of $$M_1$$, so this allows for a natural type of compositional verification. That is, we can consider all behaviors of $$M_2$$, projected to the interaction variable $$b$$, and then verify $$M_1$$ against this behavior. If we check pairwise interactions between all actions of an original protocol, we can produce this type of interaction graph as shown above, which can serve as a basis for protocol decomposition.
 
 To take another example, we can consider [this simplified consensus protocol](https://github.com/will62794/ipa/blob/main/specs/consensus_epr/consensus_epr.tla) for selecting a value among a set of nodes via a simple leader election protocol. There are 5 actions of this protocol, related to nodes sending out votes for a leader, a leader processing those votes, getting electing leader and a leader deciding on a value. If we examine this protocol's interaction graph, we obtain the following:
 <p align="center">
@@ -79,17 +75,17 @@ To take another example, we can consider [this simplified consensus protocol](ht
 In this protocol, we can see its interaction graph admits quite a simple structure, with nearly unidirectional dataflow between most actions. We can utilize this for accelerating verification as we discuss below.
 
 
-We can see another concrete example of an interaction graph, for the two-phase commit protocol, based on its specification [here](https://github.com/will62794/scimitar/blob/main/benchmarks/TwoPhase.tla):
+We can see another concrete example of an interaction graph, for the two-phase commit protocol, based on the protocol specification [here](https://github.com/will62794/scimitar/blob/main/benchmarks/TwoPhase.tla):
 
 <p align="center">
   <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
 </p>
 
-This interaction graph, annotated with the interaction variables along its edges, allows us to reason explicitly about the logical dataflow between actions/components of the protocol. For example, we can note that the only outgoing dataflow from the set of actions of the resource manager is via the `msgsPrepared` variable, which is read by the transaction manager via the `TMRcvPrepare` action. The only incoming dataflow to the resource manager sub-component is the via the `msgsAbort` and `msgsCommit` variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
+This interaction graph, annotated with the interaction variables along its edges, makes explicit the logical dataflow between actions of the protocol, and also suggests natural action groupings for decomposition. For example, we can note that the only outgoing dataflow from the set of actions of the resource manager is via the $$msgsPrepared$$ variable, which is read by the transaction manager via the $$TMRcvPrepare$$ action. The only incoming dataflow to the resource manager sub-component is the via the $$msgsAbort$$ and $$msgsCommit$$ variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
 
 ## Interaction Abstraction for Compositional Verification
 
-The decomposition notions above based on interaction graphs provide a way to consider a protocol decomposition in terms of how its fine-grained atomic sub-components interact. But, we can take this concept further and utilize this structure for a kind of compositional verification for certain interaction graph structures that are amenable to this type of analysis.
+The decomposition notions above based on interaction graphs provide a way to consider a protocol decomposition in terms of how its fine-grained atomic sub-components interact. We can take this concept further and utilize this structure for a kind of compositional verification for certain interaction graph structures that are amenable to this type of analysis.
 
 ### Simple Consensus Protocol
 
