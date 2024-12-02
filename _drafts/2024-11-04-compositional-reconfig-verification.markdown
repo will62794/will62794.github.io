@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Protocol Decomposition and Interaction Abstraction"
+title:  "Interaction Graphs for Protocol Decomposition"
 categories: distributed-systems verification
 ---
 
@@ -83,7 +83,7 @@ We can see another concrete example of an interaction graph, for the two-phase c
 
 This interaction graph, annotated with the interaction variables along its edges, makes explicit the logical dataflow between actions of the protocol, and also suggests natural action groupings for decomposition. For example, we can note that the only outgoing dataflow from the set of actions of the resource manager is via the $$msgsPrepared$$ variable, which is read by the transaction manager via the $$TMRcvPrepare$$ action. The only incoming dataflow to the resource manager sub-component is the via the $$msgsAbort$$ and $$msgsCommit$$ variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol where the resource manager and transaction manager are logically separate processes, and only interact via specific message channels.
 
-## Interaction Abstraction and Compositional Verification
+## Compositional Verification
 
 The decomposition notions above based on interaction graphs provide a way to consider a protocol decomposition in terms of how its fine-grained atomic sub-components interact. We can take this concept further and utilize this structure for a kind of compositional verification for certain interaction graph structures that are amenable to this type of analysis.
 
@@ -268,15 +268,17 @@ $$ -->
 
 Note that there is a practical tradeoff between the read/write interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis i.e. to check the independence conditions properly may require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly, especially since these conditions can be produced automatically, without any kind of special synthesis procedure needed (e.g. in the case of inductive/loop invariant synthesis).
 
-## Conditional Interaction
+<!-- ## Conditional Interaction
 
-TODO.
+TODO. Explore conditional interaction for Paxos based ballots.
 
-## Questions
+-->
+
+<!-- ## Questions
 
 - **TODO:** how exactly do we check that one abstraction is "interaction preserving" w.r.t some interaction variable, like in the consensus_epr example? just a refinement check?
 - Note that for some interactions that are "read only", this may be even a more fine-grained distinction in the sense that the read variable may only appear in the precondition of an action, and so may only *restrict* the behavior of the component that reads from this variable.
-- Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries?
+- Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries? -->
 
 ## Conclusions
 
