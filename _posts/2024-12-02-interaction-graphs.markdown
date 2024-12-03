@@ -267,11 +267,13 @@ $$
 <figcaption>Figure 5. Semantic interaction conditions between one action and another.</figcaption>
 </figure>
 
-where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. its postcondition). Basically, the $$Independence$$ states that if $$A_2$$ is enabled/disabled in a current state ($${A_2}^{Pre}$$/$$\neg{A_2}^{Pre}$$ holds), then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
+where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. its postcondition). 
 
-This definition provides a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. For example, in the case of the simple consensus protocol from <a href="#consensus-interaction-graph">above</a>, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. 
+Essentially, the $$Independence$$ condition states that if $$A_2$$ is enabled/disabled in a current state ($${A_2}^{Pre}$$/$$\neg{A_2}^{Pre}$$ holds), then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
 
-For two-phase commit, however, its semantic interaction graph differs from the original one <a href="#2pc-interaction-graph">above</a>, as follows:
+The above definitions provide a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. For example, in the case of the simple consensus protocol from <a href="#consensus-interaction-graph">above</a>, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. 
+
+For two-phase commit, however, its semantic interaction graph differs slightly from the original one <a href="#2pc-interaction-graph">above</a>, as follows:
 
 <figure id="2pc-semantic-interaction-graph">
   <p align="center">
