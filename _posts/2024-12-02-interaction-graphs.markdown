@@ -11,7 +11,7 @@ categories: distributed-systems verification
 Concurrent and distributed protocols can be formally viewed as a set of logical *actions*, each of which symbolically describe allowed state transitions of the system. We can analyze the structure of a protocol's actions to understand the interaction between them, and to reason about a protocol's underlying compositional structure.
  <!-- e.g. for improving verification efficiency if possible.  -->
 
-One approach to decomposing a protocol into subcomponents is to break up its actions into disjoint subsets, and view each disjoint subset of actions as a separate logical component. This is a useful starting point for decomposition of protocols since actions represent the atomic units of behavior within a protocol specification. We can also use this basic type of decomposition to define various formal notions of *interaction* between individual actions or subcomponents of a protocol.
+One approach to decomposing a protocol into subcomponents is to break up its actions into disjoint subsets, and view each disjoint subset of actions as a separate logical component. This is a useful starting point for decomposition of protocols since actions represent the atomic units of concurrent behavior within a protocol specification. We can also use this basic type of decomposition to define various formal notions of *interaction* between individual actions or subcomponents of a protocol.
 
 <!-- , which illustrates the logical interaction structure of a protocol and can also be used for accelerating verification for some protocols with the adequate interaction structure. -->
 
