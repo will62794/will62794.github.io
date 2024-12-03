@@ -15,12 +15,25 @@
   <link rel="stylesheet" href="/css/academicons-1.9.4/css/academicons.min.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  
+
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script type="text/javascript" src="/js/main.js"></script>
-  <script type="text/javascript" id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-  </script>
+
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js"></script>
   {% seo %}
+
+  <script>
+    MathJax = {
+        "jax": ["input/TeX", "output/HTML-CSS"],
+        chtml: {
+            scale: 0.9
+        },
+        options:{
+            enableMenu: false
+        }
+    };
+  </script>
+  <script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
