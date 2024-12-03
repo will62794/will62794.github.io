@@ -59,13 +59,13 @@ M_2 &= \{IncrementB, IncrementC\} & \qquad Vars(M_2)=\{b,c\}
 \end{align*}
 $$
 
-with the associated state variables for each component.
+with the state variables associated with each component.
 
-In this case, it is clear that the logical *interaction* between $$M_1$$ and $$M_2$$ can be defined in terms of their single shared variable, $$b$$. Furthermore, this interaction is "uni-directional" in terms of the data flow between components, in the sense that only $$M_1$$ reads from $$b$$ and only $$M_2$$ writes to $$b$$. In this simple case of interaction it is also clear that, for example, verification of $$M_1$$ behavior's could be done only via dependence on the behavior of the interaction variable $$b$$. The full behavior of $$M_2$$ is irrelevant to the behavior of $$M_1$$, enabling a natural type of compositional verification. 
+In this case, it is clear that the logical *interaction* between $$M_1$$ and $$M_2$$ can be defined in terms of their single shared variable, $$b$$. Furthermore, this interaction is "uni-directional" in terms of the data flow between components i.e. only $$M_1$$ reads from $$b$$ and only $$M_2$$ writes to $$b$$. In this simple case of interaction it is also clear that, for example, verification of $$M_1$$ behavior's should only depend on the behavior of the interaction variable $$b$$. The full behavior of $$M_2$$ is irrelevant to the behavior of $$M_1$$, enabling a natural type of compositional verification. 
 
 <!-- That is, we can consider all behaviors of $$M_2$$, projected to the interaction variable $$b$$, and then verify $$M_1$$ against this behavior.  -->
 
-More generally, if we consider every action as its own component, with associated read/write variables, we can check pairwise interactions between all actions of an original protocol to produce an *interaction graph*, as shown below. This can then serve as a starting point for understanding the interaction between protocol actions and the potential boundaries for protocol decomposition.
+More generally, if we consider every action of a protocol as its own, fine-grained component, with associated read/write variables, we can check pairwise interactions between all actions of an original protocol to produce an *interaction graph*, as shown below. This then serves as a starting point for understanding the interaction between protocol actions and the potential boundaries for protocol decomposition.
 
 <p align="center">
   <img src="https://github.com/will62794/ipa/blob/main/specs/M_uni/M_uni_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="430">
@@ -110,31 +110,35 @@ $$
   <figcaption>Figure 3. Two phase commit protocol interaction graph from <a href="#2pc-interaction-graph">Figure 2</a> with partitioned components shown.</figcaption>
 </figure>
 
-For example, we can note that the only outgoing dataflow from the $$RM$$ set of actions is via the $$msgsPrepared$$ variable, which is read via $$TMRcvPrepare$$. The only incoming dataflow to the resource manager sub-component is via the $$msgsAbort$$ and $$msgsCommit$$ variables, which are written to by the transaction manager. This matches our intuitive notions of the protocol whereby the resource manager and transaction manager behave as logically separate processes, and only interact via the relevant message channels ($$msgsAbort$$, $$msgsCommit$$, and $$msgsPrepared$$).
+For example, we can note that the only outgoing dataflow from the $$RM$$ set of actions is via the $$msgsPrepared$$ variable, which is read via $$TMRcvPrepare$$. The only incoming dataflow to the resource manager sub-component is via the $$msgsAbort$$ and $$msgsCommit$$ variables, which are written to by the transaction manager. 
+
+This matches our intuitive notions of the protocol whereby the resource manager and transaction manager behave as logically separate processes, and only interact via the relevant message channels ($$msgsAbort$$, $$msgsCommit$$, and $$msgsPrepared$$).
 
 ## Compositional Verification
 
-The decomposition concepts above provide a way to view a protocol in terms of how its fine-grained atomic sub-components interact. We can, in some cases, utilize this structure for a kind of compositional verification for interaction graph structures that are amenable.
+The decomposition concepts above provide a way to view a protocol in terms of how its fine-grained atomic sub-components interact. We can, in some cases, utilize this structure for a kind of compositional verification when a protocol's interaction graph is amenable.
 
 ### Simple Consensus Protocol
 
-If we consider, for example, the interaction graph of the simple consensus protocol from above, its simple interaction graph (<a href="#consensus-interaction-graph">Figure 1</a>) makes it directly amenable to a very simple form of accelerated compositional verification. If we want to verify the core safety property of this protocol, $$NoConflictingValues$$, which states that no two nodes decide on different values, we can check this with TLC using a model with 3 nodes, $$Node=\{n1,n2,n3\}$$ in a few seconds, generating a reachable state space with 110,464 states.
+For example, we can consider the interaction graph of the simple consensus protocol from above. Its mostly acyclic interaction graph (<a href="#consensus-interaction-graph">Figure 1</a>) makes it directly amenable to a simple form of efficient, compositional verification. If we want to verify the core safety property of this protocol, $$NoConflictingValues$$, which states that no two nodes decide on distinct values, we can check this with the TLC model checker in a few seconds, using a model with 3 nodes, $$Node=\{n1,n2,n3\}$$ and generating a reachable state space with 110,464 states.
 
-From the interaction graph, it is easy to see that the actions $$\{SendRequestVote, SendVote\}$$, operate independently from the rest of the protocol, interacting only via writes to the $$vote\_msg$$ variable. So, one approach to verifying this protocol is to start by verifying the $$\{SendRequestVote, SendVote\}$$ actions independently of the rest of the protocol, and then verify the rest of the protocol against this behavior. More specifically, the overall protocol only depends on the observable behavior of this $$\{SendRequestVote, SendVote\}$$ sub-component with respect to the $$vote\_msg$$ variable.
+From the protocol's interaction graph, however, it is easy to see that the actions $$\{SendRequestVote, SendVote\}$$, operate independently from the rest of the protocol, interacting only via writes to the $$vote\_msg$$ variable. So, one approach to verifying this protocol is to start by verifying the $$\{SendRequestVote, SendVote\}$$ actions independently of the rest of the protocol, and then verify the rest of the protocol against this behavior. More specifically, the overall protocol only depends on the observable behavior of this $$\{SendRequestVote, SendVote\}$$ sub-component with respect to the $$vote\_msg$$ variable.
 
 For example, if we model check the protocol with the pruned transition relation of
 
 $$
 \begin{align*}
-Next_A &\triangleq \\
-&\vee SendRequestVote\\
-&\vee SendVote \\
+&Next_A \triangleq \\
+& \quad \vee SendRequestVote\\
+& \quad \vee SendVote \\
 \end{align*}
 $$
 
-we find 16,128 distinct reachable states, a ~7x reduction from the full state space. Now, since the only "interaction variable" between this $$Next_A$$ sub-protocol and the rest of the protocol is the $$vote\_msg$$ variable, we could project the state space of $$Next_A$$ to the $$vote\_msg$$ variable, and verify the rest of the protocol against this projected state space. With an explicit state model checker, one way to do this would be to directly compute this projection and just use the projected state graph as the "assume" model to verify the remainder of the protocol against. Alternatively, we can come up with an *abstraction* of the $$Next_A$$ protocol that reflects this abstract behavior adequately i.e. it reflects the projected behavior of the $$vote\_msg$$ variable correctly. 
+we generate 16,128 distinct reachable states, a ~7x reduction from the full state space. Now, since the only "interaction variable" between this $$Next_A$$ sub-protocol and the rest of the protocol is the $$vote\_msg$$ variable, we could project the state space of $$Next_A$$ to the $$vote\_msg$$ variable, and verify the rest of the protocol against this projected state space. 
 
-For example, consider the following abstract model that effectivelymerges the $$SendRequestVote$$ and $$SendVote$$ actions into a single atomic action:
+With an explicit state model checker, we could directly compute this projection by generating and projecting the full state graph, and using this projected state graph as the "environment" under which to verify the rest of the protocol. Alternatively, we can come up with an *abstraction* of the $$Next_A$$ protocol that reflects the external behavior of the interaction variable $$vote\_msg$$ adequately.
+
+For example, consider the following abstract model that logically merges the $$SendRequestVote$$ and $$SendVote$$ actions into a single atomic action:
 
 $$
 \begin{align*}
@@ -145,9 +149,9 @@ $$
 \end{align*}
 $$
 
-That is, this merged action adds a new message into $$vote\_msg$$ only if no existing node has already put such a message into $$vote\_msg$$ (i.e. since nodes can't vote twice in the original protocol).
+This atomic action adds a new message into $$vote\_msg$$ only if no existing node has already put such a message into $$vote\_msg$$ (i.e. since nodes can't vote twice in the original protocol).
 
-Due to the structured, acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further reduce verification time, but even if we go ahead with this initial reduction, we can see significant improvement. Now that we have developed an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
+Due to the structured, acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further accelerate verification, but even if with this initial reduction, we can see significant improvement. Now that we have developed an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
 
 $$
 \begin{align*}
@@ -217,9 +221,9 @@ In general, though proving this refinement may be hard, and require development 
 
 ## Generalized Interaction Semantics
 
-Note that the above notions of interaction between protocol actions are based on static (i.e. syntactic) checks, and so are in fact conservative. That is, they may determine that two actions interact, even when they, in a semantic sense, do not. For this, we need a more general notion of "interaction".
+Note that the above notions of interaction between protocol actions are based on static (i.e. syntactic) checks, and so are, in fact, conservative. That is, they may syntactically determine that two actions interact, even when they, in a semantic sense, do not. For this, we need a more general notion of "interaction".
 
-For example, even if an action $$A$$ writes to a variable that another action $$B$$ reads, this does not necessarily mean that the two actions interact. If both share variable $$x$$, and $$A$$ and $$B$$ are defined as follows:
+As a concrete example, consider that even if an action $$A$$ writes to a variable that another action $$B$$ reads, this does not necessarily mean that the two actions interact. If both share variable $$x$$, and $$A$$ and $$B$$ are defined as follows:
 
 $$ 
 \begin{aligned}
@@ -232,7 +236,7 @@ $$
 \end{aligned}
 $$
 
-then these two actions don't "truly" interact. In a sense, the actions of $$A$$ will always be "invisible" to $$B$$, since they have no effect on whether $$B$$ is enabled or on the outcome after a $$B$$ action is taken.
+then these two actions don't truly "interact". In a sense, the actions of $$A$$ will always be "invisible" to $$B$$, since they have no effect on whether $$B$$ is enabled/disabled or on the outcome after a $$B$$ action is taken.
 
 
 <!-- If we choose a specific decomposition of protocol actions, then we can check whether they interact, but how can we define more generally whether two components interact? We can start at the level of single actions i.e. does one action "interact" with another? As an approximation to this notion of interaction, we can consider the set of shared variables and their read/write semantics as we did above, but can define a more general notion of "interaction".  -->
@@ -241,18 +245,14 @@ Intuitively, we can say that one action $$A$$ "interacts" with another action $$
 1. Enable or disable $$B$$. 
 2. Affect the resulting state after a $$B$$ action is taken. 
 
-This gives more rise to a more precise notion of interaction compared to our syntactic read/write definition above.  Note that this notion of interaction (conversely, "independence") we define bears similarity to the independence notions used in classical [partial order reduction](https://www.cs.cmu.edu/~emc/15817-f08/lectures/partialorder.pdf) techniques. 
+This gives rise to a more precise notion of interaction compared to our syntactic, read/write definition from above. Note that this notion of interaction we define (conversely, "independence") bears similarity to the independence notions used in classical [partial order reduction](https://www.cs.cmu.edu/~emc/15817-f08/lectures/partialorder.pdf) techniques. 
 <!-- and we can in theory do these kinds of checks statically, though we may need assistance of a symbolic checker i.e. SAT/SMT solver to check these interactino conditions in general.  -->
 Related ideas also appear in [early papers](https://www-old.cs.utah.edu/docs/techreports/2003/pdf/UUCS-03-028.pdf) on symbolic partial order reduction, which use a SAT solver to check these independence conditions.
 
 <!-- We can also try to mechanically check these notions of interaction e.g. using a symbolic verification tool or model checker. -->
 
 
-
-
-
-
-We can formally encode these two interaction properties above for generic actions $$A_1, A_2$$ as follows, defined as temporal logic formulas stating whether $$A_1$$ "interacts with"/"affects" $$A_2$$:
+We can formally encode the two interaction properties above for generic actions $$A_1, A_2$$, as follows, defined as temporal logic formulas stating whether $$A_1$$ "interacts with" / "affects" $$A_2$$:
 
 <figure id="semantic-interaction">
 $$
@@ -267,7 +267,7 @@ $$
 <figcaption>Figure 5. Semantic interaction conditions between one action and another.</figcaption>
 </figure>
 
-and $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. postcondition). Note that, for small enough protocols, we can check these conditions either symbolically or, for example, using TLC, given we define the set of type-correct states for a protocol (similar to how we can [check inductive invariant conditions](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
+where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. its postcondition). Basically, the $$Independence$$ states that if $$A_2$$ is enabled/disabled in a current state ($${A_2}^{Pre}$$/$$\neg{A_2}^{Pre}$$ holds), then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
 
 This definition provides a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. For example, in the case of the simple consensus protocol from <a href="#consensus-interaction-graph">above</a>, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. 
 
@@ -296,7 +296,7 @@ $$
 \end{aligned}
 $$
 
-From a naive syntactic analysis, we observe that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well, so we determine that they interact. Semantically, though, the updates of both actions don't depend on the value of $$rmState$$, so writes to it shouldn't"affect" these actions. Thus, these two actions can be considered as semantically independent. This leads to the slightly refined version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph), where we still include arrows representing read/write dependencies between actions, but *only* if those actions semantically interact by the conditions above.
+From a naive syntactic analysis, we observe that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well, so we determine that they interact. Semantically, though, the updates of both actions don't depend on the value of $$rmState$$, so writes to it shouldn't "affect" these actions. Thus, these two actions can be considered as semantically independent. This leads to the slightly refined version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph), where we still include arrows representing read/write dependencies between actions, but *only* if those actions semantically interact by the conditions above.
 
 <!-- From the interaction graph [above](#2pc-semantic-interaction-graph), we can apply some simple rewrites to derive an interaction prerserving abstraction. If we take the $$RMChooseToAbort$$, we can try to rewrite this somehow to preserve its interactions with the rest of the components. It interacts with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ only via $$rmState$$, and similarly for $$RMPrepare$$, which is in fact the only action that can observe its transitions. So, we what if we merge it with $$RMPrepare$$? If we do this, then we need to preserve this merged node's interaction with $$RMPrepare$$.  -->
 
