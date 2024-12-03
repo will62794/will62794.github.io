@@ -260,7 +260,7 @@ We can formally encode the two interaction properties above for generic actions 
 <figure id="semantic-interaction">
 $$
 \begin{aligned}
-Independence \triangleq& \, \square[A_1 \Rightarrow  ({A_2}^{Pre} \Leftrightarrow {A_{2}^{Pre}}')]_{vars} \\
+Enabledness \triangleq& \, \square[A_1 \Rightarrow  ({A_2}^{Pre} \Leftrightarrow {A_{2}^{Pre}}')]_{vars} \\
 Commutativity \triangleq&  \, \square[A_1 \Rightarrow (A_{2}^{Post} \Leftrightarrow {A_{2}^{Post}}')]_{vars}
 \end{aligned}
 $$
@@ -269,7 +269,7 @@ $$
 
 where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. its postcondition expressions). 
 
-Essentially, the $$Independence$$ condition states that if $$A_2$$ is enabled/disabled in a current state, then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
+Essentially, the $$Enabledness$$ condition states that if $$A_2$$ is enabled/disabled in a current state, then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
 
 The above definitions provide a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. For example, in the case of the simple consensus protocol from <a href="#consensus-interaction-graph">above</a>, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. 
 
