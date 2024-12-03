@@ -171,6 +171,8 @@ So, in this case, with only a simple dataflow/interaction analysis, we were able
 <!--
 ### Two Phase Commit Protocol
 
+Any actions taken by `RMChooseToAbort` can only *disable* the `RMPrepare` action, right? So, from an external view, it should be safe to absorb `RMChooseToAbort` into `RMPrepare`, since it could only restrict the behaviors of `RMPrepare`, and there is not true "data flow" from `RMChooseToAbort` to `RMPrepare`, since the update expressions of`RMPrepare` don't actually depend on `RMChooseToAbort` writes?
+
 
 Is there an "interaction preserving abstraction" that exists for the transaction manager sub-component in the two-phase commit protocol? Well, if we break down the protocol into transaction manager and resource manager sub-components, then we know the only interaction points between these two sub-components are via the $$\{msgsCommit, msgsAbort\}$$ (written to by RM, read by TM) and the $$msgsPrepared$$ (read by TM, written to by RM) variables. 
 
