@@ -258,19 +258,16 @@ We can formally encode the two interaction properties above for generic actions 
 <figure id="semantic-interaction">
 $$
 \begin{aligned}
-&Independence \triangleq \\
-    &\quad \wedge \square[(\phantom{\neg} {A_2}^{Pre} \wedge A_1 ) \Rightarrow \phantom{\neg} {A_{2}^{Pre}}']_{vars} \\
-    &\quad \wedge \square[(\neg {A_2}^{Pre} \wedge A_1 ) \Rightarrow \neg {A_{2}^{Pre}}']_{vars}\\[0.8em]
-&Commutativity \triangleq \\
-    &\quad \square[A_1 \Rightarrow (A_{2}^{Post} = {A_{2}^{Post}}')]_{vars}
+Independence \triangleq& \, \square[A_1 \Rightarrow  ({A_2}^{Pre} \Leftrightarrow {A_{2}^{Pre}}')]_{vars} \\
+Commutativity \triangleq&  \, \square[A_1 \Rightarrow (A_{2}^{Post} \Leftrightarrow {A_{2}^{Post}}')]_{vars}
 \end{aligned}
 $$
 <figcaption>Figure 5. Semantic interaction conditions between one action and another.</figcaption>
 </figure>
 
-where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. its postcondition). 
+where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. its postcondition expressions). 
 
-Essentially, the $$Independence$$ condition states that if $$A_2$$ is enabled/disabled in a current state ($${A_2}^{Pre}$$/$$\neg{A_2}^{Pre}$$ holds), then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
+Essentially, the $$Independence$$ condition states that if $$A_2$$ is enabled/disabled in a current state, then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
 
 The above definitions provide a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. For example, in the case of the simple consensus protocol from <a href="#consensus-interaction-graph">above</a>, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. 
 
@@ -280,7 +277,7 @@ For two-phase commit, however, its semantic interaction graph differs slightly f
   <p align="center">
     <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_semantic_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
   </p>
-  <figcaption>Figure 4. Interaction graph for the two-phase commit protocol, based on the semantic independence conditions above.</figcaption>
+  <figcaption>Figure 4. Interaction graph for the two-phase commit protocol, based on the semantic independence.</figcaption>
 </figure>
 
 We can see, for example, that the $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ actions are determined as interacting in the original, syntactic interaction graph, but in the refined, semantic interaction graph, they do not interact. This makes sense if we look at these underlying actions:
@@ -327,4 +324,6 @@ TODO. Explore conditional interaction for Paxos based ballots.
 
 ## Conclusions
 
-The ideas and techniques discussed above are similar to various types of compositional verification techniques that have been applied in various contexts. Similar ideas are utilized in the "interaction preserving abstraction" techniques in [this paper](https://arxiv.org/abs/2202.11385), and also in the work on *[recomposition](https://iandardik.github.io/assets/papers/recomp_fmcad24.pdf)*, which builds similar techniques within the TLC model checker. The notion of using dataflow to analyze distributed and concurrent protocols has also appeared in various works in the past (e.g. [distributed data flow](https://www.cs.cornell.edu/~krzys/krzys_debs2009.pdf)), and also more [recent work](https://dl.acm.org/doi/10.1145/3639257) on using a Datalog like variant to automatically optimize distributed protocols using pre-defined rewrite rules.
+The ideas and techniques discussed above are similar to various types of compositional verification techniques that have been applied in various contexts. Similar ideas are utilized in the "interaction preserving abstraction" techniques in [this paper](https://arxiv.org/abs/2202.11385), and also in the work on *[recomposition](https://iandardik.github.io/assets/papers/recomp_fmcad24.pdf)*, which builds similar techniques within the TLC model checker. The notion of using dataflow to analyze distributed and concurrent protocols has also appeared in various works in the past (e.g. [distributed data flow](https://www.cs.cornell.edu/~krzys/krzys_debs2009.pdf)), and also more [recent work](https://dl.acm.org/doi/10.1145/3639257) on using a Datalog like variant to automatically optimize distributed protocols using pre-defined rewrite rules. 
+
+Note that the code used to model the protocols above and generate their associated interaction graphs can be found [here](https://github.com/will62794/ipa).
