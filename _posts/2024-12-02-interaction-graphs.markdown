@@ -33,11 +33,11 @@ $$
 & IncrementB 
     \triangleq \\
      & \quad \land \, b' = b + c \\
-     & \quad \land \, \text{UNCHANGED } c \\[0.4em]
+     & \quad \land \, \text{UNCHANGED } \langle a,c \rangle \\[0.4em]
 & IncrementC  \triangleq \\
     &\quad \land \, c < cycle  \\
     &\quad \land \, c' = (c + 1) \% cycle \\
-    &\quad \land \, \text{UNCHANGED } b
+    &\quad \land \, \text{UNCHANGED } \langle a,b \rangle
 \\[0.4em]
 &Next \triangleq \\ 
 &\quad \lor IncrementA \\
