@@ -134,7 +134,7 @@ $$
 \end{align*}
 $$
 
-we generate 16,128 distinct reachable states, a ~7x reduction from the full state space. Now, since the only "interaction variable" between this $$Next_A$$ sub-protocol and the rest of the protocol is the $$vote\_msg$$ variable, we could project the state space of $$Next_A$$ to the $$vote\_msg$$ variable, and verify the rest of the protocol against this projected state space. 
+we generate 16,128 distinct reachable states, a ~7x reduction from the full state space. Now, since the only "interaction variable" between this $$Next_A$$ sub-protocol and the rest of the protocol is the $$vote\_msg$$ variable, we could project the state space of $$Next_A$$ to the $$vote\_msg$$ variable and verify the rest of the protocol against this projected state space. 
 
 With an explicit state model checker, we could directly compute this projection by generating and projecting the full state graph, and using this projected state graph as the "environment" under which to verify the rest of the protocol. Alternatively, we can come up with an *abstraction* of the $$Next_A$$ protocol that reflects the external behavior of the interaction variable $$vote\_msg$$ adequately.
 
@@ -151,7 +151,7 @@ $$
 
 This atomic action adds a new message into $$vote\_msg$$ only if no existing node has already put such a message into $$vote\_msg$$ (i.e. since nodes can't vote twice in the original protocol).
 
-Due to the structured, acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further accelerate verification, but even if with this initial reduction, we can see significant improvement. Now that we have developed an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
+Due to the structured, acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further accelerate verification, but even with this initial reduction, we can see significant improvement. Now that we have developed an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
 
 $$
 \begin{align*}
@@ -165,7 +165,8 @@ $$
 
 Model checking the above protocol ($$Next_B$$) with TLC, produces 514 distinct reachable states, a > 200x reduction from the original state space. 
 
-So, in this case, with only a simple dataflow/interaction analysis, we were able to reduce the largest model checking problem by a factor of ~10x e.g. in this case model checking of the $$Next_A$$ sub-protocol was the most expensive verification sub-problem e.g. since we would need to verify that $$Next_A$$ is a valid abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol.
+So, in this case, with only a simple dataflow/interaction analysis, we were able to reduce the largest model checking problem by a factor of ~10x e.g. in this case model checking of the $$Next_A$$ sub-protocol was the most expensive verification sub-problem.
+ <!-- e.g. since we would need to verify that $$Next_A$$ is a valid abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol. -->
 
 <!--
 ### Two Phase Commit Protocol
@@ -221,7 +222,7 @@ In general, though proving this refinement may be hard, and require development 
 
 ## Generalized Interaction Semantics
 
-Note that the above notions of interaction between protocol actions are based on static (i.e. syntactic) checks, and so are, in fact, conservative. That is, they may syntactically determine that two actions interact, even when they, in a semantic sense, do not. For this, we need a more general notion of "interaction".
+Note that the above notions of interaction between protocol actions are based on static (i.e. syntactic) checks and so they are, in fact, conservative. That is, they may syntactically determine that two actions interact, even when they, in a semantic sense, do not. For this, we need a more general notion of "interaction".
 
 As a concrete example, consider that even if an action $$A$$ writes to a variable that another action $$B$$ reads, this does not necessarily mean that the two actions interact. If both share variable $$x$$, and $$A$$ and $$B$$ are defined as follows:
 
