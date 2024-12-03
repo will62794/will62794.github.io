@@ -280,7 +280,7 @@ For two-phase commit, however, its semantic interaction graph differs from the o
   <figcaption>Figure 4. Interaction graph for the two-phase commit protocol, based on the semantic independence conditions above.</figcaption>
 </figure>
 
-We can see, for example, that the $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ actions are determined as interacting in the original, read/write interaction graph, but in the refined, semantic interaction graph, they do not interact. This makes sense if we look at these underlying actions:
+We can see, for example, that the $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ actions are determined as interacting in the original, syntactic interaction graph, but in the refined, semantic interaction graph, they do not interact. This makes sense if we look at these underlying actions:
 
 $$
 \small
@@ -296,7 +296,7 @@ $$
 \end{aligned}
 $$
 
-From a naive syntactic analysis, we observe that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well, so we determine that they interact. Semantically, though, the updates of both actions don't depend on the value of $$rmState$$, so writes to it shouldn't "affect" these actions. Thus, these two actions can be considered as semantically independent. This leads to the slightly refined version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph), where we still include arrows representing read/write dependencies between actions, but *only* if those actions semantically interact by the conditions above.
+From a naive syntactic analysis, we observe that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well, so we determine that they interact. Semantically, though, the updates of both actions don't depend on the value of $$rmState$$, so writes to that variable shouldn't "affect" either actions. Thus, these two actions can be considered as semantically independent. This leads to the slightly refined version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph), where we still include arrows representing read/write dependencies between actions, but *only* if those actions semantically interact by the conditions above.
 
 <!-- From the interaction graph [above](#2pc-semantic-interaction-graph), we can apply some simple rewrites to derive an interaction prerserving abstraction. If we take the $$RMChooseToAbort$$, we can try to rewrite this somehow to preserve its interactions with the rest of the components. It interacts with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ only via $$rmState$$, and similarly for $$RMPrepare$$, which is in fact the only action that can observe its transitions. So, we what if we merge it with $$RMPrepare$$? If we do this, then we need to preserve this merged node's interaction with $$RMPrepare$$.  -->
 
@@ -307,7 +307,7 @@ From a naive syntactic analysis, we observe that both actions read from the $$rm
 RMChooseToAbort(rm) \triangleq \neg \langle \text{Commit} \rangle \in msgsCommit \Rightarrow RMChooseToAbort(rm)
 $$ -->
 
-Note that there is a practical tradeoff between the read/write interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis e.g. checking the independence conditions properly may in general require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly. Especially since these independence conditions can be generated automatically, without any kind of special synthesis or learning procedure needed (e.g. in the case of inductive/loop invariant synthesis).
+Note that there is a practical tradeoff between the read/write, syntactic interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis e.g. checking the independence conditions properly may in general require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly. Especially since these independence conditions can be generated automatically, without any kind of special synthesis or learning procedure needed (e.g. in the case of inductive/loop invariant synthesis).
 
 <!-- ## Conditional Interaction
 
