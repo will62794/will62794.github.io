@@ -319,6 +319,7 @@ TODO. Explore conditional interaction for Paxos based ballots.
 
 - **TODO:** how exactly do we check that one abstraction is "interaction preserving" w.r.t some interaction variable, like in the consensus_epr example? just a refinement check?
 - Note that for some interactions that are "read only", this may be even a more fine-grained distinction in the sense that the read variable may only appear in the precondition of an action, and so may only *restrict* the behavior of the component that reads from this variable.
+- Can we have some simple graph-based rewriting rules that are permitted as valid "merging" of multiple actions as long as we preserve externally visible behavior? 
 - Can you also do "conditional" interaction? i.e. interaction might occur between two Raft actions in general, but may not occur between those actions executed across different term boundaries? -->
 
 ## Conclusions
