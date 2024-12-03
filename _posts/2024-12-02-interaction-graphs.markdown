@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Interaction Graphs for Protocol Decomposition"
+title:  "Decomposing Protocols via Interactions"
 categories: distributed-systems verification
 ---
 
