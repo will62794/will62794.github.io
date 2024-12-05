@@ -159,7 +159,7 @@ $$
 
 Verifying this refinement is one way of ensuring that the abstract spec preserves the "externally observable" transitions of this sub-component (e.g. with respect to the $$vote\_msg$$ variable).
 
-Due to the acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further accelerate verification, but even with this initial reduction, we can see significant improvement. Now that we have developed an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
+Due to the acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further accelerate verification, but even with this initial reduction, we can see significant improvement. That is, now that we have an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
 
 $$
 \begin{align*}
