@@ -151,7 +151,7 @@ $$
 
 This atomic action adds a new message into $$vote\_msg$$ only if no existing node has already put such a message into $$vote\_msg$$ (i.e. since nodes can't vote twice in the original protocol). 
 
-We can formally check that this is a valid abstraction of the $$Next_A$$ sub-protocol by showing a refinement between them e.g. showing that every behavior of $$Next_A$$ is a valid behavior of the abstract spec i.e. showing that:
+We can formally check that this is a valid abstraction of the $$Next_A$$ sub-protocol by showing a refinement between them e.g. showing that every behavior of $$Next_A$$ is a valid behavior of this abstract spec:
 
 $$
 (Init \wedge \square [Next_A]_{vars}) \Rightarrow (Init \wedge \square [SendRequestVote\_SendVote]_{vote\_msg})
