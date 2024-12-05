@@ -138,28 +138,37 @@ we generate 16,128 distinct reachable states, a ~7x reduction from the full stat
 
 With an explicit state model checker, we could directly compute this projection by generating and projecting the full state graph, and using this projected state graph as the "environment" under which to verify the rest of the protocol. Alternatively, we can come up with an *abstraction* of the $$Next_A$$ protocol that reflects the external behavior of the interaction variable $$vote\_msg$$ adequately.
 
-For example, consider the following abstract model that logically merges the $$SendRequestVote$$ and $$SendVote$$ actions into a single atomic action:
+For example, consider the following abstract model over the single $$vote\_msg$$ variable that logically merges the $$SendRequestVote$$ and $$SendVote$$ actions into one atomic action:
 
 $$
 \begin{align*}
 &SendRequestVote\_SendVote(src, dst) \triangleq \\
     &\quad \wedge \, \nexists m \in vote\_msg : m[1] = src  \\
-    &\quad \wedge \, vote\_msg' = vote\_msg \cup \{\langle src,dst \rangle\} \\
-    &\quad \wedge \, \text{UNCHANGED } \langle vote\_request\_msg, voted, votes, leader, decided \rangle\\
+    &\quad \wedge \, vote\_msg' = vote\_msg \cup \{\langle src,dst \rangle\}
+    % &\quad \wedge \, \text{UNCHANGED } \langle vote\_request\_msg, voted, votes, leader, decided \rangle\\
 \end{align*}
 $$
 
-This atomic action adds a new message into $$vote\_msg$$ only if no existing node has already put such a message into $$vote\_msg$$ (i.e. since nodes can't vote twice in the original protocol).
+This atomic action adds a new message into $$vote\_msg$$ only if no existing node has already put such a message into $$vote\_msg$$ (i.e. since nodes can't vote twice in the original protocol). 
 
-Due to the structured, acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further accelerate verification, but even with this initial reduction, we can see significant improvement. Now that we have developed an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
+We can formally check that this is a valid abstraction of the $$Next_A$$ sub-protocol by showing a refinement between them e.g. showing that every behavior of $$Next_A$$ is a valid behavior of the abstract spec i.e. showing that:
+
+$$
+(Init \wedge \square [Next_A]_{vars}) \Rightarrow (Init \wedge \square [SendRequestVote\_SendVote]_{vote\_msg})
+$$
+
+Verifying this refinement is one way of ensuring that the abstract spec preserves the "externally observable" transitions of this sub-component (e.g. with respect to the $$vote\_msg$$ variable).
+
+Due to the acyclic nature of this protocol's interaction graph, we could continue applying this compositional rule to further accelerate verification, but even with this initial reduction, we can see significant improvement. Now that we have developed an abstraction of the $$\{SendRequestVote, SendVote\}$$ sub-protocol that preserves its interactions with the rest of the protocol, we can try verifying the rest of the protocol against this abstraction e.g.
 
 $$
 \begin{align*}
-Next_B &\triangleq \\
-    &\vee \exists i,j \in Node : SendRequestVote\_SendVote(i,j) \\
-    &\vee \exists i,j \in Node : RecvVote(i,j) \\
-    &\vee \exists i \in Node, Q \in Quorum : BecomeLeader(i,Q) \\
-    &\vee \exists i,j \in Node, v \in Value : Decide(i,v)
+& Next_B \triangleq \\
+    &\quad \vee \wedge \exists i,j \in Node : SendRequestVote\_SendVote(i,j) \\
+    &\quad \quad  \wedge \text{UNCHANGED } \langle vote\_request\_msg,voted,votes,leader,decided \rangle \\
+    &\quad \vee \exists i,j \in Node : RecvVote(i,j) \\
+    &\quad \vee \exists i \in Node, Q \in Quorum : BecomeLeader(i,Q) \\
+    &\quad \vee \exists i,j \in Node, v \in Value : Decide(i,v)
 \end{align*}
 $$
 
