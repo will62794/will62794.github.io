@@ -88,7 +88,7 @@ We can see another example of an interaction graph, for the two-phase commit pro
 
 <figure id="2pc-interaction-graph">
   <p align="center">
-    <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
+    <img src="https://github.com/will62794/ipa/blob/8cbb8e01a7640a13504a4f2577088a906ada2077/specs/TwoPhase/TwoPhase_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
   </p>
   <figcaption>Figure 2. Two phase commit protocol interaction graph.</figcaption>
 </figure>
@@ -286,7 +286,7 @@ For two-phase commit, however, its semantic interaction graph differs slightly f
 
 <figure id="2pc-semantic-interaction-graph">
   <p align="center">
-    <img src="https://github.com/will62794/ipa/blob/main/specs/TwoPhase/TwoPhase_semantic_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
+    <img src="https://github.com/will62794/ipa/blob/8cbb8e01a7640a13504a4f2577088a906ada2077/specs/TwoPhase/TwoPhase_semantic_interaction_graph.png?raw=true" alt="Two Phase Commit Protocol Interaction Graph" width="750">
   </p>
   <figcaption>Figure 4. Interaction graph for the two-phase commit protocol, based on the semantic independence.</figcaption>
 </figure>
