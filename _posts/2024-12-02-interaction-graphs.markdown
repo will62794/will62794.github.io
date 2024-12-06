@@ -168,7 +168,7 @@ $$
     &\quad \quad  \wedge \text{UNCHANGED } \langle vote\_request\_msg,voted,votes,leader,decided \rangle \\
     &\quad \vee \exists i,j \in Node : RecvVote(i,j) \\
     &\quad \vee \exists i \in Node, Q \in Quorum : BecomeLeader(i,Q) \\
-    &\quad \vee \exists i,j \in Node, v \in Value : Decide(i,v)
+    &\quad \vee \exists i \in Node, v \in Value : Decide(i,v)
 \end{align*}
 $$
 
