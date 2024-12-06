@@ -280,7 +280,12 @@ where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_
 
 Essentially, the $$Enabledness$$ condition states that if $$A_2$$ is enabled/disabled in a current state, then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
 
-The above definitions provide a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. For example, in the case of the simple consensus protocol from <a href="#consensus-interaction-graph">above</a>, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. 
+
+<!-- 
+
+DISABLE this semantic graph details temporarily.
+
+For example, in the case of the simple consensus protocol from <a href="#consensus-interaction-graph">above</a>, its semantic interaction graph based on these new property definitions turns out to be the same as the one based on read/write interactions, since the read/write relationships already capture the semantic interaction accurately. 
 
 For two-phase commit, however, its semantic interaction graph differs slightly from the original one <a href="#2pc-interaction-graph">above</a>, as follows:
 
@@ -309,6 +314,9 @@ $$
 
 From a naive syntactic analysis, we observe that both actions read from the $$rmState$$ variable (e.g. in their postcondition), and both write to that variable as well, so we determine that they interact. Semantically, though, the updates of both actions don't depend on the value of $$rmState$$, so writes to that variable shouldn't "affect" either actions. Thus, these two actions can be considered as semantically independent. This leads to the slightly refined version of the interaction graph shown in the [figure above](#2pc-semantic-interaction-graph), where we still include arrows representing read/write dependencies between actions, but *only* if those actions semantically interact by the conditions above.
 
+-->
+
+
 <!-- From the interaction graph [above](#2pc-semantic-interaction-graph), we can apply some simple rewrites to derive an interaction prerserving abstraction. If we take the $$RMChooseToAbort$$, we can try to rewrite this somehow to preserve its interactions with the rest of the components. It interacts with $$RMRcvAbortMsg$$ and $$RMRcvCommitMsg$$ only via $$rmState$$, and similarly for $$RMPrepare$$, which is in fact the only action that can observe its transitions. So, we what if we merge it with $$RMPrepare$$? If we do this, then we need to preserve this merged node's interaction with $$RMPrepare$$.  -->
 
 <!-- We know that $$RMChooseToAbort$$ transitions a resource manager to state `"aborted"` if that resource manager's state is currently `"working"`, so we need to preserve these externally visible transitions. The only way that $$RMChooseToAbort$$ can affect $$RMPrepare$$ -->
@@ -318,7 +326,8 @@ From a naive syntactic analysis, we observe that both actions read from the $$rm
 RMChooseToAbort(rm) \triangleq \neg \langle \text{Commit} \rangle \in msgsCommit \Rightarrow RMChooseToAbort(rm)
 $$ -->
 
-Note that there is a practical tradeoff between the read/write, syntactic interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis e.g. checking the independence conditions properly may in general require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly. Especially since these independence conditions can be generated automatically, without any kind of special synthesis or learning procedure needed (e.g. in the case of inductive/loop invariant synthesis).
+The above definitions provide a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. 
+In practice, there may be a tradeoff between the read/write, syntactic interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis e.g. checking the independence conditions properly may in general require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly. Especially since these independence conditions can be generated automatically, without any kind of special synthesis or learning procedure needed (e.g. in the case of inductive/loop invariant synthesis).
 
 <!-- ## Conditional Interaction
 
