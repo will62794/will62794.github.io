@@ -1,51 +1,21 @@
 ---
 layout: post
-title:  "Interactive Formal Specifications"
+title:  "A Tool for Exploring Formal Specifications"
 categories: formal-methods specification
 ---
 
-Formal specifications of complex systems are often difficult to understand and debug. While tools like TLA+ provide powerful ways to specify system behavior, the process of writing and validating specifications remains largely static and non-interactive. We explore how interactive environments could transform how we write and understand formal specifications.
+Formal specifications are a core part of rigorous distributed systems design and verification, but the existing tools have still been lacking in providing good interfaces for interacting with, exploring, visualizing and sharing these specifications and models in a convenient manner. 
 
-## The Need for Interactive Specifications
+The TLA+ web explorer aims to address this by providing a web-based interface for exploring and visualizing TLA+ formal specifications. 
 
-Traditional formal specifications face several challenges:
+## Interactive Trace Exploration
 
-1. Limited feedback during specification development
-2. Difficulty in understanding specification behavior
-3. Long iteration cycles between writing and validation
-4. Complex debugging of specification violations
+Ability to explore traces and and back track, and evaluate trace expressions.
 
-## Interactive Specification Environment
+## REPL
 
-An interactive specification environment could provide immediate feedback and exploration capabilities:
+As a part of this, we get a nice interface for a REPL, that also can be evaluated in the context of the current loaded specification.
 
-- Real-time state space visualization
-- Interactive execution of specification steps
-- Dynamic property checking
-- Immediate counterexample exploration
-- Live syntax and type checking
+## Visualization
 
-## Example: Interactive Protocol Specification
-
-Consider specifying a distributed consensus protocol interactively:
-
-1. As actions are written, their enabled states are immediately visible
-2. State transitions can be explored step-by-step
-3. Invariant violations are detected and displayed in real-time
-4. Protocol behaviors can be observed through interactive simulation
-
-## Benefits and Challenges
-
-### Benefits
-- Faster iteration cycles
-- Better understanding of specification behavior
-- Earlier detection of specification issues
-- More intuitive debugging experience
-
-### Challenges
-- Performance with large state spaces
-- Maintaining specification clarity
-- Balance between interaction and formal rigor
-- Tool integration complexity
-
-[More content to be added...] 
+Visualize system states using a simple DSL defined in TLA+.
