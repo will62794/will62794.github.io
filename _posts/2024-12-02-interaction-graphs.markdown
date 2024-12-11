@@ -231,6 +231,16 @@ In general, though proving this refinement may be hard, and require development 
 
 <!-- In this case, it is fairly easy to intuitively see why this is true. For example, we can first consider actions that write to `msgsPrepared` in the original component and the abstracted one. Only the `RMPrepare` action of the original sub-component do this,  -->
 
+
+
+
+
+
+
+
+
+<!--
+
 ## Generalized Interaction Semantics
 
 Note that the above notions of interaction between protocol actions are based on static (i.e. syntactic) checks and so they are, in fact, conservative. That is, they may syntactically determine that two actions interact, even when they, in a semantic sense, do not. For this, we need a more general notion of "interaction".
@@ -251,17 +261,15 @@ $$
 then these two actions don't truly "interact". In a sense, the actions of $$A$$ will always be "invisible" to $$B$$, since they have no effect on whether $$B$$ is enabled/disabled or on the outcome after a $$B$$ action is taken.
 
 
-<!-- If we choose a specific decomposition of protocol actions, then we can check whether they interact, but how can we define more generally whether two components interact? We can start at the level of single actions i.e. does one action "interact" with another? As an approximation to this notion of interaction, we can consider the set of shared variables and their read/write semantics as we did above, but can define a more general notion of "interaction".  -->
+
 Intuitively, we can say that one action $$A$$ "interacts" with another action $$B$$ if action $$A$$ can "affect" $$B$$. More concretely, $$A$$ could either:
 
 1. Enable or disable $$B$$. 
 2. Affect the resulting state after a $$B$$ action is taken. 
 
 This gives rise to a more precise notion of interaction compared to our syntactic, read/write definition from above. Note that this notion of interaction we define (conversely, "independence") bears similarity to the independence notions used in classical [partial order reduction](https://www.cs.cmu.edu/~emc/15817-f08/lectures/partialorder.pdf) techniques. 
-<!-- and we can in theory do these kinds of checks statically, though we may need assistance of a symbolic checker i.e. SAT/SMT solver to check these interactino conditions in general.  -->
 Related ideas also appear in [early papers](https://www-old.cs.utah.edu/docs/techreports/2003/pdf/UUCS-03-028.pdf) on symbolic partial order reduction, which use a SAT solver to check these independence conditions.
 
-<!-- We can also try to mechanically check these notions of interaction e.g. using a symbolic verification tool or model checker. -->
 
 
 We can formally encode the two interaction properties above for generic actions $$A_1, A_2$$, as follows, defined as temporal logic formulas stating whether $$A_1$$ "interacts with" / "affects" $$A_2$$:
@@ -279,6 +287,15 @@ $$
 where $${A_i}^{Pre}$$ represents the formula of $$A_i$$'s precondition, and $$A_i^{Post}$$ represent the list of $$A_i$$'s update expressions (i.e. its postcondition expressions). 
 
 Essentially, the $$Enabledness$$ condition states that if $$A_2$$ is enabled/disabled in a current state, then after an $$A_1$$ transition, $$A_2$$ is still enabled/disabled. Similarly, $$Commutativity$$ states that if an $$A_1$$ step is taken, the update expressions of $$A_2$$ are unchanged. Note that we can in theory check these conditions symbolically or, for small enough protocols, using an explicit state tool like TLC, given we define the set of type-correct states (similar to how TLC can be [used to check inductive invariants](https://lamport.azurewebsites.net/tla/inductive-invariant.pdf)).
+-->
+
+
+
+
+
+
+
+
 
 
 <!-- 
@@ -326,8 +343,20 @@ From a naive syntactic analysis, we observe that both actions read from the $$rm
 RMChooseToAbort(rm) \triangleq \neg \langle \text{Commit} \rangle \in msgsCommit \Rightarrow RMChooseToAbort(rm)
 $$ -->
 
-The above definitions provide a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. 
-In practice, there may be a tradeoff between the read/write, syntactic interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis e.g. checking the independence conditions properly may in general require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly. Especially since these independence conditions can be generated automatically, without any kind of special synthesis or learning procedure needed (e.g. in the case of inductive/loop invariant synthesis).
+
+
+
+<!-- The above definitions provide a more precise notion of interaction between two actions, for which the syntactic checks we defined above are an overapproximation. 
+In practice, there may be a tradeoff between the read/write, syntactic interaction analysis and the semantic interaction analysis. The former can in theory be done statically, based only on syntactic analysis of actions, whereas the semantic notions of interaction may require some symbolic analysis e.g. checking the independence conditions properly may in general require a SAT/SMT query. In general, though, this may be worth it if the semantic interactions can help us reduce verification times significantly. Especially since these independence conditions can be generated automatically, without any kind of special synthesis or learning procedure needed (e.g. in the case of inductive/loop invariant synthesis). -->
+
+
+
+
+
+
+
+
+
 
 <!-- ## Conditional Interaction
 
