@@ -19,11 +19,13 @@ The development of a Javascript interpreter for TLA+ was largely enabled by earl
 
 A core feature of the TLA+ web explorer is the ability to load a TLA+ specification and *interactively* explore behaviors of the specification. It provides the capability for a user to, at any current state, select any currently enabled action to transition to the next state reached by that action. This also allows for back-tracking in the current trace, and also for features like *trace expressions*, which allow arbitrary TLA+ expressions to be evaluated at each state of the current trace.
 
-Ability to explore traces and and back track, and evaluate trace expressions.
+Ability to explore traces and and back track, and evaluate trace expressions e.g. a partial trace of the two-phase commit specification:
 
-<img src="/assets/Screenshot 2024-12-11 at 9.29.33 PM.png" alt="TLA+ Web Explorer Trace Exploration" style="width: 100%; height: auto;">
+<div style="text-align: center;">
+<img src="/assets/interactive-formal-specs/Screenshot 2024-12-11 at 9.59.05 PM.png" alt="TLA+ Web Explorer Visualization" style="width: 95%; height: auto;">
+</div>
 
-Coupled with this is the ability to easily share traces via static links, which can be reloaded in a new browser window while retaining the generated trace and its various exploratory parameters/settings. This provides a very universal, portable way to share system traces, in a way that was somewhat awkward in the past. For example, it is easy to link to some of the following system traces/counterexamples, that illustrate interesting behaviors and/or edge cases of different protocols:
+Coupled with this is the ability to easily share traces via static links, which can be reloaded in a new browser window while retaining the generated trace and its various exploratory parameters/settings. This provides a very universal, portable way to share system traces, in a way that was somewhat awkward in the past. For example, here is one link showing two-phase commit [driving all the way to commit](https://will62794.github.io/tla-web/#!/home?specpath=.%2Fspecs%2FTwoPhase_anim.tla&constants%5BRM%5D=%7Brm1%2Crm2%7D&trace=c99c20ba%2C30c6b350_0890eb82%2C344e78da_1b98ff2e%2C0d5b83ed_0890eb82%2Cd269707c_1b98ff2e%2Cbe584cb6%2Cb43678f6_0890eb82%2C148074d7_1b98ff2e), and another link showing it [driving through to abort](https://will62794.github.io/tla-web/#!/home?specpath=.%2Fspecs%2FTwoPhase_anim.tla&constants%5BRM%5D=%7Brm1%2Crm2%7D&trace=c99c20ba%2Cf8e02e82%2C5591f69d_1fed159c%2C34e21ef8_b103fde2). It is also easy to link to some of the following system traces/counterexamples, that illustrate interesting behaviors and/or edge cases of different protocols:
 
 - Raft rolling back entries
 - 
@@ -33,7 +35,7 @@ In addition, the tool also provides a nice, dynamic REPL interface, that also ca
 
 ### Visualization
 
-The above features are very useful for exploring and understanding a specification, but in some cases it can also be nice to have a more polished and visual way to understand a system and its states/behaviors. So, having a visualization feature was a natural externsion to include in the web explorer tool, and it includes a simple DSL for visualizing system states using TLA+ itself. Currently, the goal is to provide a very simple, SVG-based DSL for defining visualizations right in the TLA+ specification itself, rather than requiring a separate interface/language for defining visualizations.
+The above features are effective for exploring and understanding a specification, but in some cases it can also be nice to have a more polished and visual way to understand a system and its states/behaviors. So, having a visualization feature was a natural externsion to include in the web explorer tool, and it includes a simple DSL for visualizing system states using TLA+ itself. Currently, the goal is to provide a very simple, SVG-based DSL for defining visualizations right in the TLA+ specification itself, rather than requiring a separate interface/language for defining visualizations.
 
 For example, here is a simple visualization of the famous Cabbage, Goat, Wolf puzzle specification solution:
 
