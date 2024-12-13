@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Decomposing Distributed Protocols via Interactions"
+title:  "Decomposing Concurrent Protocols via Interactions"
 categories: distributed-systems verification
 ---
 
