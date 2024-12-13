@@ -125,7 +125,7 @@ A benefit of this interpreter implementation is its ability to evaluate TLA+ spe
 
 ### Interactive Trace Exploration
 
-A core feature of the TLA+ web explorer is the ability to load a TLA+ specification and *interactively* explore behaviors of the specification. It provides the capability for a user to, from any current state, select an enabled action to transition to a next state, and also allows for back-tracking in the current trace. It also allows for the definition of *trace expressions*, which allow arbitrary TLA+ expressions to be evaluated at each state of the current trace.
+A core feature of the TLA+ web explorer is the ability to load a TLA+ specification and *interactively* explore its behaviors. It provides the capability for a user to, from any current state, select an enabled action to transition to a next state, and also allows for back-tracking in the current trace. It also allows for the definition of *trace expressions*, which allow arbitrary TLA+ expressions to be evaluated at each state of the current trace.
 
 For example below shows a partial trace of the [two-phase commit protocol specification](https://github.com/will62794/tla-web/blob/07c093c27a0886c70cbbf1ab1c1b7188caf4ca3d/specs/TwoPhase.tla) in the tool:
 
