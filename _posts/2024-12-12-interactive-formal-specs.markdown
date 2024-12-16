@@ -129,7 +129,7 @@ A benefit of this interpreter implementation is its ability to evaluate TLA+ spe
 
 A core feature of the TLA+ web explorer is the ability to load a TLA+ specification and *interactively* explore its behaviors. It provides the capability for a user to, from any current state, select an enabled action to transition to a next state, and also allows for back-tracking in the current trace. It also allows for the definition of *trace expressions*, which allow arbitrary TLA+ expressions to be evaluated at each state of the current trace.
 
-For example below shows a partial trace of the [two-phase commit protocol specification](https://github.com/will62794/tla-web/blob/07c093c27a0886c70cbbf1ab1c1b7188caf4ca3d/specs/TwoPhase.tla) in the tool:
+For example, below shows a partial trace of the [two-phase commit protocol specification](https://github.com/will62794/tla-web/blob/07c093c27a0886c70cbbf1ab1c1b7188caf4ca3d/specs/TwoPhase.tla) in the tool:
 
 <div style="text-align: center;">
 <img src="/assets/interactive-formal-specs/Screenshot 2024-12-12 at 12.19.13 PM.png" alt="TLA+ Web Explorer Visualization" style="width: 92%; height: auto;" style="border:solid 1px;" width="95%">
@@ -141,7 +141,7 @@ In addition to the trace exploration and expression features, the tool also prov
 
 ### Visualization
 
-The above features are effective for exploring and understanding a specification, but in some cases it can also be nice to have a more polished and visual way to understand a system and its states/behaviors. Currently, the tool provides a very simple, SVG-based DSL for defining visualizations directly in a TLA+ specification itself, rather than requiring a separate interface/language for defining visualizations.
+The above features are effective for exploring and understanding a specification, but in some cases it can be helpful to have a more polished and visual way to understand a system and its states/behaviors. Currently, the tool provides a very simple, SVG-based DSL for defining visualizations directly in a TLA+ specification itself, rather than requiring a separate interface/language for defining visualizations.
 
 For example, here is a [simple visualization](https://will62794.github.io/tla-web/#!/home?specpath=.%2Fspecs%2FCabbageGoatWolf.tla&trace=f3cb45ca%2C4357915f_7da698e2%2C126ae834_bf3b326e%2C76c2f092_652fccef%2C7229f089_f598e730%2C29e91cea_2ac3323e%2C50fe2821_bf3b326e%2C1d26e01c_9abe74ba%2C5f98d202_f598e730%2C3a9fa186_34b35f78%2Ca49994fc_bf3b326e%2Ceec0674a_652fccef%2C2afe63ed_f598e730%2C2883b61a_7da698e2%2C73ea1058_bf3b326e) of the final state of the famous Cabbage, Goat, Wolf puzzle specification solution:
 
