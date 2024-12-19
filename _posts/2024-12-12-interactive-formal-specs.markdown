@@ -17,15 +17,15 @@ One could build a type of language server into TLC that allows for remote intera
 <!-- In light of this, the origin of this tool centered around building a native interpreter for TLA+ in Javascript, so that we could have a fast, dynamic interpreter that could be directly embedded in the browser, and could run anywhere, locally. -->
 The development of a Javascript interpreter for TLA+ was largely enabled by earlier work on [building a tree-sitter parser for TLA+](https://ahelwer.ca/post/2023-01-11-tree-sitter-tlaplus/), which can be compiled to [WebAssembly](https://webassembly.org/) and run in the browser. Parsing TLA+ itself is a non-trivial task, so the development of this browser-based parser was a big step forward in terms of enabling the development of the interpreter. The interpreter itself is written entirely in plain Javascript, and [currently sits](https://github.com/will62794/tla-web/blob/07c093c27a0886c70cbbf1ab1c1b7188caf4ca3d/js/eval.js) at around 5000 lines of code. The goal is for the interpreter semantics to conform as closely as possible with TLC semantics, which we try to achieve via a conformance testing approach that compares the results of the Javascript interpreter and TLC [on a large corpus of TLA+ specifications](https://will62794.github.io/tla-web/test.html).
 
-A benefit of this interpreter implementation is its ability to evaluate TLA+ specifications and expressions dynamically in any browser e.g., seen below with a simple demo:
+A benefit of this interpreter implementation is its ability to evaluate TLA+ specifications and expressions dynamically in any browser. For example, the demo below shows the dynamic evaluation of intial states over a simple `VARIABLE x` declaration:
 
 <div style="display: flex; justify-content: center;padding:20px;font-size:16px;">
-    <input type="text" id="tla-repl-input" placeholder="Enter TLA+ expression" style="font-size: 18px;padding:10px;width:500px;font-family:monospace;" />
+    <input type="text" id="tla-repl-input" placeholder="Enter initial state expression (e.g. x \in {1,2,3})" style="font-size: 18px;padding:10px;width:600px;font-family:monospace;" />
 </div>
 
-<div style="display: flex; justify-content: center;">Result:</div>
+<div style="display: flex; justify-content: center;">Generated states:</div>
 
-<div id="tla-init-states" style="display: flex; justify-content: center;align-items:center;font-size:16px;font-family:monospace;border:solid 1px gray;padding:10px;margin:15px;margin-bottom:32px;width:50%;margin-left:auto;margin-right:auto;height:26px;border-radius:10px;"></div>
+<div id="tla-init-states" style="display: flex; justify-content: center;align-items:center;font-size:14px;font-family:monospace;border:solid 1px gray;padding:20px;margin:15px;margin-bottom:32px;width:50%;margin-left:auto;margin-right:auto;border-radius:10px;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <script src="/assets/tla-web-embed/js/hash-sum/hash-sum.js"></script>
@@ -76,9 +76,9 @@ A benefit of this interpreter implementation is its ability to evaluate TLA+ spe
             // Re-parse and evaluate spec with new input value
             let specText = `
             ---- MODULE test ----
-            VARIABLE expr
-            Init == expr = ${inputExpr.value}
-            Next == expr' = expr
+            VARIABLE x
+            Init == ${inputExpr.value}
+            Next == x' = x
             ====`;
 
             document.getElementById('tla-init-states').innerHTML = "";
@@ -92,7 +92,13 @@ A benefit of this interpreter implementation is its ability to evaluate TLA+ spe
                 // Generate initial states
                 let initStates = interp.computeInitStates(spec.spec_obj, {}, false);
                 console.log("Init states:", initStates);
-                document.getElementById('tla-init-states').innerHTML = initStates[0].getVarVal("expr");
+                document.getElementById('tla-init-states').innerHTML = "";
+                initStates.forEach(state => {
+                    document.getElementById('tla-init-states').innerHTML += state.toString().substring(2) + "<br>\n";
+                });
+                
+                // = initStates;
+                // [0].getVarVal("expr");
             });
         });
         // let specText = `
