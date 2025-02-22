@@ -6,7 +6,7 @@ categories: electronics hardware reverse-engineering
 thumbnail: "scoreboardcover4.jpg"
 ---
 
-During my first year as an undergradudate at Cornell, I worked as a cameraman for the athletics department on the weekends, filming sports games so they could be streamed online. Basketball was one of the sports we covered, and we didn't have a reliable way of overlaying live statistics from the game (score, clock, fouls, etc.) onto our video stream in real time. I figured we could try to decode the signals coming out of the scoreboard controller driving the main arena scoreboard and convert them into a data format that we could then use to develop a graphic overlay on our live video stream. 
+During my first year as an undergraduate at Cornell, I worked as a cameraman for the athletics department on the weekends, filming sports games so they could be streamed online. Basketball was one of the sports we covered, and we didn't have a reliable way of overlaying live statistics from the game (score, clock, fouls, etc.) onto our video stream in real time. I figured we could try to decode the signals coming out of the scoreboard controller driving the main arena scoreboard and convert them into a data format that we could then use to develop a graphic overlay on our live video stream. 
 
 The basketball stadium uses a [Fairplay MP-69D](https://nesc-timekeeping.fandom.com/wiki/Fair-Play_MP-69) scoreboard controller, which I reverse engineered by analyzing its output signal on a digital oscilloscope.
 
