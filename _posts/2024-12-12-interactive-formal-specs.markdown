@@ -6,7 +6,7 @@ categories: formal-methods specification
 
 Formal specifications [have](https://github.com/elastic/elasticsearch-formal-models) [become](https://www.datadoghq.com/blog/engineering/formal-modeling-and-simulation/) [a core part](https://www.amazon.science/publications/how-amazon-web-services-uses-formal-methods) of rigorous distributed systems design and verification, but existing tools have still been lacking in providing good interfaces for interacting with, exploring, visualizing and sharing these specifications and models in a portable and effective manner. 
 
-The [TLA+ Web Explorer](https://github.com/will62794/tla-web) aims to address this shortcoming by providing a browser-based tool for exploring and visualizing formal specifications written in [TLA+](https://lamport.azurewebsites.net/tla/tla.html). It takes inspiration from past attempts at building similar tools, like Diego Ongaro's [Runway](https://www.usenix.org/system/files/login/articles/login_fall16_06_ongaro.pdf), but it builds on top of TLA+, taking advantage of an existing, well-defined formal specification language, rather than trying to build a new language alongside the tool.
+[Spectacle](https://github.com/will62794/tla-web) aims to address this shortcoming by providing a browser-based tool for exploring and visualizing formal specifications written in [TLA+](https://lamport.azurewebsites.net/tla/tla.html). It takes inspiration from past attempts at building similar tools, like Diego Ongaro's [Runway](https://www.usenix.org/system/files/login/articles/login_fall16_06_ongaro.pdf), but it builds on top of TLA+, taking advantage of an existing, well-defined formal specification language, rather than trying to build a new language alongside the tool.
 
 ### The Javascript Interpreter 
 
@@ -133,7 +133,7 @@ A benefit of this interpreter implementation is its ability to dynamically evalu
 
 ### Interactive Trace Exploration
 
-A core feature of the TLA+ web explorer is the ability to load a TLA+ specification and *interactively* explore its behaviors. It provides the capability for a user to, from any current state, select an enabled action to transition to a next state, and also allows for back-tracking in the current trace. It also allows for the definition of *trace expressions*, which allow arbitrary TLA+ expressions to be evaluated at each state of the current trace.
+A core feature of the tool is the ability to load a TLA+ specification and *interactively* explore its behaviors. It provides the capability for a user to, from any current state, select an enabled action to transition to a next state, and also allows for back-tracking in the current trace. It also allows for the definition of *trace expressions*, which allow arbitrary TLA+ expressions to be evaluated at each state of the current trace.
 
 For example, below shows a partial trace of the [two-phase commit protocol specification](https://github.com/will62794/tla-web/blob/07c093c27a0886c70cbbf1ab1c1b7188caf4ca3d/specs/TwoPhase.tla) in the tool:
 
@@ -164,5 +164,5 @@ The visualization DSL can currently be defined directly in the TLA+ specificatio
 
 ### Conclusion
 
-Overall, the vision is for the web explorer tool to remain complementary to existing tooling. For example, it is expected that TLC will remain the primary tool for model checking of non-trivial TLA+ specifications, since it is still the most performant tool for doing so. The goal is for the web explorer to be a tool for prototyping, exploring, and understanding specs, and sharing the results of these explorations in a convenient and portable manner, aspects that few existing tools in the ecosystem excel at.
+Overall, the vision is for Spectacle to be complementary to existing TLA+ tooling. For example, it is expected that TLC will remain the primary tool for model checking of non-trivial TLA+ specifications, since it is still the most performant tool for doing so. The goal is for Spectacle to be a tool for prototyping, exploring, and understanding specs, and sharing the results of these explorations in a convenient and portable manner, aspects that few existing tools in the ecosystem excel at.
 
