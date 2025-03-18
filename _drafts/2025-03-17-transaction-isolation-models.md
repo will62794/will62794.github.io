@@ -28,8 +28,13 @@ Also, *why* does snapshot isolation actually need to enforce write-write conflic
 
 ```
 t1: r(x,init) w(y,1) w(z, 1)
-t2: r(x,init) w(y,2) w(z, 2)
+t2: r(x,init) w(z,2) w(y, 2)
 ```
+
+If you don't prevent a certain anomaly, is the effect of this anomaly actually observable to the reads of any other transactions?
+
+Do we actually care about how writes are abitrated between concurrent/conflicting transactions?
+
 what if both transactions were allowed to commit? How do we arbitrate between them?
 
 
