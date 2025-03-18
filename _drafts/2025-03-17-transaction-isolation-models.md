@@ -37,6 +37,8 @@ Do we actually care about how writes are abitrated between concurrent/conflictin
 
 what if both transactions were allowed to commit? How do we arbitrate between them?
 
+It seems that certain anomalies, like "Lost Updates", are really only representable/observable if you include in your transactions model the ability of a write inside a transaction to use some value previously read within the transaction i.e. having a first-class semantic notion of an "update".
+
 
 ### Adya's formalism 
 
