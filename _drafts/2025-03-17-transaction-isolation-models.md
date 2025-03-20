@@ -18,7 +18,9 @@ Any transaction isolation model can basically be viewed as a condition over a se
 </div>
 
 
-Note that isolation really only makes sense to define with respect to how *reads observe database state*. If we have a set of transactions that only perform writes, we might intuitively have some notion of a correctness for a database executing these transactions, but we such definitions really don't mean anything unless we have some type of read operation that occurs to observe the effect of other transaction's writes. So, we could say that transaction isolation should really fundamentally be related to **conditions on the possible set of values that any transaction can read/observe**. 
+Note that isolation really only makes sense to define with respect to how *reads observe database state*. If we have a set of transactions that only perform writes, we might intuitively have some notion of a correctness for a database executing these transactions, but we such definitions really don't mean anything unless we have some type of read operation that occurs to observe the effect of other transaction's writes. So, we could say that transaction isolation should really fundamentally be related to 
+
+> **conditions on the possible set of values that any transaction can read**. 
 
 ### Modern Isolation Formalisms
 
@@ -32,6 +34,9 @@ There are some other reasonable constraints, though. Basically, we *probably* ex
 #### Cerone 2015
 
 The Cerone paper simply takes the simplifying assumption of *atomic visibility*, which is simply that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than the weakest model they represent, *read atomic*. 
+
+Note that this can be viewed as an interesting "boundary" in isolation strenght since, for something like *read committed* you only need to ensure that reads within a transaction of a key $$k$$ read the value written by *some* other transaction to key $$k$$. But, in the weakest sense, there may be no restriction on a notion of reading from a "consistent" state across keys. So, the weakest interpretation of read committed might be simply that any read can read any value that was written to that key at some point by any transaction in the history. This doesn't even impose any notion of ordering on transactions, since you really only care about your consistency guarantees at the level of a single key.
+
 
 Note that the read atomic model was actually first introduced in [Bailis' 2014 paper](http://www.bailis.org/papers/ramp-sigmod2014.pdf) on RAMP transactions. Note that Read Atomic is something similar to Snapshot Isolation but with an allowance for concurrent updates (e.g. allows write-write conflicts). This was preceded by their earlier proposal of [*monotonic atomic view*](https://www.vldb.org/pvldb/vol7/p181-bailis.pdf) which is strictly weaker than Read Atomic.
 
@@ -54,6 +59,7 @@ Cerone's formalism starts with the notion of a partial ordering of transactions,
 
 The basic idea of this formalism is that reads of any transactios will be determined based on *read states*, which are simply the states that the database passed through as it executed the transactions according to the execution ordering you defined. In a sense, this is more similar to the notion of serializability as classically defined i.e. in terms of your committed transactions conforming to *some* ordering that could have occurred which is consistent with the values observed by each transaction.
 
+Crooks model is able to allow for transactions observing concurrent transaction writes in different orders since it doesn't require strict ordering between transactions to disjoint keys?
 
 ---------------------------
 
@@ -80,6 +86,9 @@ y' = 2
 ```
 where `x` is modified based on current value of `y` and `y` is just set to a new constant value. This simplified/condenses the whole read/write model of transactions. Obviously, in practice, we may not know the whole set of transaction keys upfront, but in a model, we could consider any transaction as reading some set of keys, and making writes possibly dependent on the values read from those keys.
 
+#### Partial vs. Total
+
+Partial or total ordering more natural?
 
 ### Adya's formalism 
 
