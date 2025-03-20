@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "On Models of Transaction Isolation"
+title:  "Modern Views of Transaction Isolation"
 categories: formal-methods specification
 ---
 
@@ -14,15 +14,24 @@ Any transaction isolation model can basically be viewed as a condition over a se
 
 Note that isolation really only makes sense to define with respect to how *reads observe database state*. If we have a set of transactions that only perform writes, we might intuitively have some notion of a correctness for a database executing these transactions, but we such definitions really don't mean anything unless we have some type of read operation that occurs to observe the effect of other transaction's writes. So, we could say that transaction isolation should really fundamentally be related to **conditions on the possible set of values that any transaction can read/observe**. 
 
+### Modern Isolation Formalisms
+
 There are two notable, modern models of transaction isolation that try to capture some of this intuition formally: [Crooks 2017 client-centric model](https://dl.acm.org/doi/10.1145/3087801.3087802), and also the slightly earlier [2015 model of Cerone et al.](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf). 
 
 If we consider transaction isolation under the above intuitive view, then when we think about how to define an isolation level, we should really be thinking about how we define *what values a transaction can read*. If our isolation level makes no restrictions, then a transaction can read any value (in practice what a level like *read uncommitted* may give you). But, more sensibly, we would expect a transaction to read states that are *reasonable*, in some sense. More concretely, we should expect that transactions actually read values written by other transactions! This could, in fact, be on possible isolation definition, that is extremely weak, but stronger than allowing transactions to read *any* value. 
 
 There are some other reasonable constraints, though. Basically, we *probably* expect that the possible states we read from came about through some "reasonable" execution of the transactions we gave to the database. One "reasonable" type of execution would be to execute these transactions in some sequential order. This is, for example, what we would expect out of a database system if we gave it a series of transactions one-by-one, with no concurrent overlapping between transactions.
 
-The Cerone paper simply takes the simplyifying assumption of *atomic visibility*, which is simply that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than the weakest model they represent, *read atomic*. The *read atomic* model is basically defined by saying 
+The Cerone paper simply takes the simplyifying assumption of *atomic visibility*, which is simply that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than the weakest model they represent, *read atomic*. 
 
-The read atomic model was actually first introduced in [Bailis' 2014 paper](http://www.bailis.org/papers/ramp-sigmod2014.pdf) on RAMP transactions. Note that Read Atomic is something similar to Snapshot Isolation but with an allowance for concurrent updates (e.g. allows write-write conflicts). This was preceded by their earlier proposal of [*monotonic atomic view*](https://www.vldb.org/pvldb/vol7/p181-bailis.pdf) which is strictly weaker than Read Atomic.
+Note that the read atomic model was actually first introduced in [Bailis' 2014 paper](http://www.bailis.org/papers/ramp-sigmod2014.pdf) on RAMP transactions. Note that Read Atomic is something similar to Snapshot Isolation but with an allowance for concurrent updates (e.g. allows write-write conflicts). This was preceded by their earlier proposal of [*monotonic atomic view*](https://www.vldb.org/pvldb/vol7/p181-bailis.pdf) which is strictly weaker than Read Atomic.
+
+
+ - *Visibility*: relation where $$T \overset{VIS}{\rightarrow} S$$ means that $$S$$ is aware of $$T$$.
+ - *Arbitration*: relation where $$T \overset{AR}{\rightarrow} S$$ means that the writes of $$S$$ supersed those written by $$T$$ (essentially only orders write by concurrent transactions).
+
+It views any database computation as an *abstract execution*, and a consistency model as a set of *consistency axioms* constraining executions. A model allows histories for which there exists an execution satisfying the axioms, where a *history* is simply a set of transactions with disjoint sets of event identifiers. So, in other words, given a set of transactions that executed against the database, they satisfy a consistency/isolation level if there exists an abstract execution that obeys the axioms of that consistency/isolation level.
+
 
 Also, *why* does snapshot isolation actually need to enforce write-write conflict checking? If it didn't, how would this be observable to other transaction reads?
 
@@ -38,6 +47,14 @@ Do we actually care about how writes are abitrated between concurrent/conflictin
 what if both transactions were allowed to commit? How do we arbitrate between them?
 
 It seems that certain anomalies, like "Lost Updates", are really only representable/observable if you include in your transactions model the ability of a write inside a transaction to use some value previously read within the transaction i.e. having a first-class semantic notion of an "update".
+
+What if we view all transactions as kind of "transactional updates" or "state transformers"? Where we describe them as writes to a set of output keys that are a function of the state of input keys at the start of the transaction? e.g. over keys `x` and `y`:
+
+```
+x' = y + 1
+y' = 2
+```
+where `x` is modified based on current value of `y` and `y` is just set to a new constant value. This simplified/condenses the whole read/write model of transactions. Obviously, in practice, we may not know the whole set of transaction keys upfront, but in a model, we could consider any transaction as reading some set of keys, and making writes possibly dependent on the values read from those keys.
 
 
 ### Adya's formalism 
