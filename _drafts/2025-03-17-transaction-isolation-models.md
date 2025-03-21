@@ -17,7 +17,7 @@ A unifying concept of essentially any transaction isolation formalism, is that i
 </div>
 
 
-Note that isolation really only makes sense to define with respect to how *reads observe database state*. If we have a set of transactions that only perform writes, we might intuitively have some notion of a correctness for a database executing these transactions, but we such definitions really don't mean anything unless we have some type of read operation that occurs to observe the effect of other transaction's writes. So, we could say that transaction isolation should really fundamentally be related to 
+A core aspect of any isolation definition is putting conditions on how *reads observe database state*. If we have a set of transactions that only perform writes, we might intuitively have some notion of a correctness for a database executing these transactions, but we such definitions really don't mean anything unless we have some type of read operation that occurs to observe the effect of other transaction's writes. So, we could say that transaction isolation should really fundamentally be related to 
 
 > **conditions on the possible set of values that any transaction can read**. 
 
