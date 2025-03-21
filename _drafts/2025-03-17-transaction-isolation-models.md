@@ -21,7 +21,7 @@ A core aspect of any isolation definition is putting conditions on how *reads ob
 
 > **conditions on the possible set of values that any transaction can read**. 
 
-### Modern Isolation Formalisms
+## Modern Isolation Formalisms
 
 There are two notable, modern models of transaction isolation that try to capture some of this intuition formally: [Crooks 2017 client-centric model](https://dl.acm.org/doi/10.1145/3087801.3087802), and also the slightly earlier [2015 model of Cerone et al.](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf). 
 
@@ -30,7 +30,7 @@ If we consider transaction isolation under the above intuitive view, then when w
 There are some other reasonable constraints, though. Basically, we *probably* expect that the possible states we read from came about through some "reasonable" execution of the transactions we gave to the database. One "reasonable" type of execution would be to execute these transactions in some sequential order. This is, for example, what we would expect out of a database system if we gave it a series of transactions one-by-one, with no concurrent overlapping between transactions.
 
 
-#### Cerone 2015
+### Cerone 2015
 
 The Cerone paper simply takes the simplifying assumption of *atomic visibility*, which is simply that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than the weakest model they represent, *read atomic*. 
 
@@ -52,7 +52,7 @@ e.g. External Consistency ($$EXT$$) axiom is basically saying, there exists a pa
 The framework is defined in terms of *abstract executions*, and a consistency model as a set of *consistency axioms* constraining executions. A model allows histories for which there exists an execution satisfying the axioms, where a *history* is simply a set of transactions with disjoint sets of event identifiers. So, in other words, given a set of transactions that executed against the database, they satisfy a consistency/isolation level if there exists an abstract execution that obeys the axioms of that consistency/isolation level.
 
 
-#### Crooks 2017
+### Crooks 2017
 
 Cerone's formalism starts with the notion of a partial ordering of transactions, while Crooks takes a different starting point, though there are ultimately similarities. Crooks again approaches isolation definitions over a set of committed transactions, but considers their definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
 
@@ -87,11 +87,28 @@ where `x` is modified based on current value of `y` and `y` is just set to a new
 
 For commutative operations, could you avoid aborting on write conflicts? e.g. pure inserts (v.s. increments, etc.) Note that commutativity/idempotency (CRDT style) is one way to avoid concurrency conflicts entirely.
 
-#### Partial vs. Total
+
+*Some anomalies don't really make sense unless you consider the semantics of operations explicitly??* i.e. dealing with how writes conflict??
+
+## Restrictions Beyond Reads
+
+Other than restricting the values that can be observed by reads, what other restrictions does an isolation level need to impose? As mentioned, why do we even need to make any other restrictions?
+
+<!-- e.g. *Read Atomic* is only making restrictions on  -->
+
+Restrictions on *what you can observe* vs. restrictions on *whether a transaction can proceed* (or, perhaps, *what you can write*)?
+
+Depends on the semantics of "writes"?
+
+- *Lost Updates* - only meaningful if you consider the semantics of "update" operations?
+- *Write Skew*
+
+
+## Partial vs. Total
 
 Partial or total ordering more natural?
 
-### Adya's formalism 
+## Adya's formalism 
 
 I would argue that Adya style formalization perhaps moved slightly in the right direction, but ultimately still strayed far from any intuitive notion of how a user or client might being to understand or reason about an isolation level.
 
