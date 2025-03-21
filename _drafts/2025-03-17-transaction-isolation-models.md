@@ -7,14 +7,13 @@ categories: formal-methods specification
 Transaction isolation is a messy topic with a lot of history. It seemed to start out messy, and it is not always clear if every attempt to clarify things really helps the problem or just adds more notation, new concepts to the domain. The rise of distributed systems and the need to reason about isolation in these contexts has worsened the problem over the past decade or so.
 
 One thing that is relatively clear is that in order to say anything precise about transaction isolation, we need some formal model in which to reason about it. 
-
 The tricky thing, though, is that even if we want to reason formally about transaction isolation, there are a host of different formalisms that all approach the problem from subtly different angles, with different goals, notation, frameworks, etc.
 
-Any transaction isolation model can basically be viewed as a condition over a set of committed transactions. That is, given some set of transactions that were committed by a database, these transactions either satisfy a given isolation level or not, based on the (read/write) operations present in each of these transactions.
+A unifying concept of essentially any transaction isolation formalism, is that isolation definition can be viewed as a condition over a set of committed transactions. That is, given some set of transactions that were committed by a database, these transactions either satisfy a given isolation level or not, based on the (read/write) operations present in each of these transactions.
 
 
 <div style="text-align: center">
-<img src="/assets/diagrams/transaction-isolation-model.drawio.svg" alt="Transaction Isolation Models" width=530>
+<img src="/assets/diagrams/transaction-isolation-model.drawio.svg" alt="Transaction Isolation Models" width=620>
 </div>
 
 
@@ -85,6 +84,8 @@ x' = y + 1
 y' = 2
 ```
 where `x` is modified based on current value of `y` and `y` is just set to a new constant value. This simplified/condenses the whole read/write model of transactions. Obviously, in practice, we may not know the whole set of transaction keys upfront, but in a model, we could consider any transaction as reading some set of keys, and making writes possibly dependent on the values read from those keys.
+
+For commutative operations, could you avoid aborting on write conflicts? e.g. pure inserts (v.s. increments, etc.) Note that commutativity/idempotency (CRDT style) is one way to avoid concurrency conflicts entirely.
 
 #### Partial vs. Total
 
