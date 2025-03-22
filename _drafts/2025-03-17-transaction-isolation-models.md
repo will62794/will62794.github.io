@@ -103,6 +103,28 @@ Depends on the semantics of "writes"?
 - *Lost Updates* - only meaningful if you consider the semantics of "update" operations?
 - *Write Skew*
 
+Write skew arises in a case when there is a read write dependency between two transactions
+
+Say two transactions both read x and y, but then T1 writes to x and T2 writes to y. Both are reading from a consistent snapshot of state, but a potentially "stale" snapshot w.r.t the other ongoing transaction.
+
+```
+T1: r(y,0) w(x' = y+2)
+T2: r(x,0) w(y' = x+2)
+```
+If executed serially, you would expect a result like `x=2, y=4`, but if executed concurrently you can get a result like `x=2, y=2`.
+
+How different is this, actually, from a *lost update*?
+
+And in the read-only transaction anomaly of SI:
+
+```
+Say initially x0=0 and y0=0.
+T1: R(y0,0) W(y' = y + 20, 20) C1 
+T2: R(x0,0) R(y0, 0) W(x' = x - 10, -11) C2
+T3: R(x0,0) R(y1,20) C3 
+```
+I think this is ultimately similar?
+
 
 ## Partial vs. Total
 
