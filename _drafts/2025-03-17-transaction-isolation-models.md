@@ -125,6 +125,7 @@ T3: R(x0,0) R(y1,20) C3
 ```
 I think this is ultimately similar?
 
+If two updates are non-concurrent, then you should expect them to always behave "correctly". It is really concurrent updates whose effect you have to decide on and reason about.
 
 ## Partial vs. Total
 
