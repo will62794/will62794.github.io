@@ -32,13 +32,14 @@ There are some other reasonable constraints, though. Basically, we *probably* ex
 
 ### Cerone 2015
 
-The Cerone paper simply takes the simplifying assumption of *atomic visibility*, which is simply that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than the weakest model they represent, *read atomic*. 
+The Cerone paper starts by making the simplifying assumption of *atomic visibility*, which is that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than the weakest model they represent, *read atomic*. 
 
-Note that this can be viewed as an interesting "boundary" in isolation strenght since, for something like *read committed* you only need to ensure that reads within a transaction of a key $$k$$ read the value written by *some* other transaction to key $$k$$. But, in the weakest sense, there may be no restriction on a notion of reading from a "consistent" state across keys. So, the weakest interpretation of read committed might be simply that any read can read any value that was written to that key at some point by any transaction in the history. This doesn't even impose any notion of ordering on transactions, since you really only care about your consistency guarantees at the level of a single key.
+Note that this can be viewed as an interesting "boundary" in isolation strength since, for something like *read committed* you only need to ensure that reads within a transaction of a key $$k$$ read the value written by *some* other transaction to key $$k$$. But, in the weakest sense, there may be no restriction on a notion of reading from a "consistent" state across keys. So, the weakest interpretation of read committed might be simply that any read can read any value that was written to that key at some point by any transaction in the history. This doesn't even impose any notion of ordering on transactions, since you really only care about your consistency guarantees at the level of a single key.
 
 
 Note that the read atomic model was actually first introduced in [Bailis' 2014 paper](http://www.bailis.org/papers/ramp-sigmod2014.pdf) on RAMP transactions. Note that Read Atomic is something similar to Snapshot Isolation but with an allowance for concurrent updates (e.g. allows write-write conflicts). This was preceded by their earlier proposal of [*monotonic atomic view*](https://www.vldb.org/pvldb/vol7/p181-bailis.pdf) which is strictly weaker than Read Atomic.
 
+Their model reflects the intuitive view of "read" based isolation by first defining a *visibility* relation between transactions, which is simply a way of definining which transactions are visible to other transactions i.e. if a transaction reads a key, what transaction write should it be observing.
 
  - *Visibility ($$VIS$$)*: acyclic relation where $$T \overset{VIS}{\rightarrow} S$$ means that $$S$$ is aware of $$T$$.
  - *Arbitration ($$AR$$)*: total order such that $$AR \supseteq VIS$$ where $$T \overset{AR}{\rightarrow} S$$ means that the writes of $$S$$ supersede those written by $$T$$ (essentially only orders write by concurrent transactions).
@@ -51,16 +52,25 @@ e.g. External Consistency ($$EXT$$) axiom is basically saying, there exists a pa
 
 The framework is defined in terms of *abstract executions*, and a consistency model as a set of *consistency axioms* constraining executions. A model allows histories for which there exists an execution satisfying the axioms, where a *history* is simply a set of transactions with disjoint sets of event identifiers. So, in other words, given a set of transactions that executed against the database, they satisfy a consistency/isolation level if there exists an abstract execution that obeys the axioms of that consistency/isolation level.
 
+So, for the weakest level, for example, all that's required is that there exists some visibility relation between transactions such that *internal* and *external* consistency are satisfied. Basically, external consistency is the important property, which is simply saying that a transaction will read the value written by the latest transaction preceding it in the visibility relation. Other than that, though, there are no real restrictions. For example, transactions could observe the effect of two different transactions in different orders, or even violate causality (e.g. by reading from the future?).
+
 
 ### Crooks 2017
 
-Cerone's formalism starts with the notion of a partial ordering of transactions, while Crooks takes a different starting point, though there are ultimately similarities. Crooks again approaches isolation definitions over a set of committed transactions, but considers their definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
+While the Cerone 2015 formalization starts with the notion of a partial ordering of transactions, Crooks takes a different starting point, though there are ultimately similarities. Crooks again approaches isolation definitions over a set of committed transactions, but considers their definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
 
-The basic idea of this formalism is that reads of any transactios will be determined based on *read states*, which are simply the states that the database passed through as it executed the transactions according to the execution ordering you defined. In a sense, this is more similar to the notion of serializability as classically defined i.e. in terms of your committed transactions conforming to *some* ordering that could have occurred which is consistent with the values observed by each transaction.
+The basic idea of this formalism is that reads of any transactions will be determined based on *read states*, which are simply the states that the database passed through as it executed the transactions according to the execution ordering you defined. In a sense, this is more similar to the notion of serializability as classically defined i.e. in terms of your committed transactions conforming to *some* ordering that could have occurred which is consistent with the values observed by each transaction.
 
 Crooks model is able to allow for transactions observing concurrent transaction writes in different orders since it doesn't require strict ordering between transactions to disjoint keys?
 
 ---------------------------
+
+<br>
+
+## Restrictions Beyond Reads
+
+A core aspect of the above models is how we define and formalize the values that transactions are able to read. But the values that a transaction can read dont capture the full picture of isolation definitions. Other than the values a transaction reads, what other restrictions are there to be made? Well, we may want to prevent a transaction from doing certain writes if they may break some "semantic" guarantees (which need to be defined a bit more carefully).
+
 
 Also, *why* does snapshot isolation actually need to enforce write-write conflict checking? If it didn't, how would this be observable to other transaction reads?
 
@@ -90,7 +100,7 @@ For commutative operations, could you avoid aborting on write conflicts? e.g. pu
 
 *Some anomalies don't really make sense unless you consider the semantics of operations explicitly??* i.e. dealing with how writes conflict??
 
-## Restrictions Beyond Reads
+--------------------
 
 Other than restricting the values that can be observed by reads, what other restrictions does an isolation level need to impose? As mentioned, why do we even need to make any other restrictions?
 
