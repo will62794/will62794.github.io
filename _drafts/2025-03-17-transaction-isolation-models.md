@@ -35,10 +35,10 @@ The Cerone paper, [*A Framework for Transactional Consistency Models with Atomic
 
 Their model encodes the intuitive idea of "read" based isolation by first defining a *visibility* relation between transactions i.e. a way of defining which transactions are visible to other transactions. That is, if a transaction reads a key, whose transactions write should it be observing. It defines this in terms of *abstract executions*, where an abstract execution consists of a set of committed transactions (a *history* $$\mathcal{H}$$) along with two relations over this set:
 
- - *Visibility ($$VIS \subseteq \mathcal{H} \times \mathcal{H}$$)*: acyclic relation where $$T \overset{VIS}{\rightarrow} S$$ means that $$S$$ is aware of $$T$$.
- - *Arbitration ($$AR \subseteq \mathcal{H} \times \mathcal{H}$$)*: total order such that $$AR \supseteq VIS$$ where $$T \overset{AR}{\rightarrow} S$$ means that the writes of $$S$$ supersede those written by $$T$$ (essentially only orders write by concurrent transactions).
+ - **Visibility** ($$VIS \subseteq \mathcal{H} \times \mathcal{H}$$): *acyclic relation* where $$T \overset{VIS}{\rightarrow} S$$ means that $$S$$ is aware of $$T$$.
+ - **Arbitration** ($$AR \subseteq \mathcal{H} \times \mathcal{H}$$): *total order* such that $$AR \supseteq VIS$$ where $$T \overset{AR}{\rightarrow} S$$ means that the writes of $$S$$ supersede those written by $$T$$ (essentially only orders write by concurrent transactions).
 
-Basically, $$VIS$$ is a partial ordering of transactions in a history, and $$AR$$ is a total order on transactions that is a superset of $$VIS$$.
+Basically, $$VIS$$ is a partial ordering of transactions in a history, and $$AR$$ is a total order on transactions that is a superset of $$VIS$$. Note that $$AR$$ is a total order, so every two transactions are comparable by this ordering even if, in some cases (as illustrated below), this ordering is not relevant, and could be omitted.
 
 
 
@@ -67,7 +67,7 @@ Basically, external consistency is the important property, which is simply sayin
 <img src="/assets/diagrams/txn-isolation/txnvis1-Page-2.drawio.svg" alt="Transaction Isolation Models" width=450>
 </div>
 
-So, at this weakest defined isolation level, we can think about a whole batch of committed transactions, and the only restrictions that we are placing on their read values is that they observe the effects of some other transaction(s) in this set, determined by a transaction's incoming edges of the visibility ($$VIS$$) relation. If multiple transactions in its incoming visibility set wrote to conflicting key sets, then the $$AR$$ exists to arbitrate between them, determining which write is observed.
+So, at this weakest defined isolation level, we can think about a whole batch of committed transactions, and the only restrictions that we are placing on their read values is that they observe the effects of some other transaction(s) in this set, determined by a transaction's incoming edges of the visibility ($$VIS$$) relation. If multiple transactions in its incoming visibility set wrote to conflicting key sets, then the $$AR$$ exists to arbitrate between them, determining which write is observed. Note sometimes $$AR$$ edges are omitted where they would not be directly relevant.
 
 Even though the underlying model does require the visibility relation to be acyclic, there are some unintuitive things allowed by this weakest definition, with *causality violations* being a notable example. Basically, the visibility relation is not, by default, required to be *transitive* in this weak model, so you can end up with transactions observing the effects of some other transaction that observed the effect of an "earlier" transaction, but you don't observe the effects of the "earlier" transaction e.g. as shown by example below with the 3 transactions.
 
@@ -82,7 +82,16 @@ Moving up the strength hierarchy, we can then start strengthening requirements o
 <img src="/assets/fig1-framework-atomic-viz.png" alt="Transaction Isolation Models" width=770>
 </div>
 
-Also, there is a notable transition between PSI and Prefix Conssitency + Snapshot Isolation (SI) which is the switch from a *partial* to *total* required on the visibility relation. Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$AR$$ predecessors of $$S$$.
+Also, there is a notable transition between PSI and Prefix Consitency + Snapshot Isolation (SI) which is the switch from a *partial* to *total* required on the visibility relation. Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$AR$$ predecessors of $$S$$. In the example below, which illustrates the *long fork* anomaly of PSI, transactions $$T_3$$ and $$T_4$$ can be considered to observe the effects of $$T_1$$ and $$T_2$$ in "different orders" i.e. for $$T_3$$ it appears as if $$T_1 \rightarrow T_2$$, but for $$T_4$$ the opposite is true.
+
+<figure style="text-align: center">
+<img src="/assets/diagrams/txn-isolation/txnvis1-LongFork.drawio.svg" alt="Transaction Isolation Models" width=330 style="display: block; margin-left: auto; margin-right: auto;">
+<figcaption>Case of long fork anomaly allowed under Parallel Snapshot Isolation.</figcaption>
+</figure>
+
+Under the $$P\small{REFIX}$$ condition, the arbitration ordering between $$T_1$$ and $$T_2$$ comes into play, effectively enforcing a fixed order on how $$T_1$$ and $$T_2$$ are observed by $$T_3$$ and $$T_4$$. That is, in the above example, if $$T_3$$ observes $$T_1$$, then by $$P\small{REFIX}$$ it must observe its $$AR$$ predecessor $$T_2$$. Similarly, $$T_4$$ is then only required to observe $$T_2$$, conforming to the $$T_2 \rightarrow T_1$$ ordering enforced by $$AR$$.
+
+If you move all the way to serializability, then the conditions simply become strengthened to $$T{\small{OTAL}}V{\small{IS}}$$, requiring simply that $$VIS$$ is a total order (along with $$I\small{NT}$$ and $$E\small{XT}$$ conditions).
 
  <!-- $$AR$$  -->
 
