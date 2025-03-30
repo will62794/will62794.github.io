@@ -82,14 +82,16 @@ Moving up the strength hierarchy, we can then start strengthening requirements o
 <img src="/assets/fig1-framework-atomic-viz.png" alt="Transaction Isolation Models" width=770>
 </div>
 
-Also, there is a notable transition between PSI and Prefix Consitency + Snapshot Isolation (SI) which is the switch from a *partial* to *total* required on the visibility relation. Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$AR$$ predecessors of $$S$$. In the example below, which illustrates the *long fork* anomaly of PSI, transactions $$T_3$$ and $$T_4$$ can be considered to observe the effects of $$T_1$$ and $$T_2$$ in "different orders" i.e. for $$T_3$$ it appears as if $$T_1 \rightarrow T_2$$, but for $$T_4$$ the opposite is true.
+Also, there is a notable transition between PSI and Prefix Consistency + Snapshot Isolation (SI) which is the switch from a *partial* to *total* required on the visibility relation. Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$AR$$ predecessors of $$S$$. In the example below, which illustrates the *long fork* anomaly of PSI, transactions $$T_3$$ and $$T_4$$ can be considered to observe the effects of $$T_1$$ and $$T_2$$ in "different orders" i.e. for $$T_3$$ it appears as if $$T_1 \rightarrow T_2$$, but for $$T_4$$ the opposite is true.
 
 <figure style="text-align: center">
 <img src="/assets/diagrams/txn-isolation/txnvis1-LongFork.drawio.svg" alt="Transaction Isolation Models" width=330 style="display: block; margin-left: auto; margin-right: auto;">
 <figcaption>Case of long fork anomaly allowed under Parallel Snapshot Isolation.</figcaption>
 </figure>
 
-Under the $$P\small{REFIX}$$ condition, the arbitration ordering between $$T_1$$ and $$T_2$$ comes into play, effectively enforcing a fixed order on how $$T_1$$ and $$T_2$$ are observed by $$T_3$$ and $$T_4$$. That is, in the above example, if $$T_3$$ observes $$T_1$$, then by $$P\small{REFIX}$$ it must observe its $$AR$$ predecessor $$T_2$$. Similarly, $$T_4$$ is then only required to observe $$T_2$$, conforming to the $$T_2 \rightarrow T_1$$ ordering enforced by $$AR$$.
+Under the $$P\small{REFIX}$$ condition, the arbitration ordering between $$T_1$$ and $$T_2$$ comes into play, effectively enforcing a fixed order on how $$T_1$$ and $$T_2$$ are observed by $$T_3$$ and $$T_4$$. That is, in the above example, if $$T_3$$ observes $$T_1$$, then by $$P\small{REFIX}$$ it must observe its $$AR$$ predecessor $$T_2$$. Similarly, $$T_4$$ is then only required to observe $$T_2$$, conforming to the $$T_2 \rightarrow T_1$$ ordering enforced by $$AR$$. Recall that since $$AR$$ is a total order, this condition is basically saying that if you are ever going to observer a transaction, then you are also forced to observe all transactions preceding it in the $$AR$$ total ordering. So, this effectively forces visibility to be totally ordered for concurrent transactions.
+
+Hm, so if $$AR$$ is a total order always estalbished upfront, then is $$VIS$$ kind of just like the "**selection of read states**" in Crooks' model???? I guess it's like a "total order if you need it".
 
 If you move all the way to serializability, then the conditions simply become strengthened to $$T{\small{OTAL}}V{\small{IS}}$$, requiring simply that $$VIS$$ is a total order (along with $$I\small{NT}$$ and $$E\small{XT}$$ conditions).
 
