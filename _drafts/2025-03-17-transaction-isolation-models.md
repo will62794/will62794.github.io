@@ -114,6 +114,9 @@ Note that the *read atomic* isolation model (the weakest in this formalism) can 
 Note that the read atomic model was actually first introduced in [Bailis' 2014 paper](http://www.bailis.org/papers/ramp-sigmod2014.pdf) on RAMP transactions. Note that Read Atomic is something similar to Snapshot Isolation but with an allowance for concurrent updates (e.g. allows write-write conflicts). This was preceded by their earlier proposal of [*monotonic atomic view*](https://www.vldb.org/pvldb/vol7/p181-bailis.pdf) which is strictly weaker than Read Atomic.
 
 
+> Is there a way to alternatively specify serializability in terms of SI + prevention of write skew? Instead of saying it is just "total ordering of visibility relation"? (Will's Question) Can we specify it in terms of NoReadWriteConflict? instead of NoConflict (which is specific to write conflicts)?
+
+
 ### Crooks 2017
 
 While the Cerone 2015 formalization starts with the visibility and arbitration ordering concepts, Crooks takes a different starting point, though there are ultimately similarities. Crooks again approaches isolation definitions over a set of committed transactions, but considers their definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
