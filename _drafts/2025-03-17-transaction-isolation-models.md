@@ -116,7 +116,7 @@ Note that the read atomic model was actually first introduced in [Bailis' 2014 p
 
 ### Crooks 2017
 
-While the Cerone 2015 formalization starts with the notion of a partial ordering of transactions, Crooks takes a different starting point, though there are ultimately similarities. Crooks again approaches isolation definitions over a set of committed transactions, but considers their definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
+While the Cerone 2015 formalization starts with the visibility and arbitration ordering concepts, Crooks takes a different starting point, though there are ultimately similarities. Crooks again approaches isolation definitions over a set of committed transactions, but considers their definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
 
 The basic idea of this formalism is centered around a *state-based* or *client-centric* view of isolation. That is, the values observed by any transactions will be determined based on *read states*, which are the states that the database passed through as it executed the transactions according to the execution ordering you defined. In a sense, this is more similar to the notion of serializability as classically defined i.e. in terms of your committed transactions conforming to *some* ordering that could have occurred which is consistent with the values observed by each transaction.
 
@@ -124,9 +124,9 @@ The basic idea of this formalism is centered around a *state-based* or *client-c
 
 <figure style="text-align: center">
 <div style="text-align: center;padding:30px;">
-<img src="/assets/diagrams/txn-isolation/txnvis1-ReadStates.drawio.svg" alt="Transaction Isolation Models" width=480>
+<img src="/assets/diagrams/txn-isolation/txnvis1-ReadStates.drawio.svg" alt="Transaction Isolation Models" width=550>
 </div>
-<figcaption>Execution of transactions with associated read states in Crooks model.</figcaption>
+<figcaption>An <i>execution</i> of transactions with associated read states \(s_i\) in Crooks model.</figcaption>
 </figure>
 
 This is ultimately quite similar to the Cerone view, since the visibility relation ($$\mathsf{VIS}$$) serves a similar purpose i.e. by basically picking out which transactions writes are visible to you. Cerone doesn't formulate this in terms of "read states" as Crooks does, but essentially the same idea is present i.e. the "read state" in the Cerone model is created by the application of your $$\mathsf{VIS}$$-preceding transactions.
