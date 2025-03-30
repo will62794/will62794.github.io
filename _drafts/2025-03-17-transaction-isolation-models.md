@@ -31,40 +31,63 @@ There are some other reasonable constraints, though. Basically, we *probably* ex
 
 ### Cerone 2015
 
-The Cerone paper starts by making the simplifying assumption of *atomic visibility*, which is that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than *read atomic*, the weakest level they can express. 
+The Cerone paper, [*A Framework for Transactional Consistency Models with Atomic Visibility*](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf), is based on a core simplifying assumption of *atomic visibility*, which is that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation notions like *read committed*, which is weaker than *read atomic*, the weakest level they can express. 
 
-Their model encodes the intuitive idea of "read" based isolation by first defining a *visibility* relation between transactions i.e. a way of defining which transactions are visible to other transactions. That is, if a transaction reads a key, whose transactions write should it be observing.
+Their model encodes the intuitive idea of "read" based isolation by first defining a *visibility* relation between transactions i.e. a way of defining which transactions are visible to other transactions. That is, if a transaction reads a key, whose transactions write should it be observing. It defines this in terms of *abstract executions*, where an abstract execution consists of a set of committed transactions (a *history* $$\mathcal{H}$$) along with two relations over this set:
 
- - *Visibility ($$VIS$$)*: acyclic relation where $$T \overset{VIS}{\rightarrow} S$$ means that $$S$$ is aware of $$T$$.
- - *Arbitration ($$AR$$)*: total order such that $$AR \supseteq VIS$$ where $$T \overset{AR}{\rightarrow} S$$ means that the writes of $$S$$ supersede those written by $$T$$ (essentially only orders write by concurrent transactions).
-
+ - *Visibility ($$VIS \subseteq \mathcal{H} \times \mathcal{H}$$)*: acyclic relation where $$T \overset{VIS}{\rightarrow} S$$ means that $$S$$ is aware of $$T$$.
+ - *Arbitration ($$AR \subseteq \mathcal{H} \times \mathcal{H}$$)*: total order such that $$AR \supseteq VIS$$ where $$T \overset{AR}{\rightarrow} S$$ means that the writes of $$S$$ supersede those written by $$T$$ (essentially only orders write by concurrent transactions).
 
 Basically, $$VIS$$ is a partial ordering of transactions in a history, and $$AR$$ is a total order on transactions that is a superset of $$VIS$$.
 
-e.g. External Consistency ($$EXT$$) axiom is basically saying, there exists a partial ordering of transactions such that you observe the latest effects of all transactions visible to you as defined by this partial order.
 
 
-The framework is defined in terms of *abstract executions*, and a consistency model as a set of *consistency axioms* constraining executions. A model allows histories for which there exists an execution satisfying the axioms, where a *history* is simply a set of transactions with disjoint sets of event identifiers. So, in other words, given a set of transactions that executed against the database, they satisfy a consistency/isolation level if there exists an abstract execution that obeys the axioms of that consistency/isolation level.
+<!-- e.g. External Consistency ($$EXT$$) axiom is basically saying, there exists a partial ordering of transactions such that you observe the latest effects of all transactions visible to you as defined by this partial order. -->
 
-So, for the weakest level, for example, all that's required is that there exists some visibility relation between transactions such that *internal* and *external* consistency are satisfied. 
+
+<!-- The framework is defined in terms of *abstract executions*, and a consistency model as a set of *consistency axioms* constraining executions.  -->
+A consistency model (e.g. isolation level) is then defined as a set of *consistency axioms* constraining executions, where  consistency model allows histories for which there exists an abstract execution satisfying the axioms. In other words, given a set of transactions that executed against the database, they satisfy a consistency/isolation level if there exists an abstract execution that obeys the axioms of that consistency/isolation level. 
+
+
+
+
+
+
+The weakest isolation level they define, *Read Atomic*, only requires that the visibility relation between transactions satisfies the *internal* and *external* consistency properties. 
 
 - $$INT$$: internal consistency
 - $$EXT$$: external consistency
 
-Basically, external consistency is the important property, which is simply saying that a transaction will read the value written by the latest transaction preceding it in the visibility relation. Other than that, though, there are no real restrictions. For example, transactions could observe the effect of two different transactions in different orders, or even violate causality (e.g. by reading from the future?).
+Basically, external consistency is the important property, which is simply saying that a transaction will read the value written by the latest transaction preceding it in the visibility relation. Other than that, though, there are no real restrictions. 
 
-<div style="text-align: center">
-<img src="/assets/fig1-framework-atomic-viz.png" alt="Transaction Isolation Models" width=720>
-</div>
-
-Moving up the strength hierarchy, we can start strengthening requirements on what transactions can observe. First, we reasonably want to prevent oddities that arise from causality violations. For example,
+<!-- For example, transactions could observe the effect of two different transactions in different orders, or even violate causality (e.g. by reading from the future?). This very weak transaction level is helpful to understand the model.  -->
 
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-isolation/txnvis1.drawio.svg" alt="Transaction Isolation Models" width=280>
+<img src="/assets/diagrams/txn-isolation/txnvis1-Page-2.drawio.svg" alt="Transaction Isolation Models" width=450>
 </div>
 
-One transaction T3 reads a value written by another transaction T2 that must have observed T1, but T3 does not observe T1's effect. (i.e. if you observe something, and another transaction observes that, it should also reflect effect of all things you observed.)
+So, at this weakest defined isolation level, we can think about a whole batch of committed transactions, and the only restrictions that we are placing on their read values is that they observe the effects of some other transaction(s) in this set, determined by a transaction's incoming edges of the visibility ($$VIS$$) relation. If multiple transactions in its incoming visibility set wrote to conflicting key sets, then the $$AR$$ exists to arbitrate between them, determining which write is observed.
+
+Even though the underlying model does require the visibility relation to be acyclic, there are some unintuitive things allowed by this weakest definition, with *causality violations* being a notable example. Basically, the visibility relation is not, by default, required to be *transitive* in this weak model, so you can end up with transactions observing the effects of some other transaction that observed the effect of an "earlier" transaction, but you don't observe the effects of the "earlier" transaction e.g. as shown by example below with the 3 transactions.
+
+<div style="text-align: center">
+<img src="/assets/diagrams/txn-isolation/txnvis1-Page-1.drawio.svg" alt="Transaction Isolation Models" width=420>
+</div>
+
+
+Moving up the strength hierarchy, we can then start strengthening requirements on what transactions can observe. In this paper, this starts by adding the transitivity condition on visibility ($$T{\small{RANS}}V{\small{IS}}$$), to get *Causal Consistency*, which is then extended to *Parallel Snapshot Isolation (PSI)* and *Prefix Consistency*, two levels that are not strictly comparable in the hierarchy. Note that the $$C\small{ONFLICT}$$ condition enforced at PSI is the first condition that does not make a restriction on the values *observed by reads*. Rather, it places conditions on valid cases of conflicting writes between transactions.  transactions 
+
+<div style="text-align: center">
+<img src="/assets/fig1-framework-atomic-viz.png" alt="Transaction Isolation Models" width=770>
+</div>
+
+Also, there is a notable transition between PSI and Prefix Conssitency + Snapshot Isolation (SI) which is the switch from a *partial* to *total* required on the visibility relation. Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$AR$$ predecessors of $$S$$.
+
+ <!-- $$AR$$  -->
+
+
+<!-- One transaction T3 reads a value written by another transaction T2 that must have observed T1, but T3 does not observe T1's effect. (i.e. if you observe something, and another transaction observes that, it should also reflect effect of all things you observed.) -->
 
 ----
 
