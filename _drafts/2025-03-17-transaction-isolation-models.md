@@ -6,9 +6,9 @@ categories: formal-methods specification
 
 Transaction isolation is a dense topic with a lot of history. There have been many attempts over the years to formalize various isolation concepts, thought [it is not always clear](https://dl.acm.org/doi/pdf/10.1145/3035918.3056096) to what extent these attempts have clarified things or just introduced new layers of complexity and notation. The rise of distributed systems and the need to reason about isolation in these contexts has worsened the problem over the past decade or so.
 
-If we want to say anything precise about transaction isolation, we need some formal model in which to reason about it. There are, however, a host of different formalisms that all approach the problem from subtly different angles, with different goals, notation, frameworks, etc. ([Adya](https://pmg.csail.mit.edu/papers/adya-phd.pdf), [Cerone](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf), [Crooks](https://dl.acm.org/doi/10.1145/3087801.3087802)). It is helpful, then, to try to understand the common underyling concepts between any of these formalisms.
+If we want to say anything precise about transaction isolation, we need some formal model in which to reason about it. There are a host of different formalisms that all approach the problem from different angles, with different goals, notation, frameworks, etc. ([Adya](https://pmg.csail.mit.edu/papers/adya-phd.pdf), [Cerone](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf), [Crooks](https://dl.acm.org/doi/10.1145/3087801.3087802)). It is helpful, though, to try to understand some common underyling concepts between these, particularly for two modern, "state-centric" formalisms of isolation, [Cerone 2015](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf) and [Crooks 2017](https://dl.acm.org/doi/10.1145/3087801.3087802).
 
-A unifying concept of essentially any transaction isolation formalism is that an isolation definition can be viewed as a *condition over a set of committed transactions*. That is, given some set of transactions that were committed by a database, these transactions either satisfy a given isolation level or not, based on the sequence of read/write operations present in each of these transactions.
+A unifying concept of essentially any transaction isolation formalism is that an isolation definition can be viewed as a *condition over a set of committed transactions*. That is, given some set of transactions that were committed by a database system, these transactions either satisfy a given isolation level or not, based on the sequence of read/write operations present in each of these transactions.
 
 
 <div style="text-align: center">
@@ -26,7 +26,7 @@ We can keep this "read-centric" view in mind in context of some of the modern fo
 
 There are two notable, modern models of transaction isolation that try to capture some of this intuition formally: the [2015 model of Cerone et al.](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf) and the subsequent [Crooks 2017 client-centric model](https://dl.acm.org/doi/10.1145/3087801.3087802).
 
-If we consider transaction isolation under the above, "read-centric" view, then when we think about how to define an isolation level, we should first be concerned with how we define *what values a transaction can read*. If our isolation level makes no restrictions on this, then a transaction can read any value (in practice how you might define a level like *read uncommitted*). More sensibly, we would expect a transaction to read states that are *reasonable*, in some sense. More concretely, we should expect that transactions actually read values written by other transactions. This could, in fact, be one possible isolation definition (similar to *read committed*), and a step up in strength from allowing transactions to read any possible value. 
+If we consider transaction isolation under the above, "read-centric" view, then when we think about how to define an isolation level, we should first be concerned with how we define *what values a transaction can read*. If our isolation level makes no restrictions on this, then a transaction can read any value (in practice how you might define a level like *read uncommitted*). More sensibly, we would expect a transaction to read states that are *reasonable*, in some sense. More concretely, we should expect that transactions actually read values written by other transactions. This could, in fact, be one possible isolation definition (similar to *read committed*), and one step up in strength from allowing transactions to read any possible value. 
 
 There are some other reasonable constraints, though. Basically, we likely expect that the possible states we read from came about through some "reasonable" execution of the transactions we gave to the database. One "reasonable" type of execution would be to execute these transactions in some sequential order. This is, for example, what we would expect out of a database system if we gave it a series of transactions one-by-one, with no concurrent overlapping between transactions.
 
@@ -35,7 +35,7 @@ There are some other reasonable constraints, though. Basically, we likely expect
 
 The Cerone paper, [*A Framework for Transactional Consistency Models with Atomic Visibility*](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf), is based on a core simplifying assumption of *atomic visibility*, which is that either all or none of the operations of a transaction can become visible to other transactions. This means that their model essentially cannot represent isolation levels like *Read Committed*, which is weaker than *Read Atomic*, the weakest level their model can express. 
 
-Their model encodes the intuitive idea of "read-centric" isolation by first defining a *visibility* relation between transactions i.e. a way of defining which transactions are visible to other transactions. That is, if a transaction reads a key, whose transactions write should it be observing. It defines this in terms of *abstract executions*, where an abstract execution consists of a set of committed transactions (a *history* $$\mathcal{H}$$) along with two relations over this set:
+Their model encodes the intuitive idea of "read-centric" isolation by first defining a *visibility* relation between transactions i.e. a way of defining which transactions are visible to other transactions. That is, if a transaction reads a key, which other transactions' writes should it observe. It defines this in terms of *abstract executions*, where an abstract execution consists of a set of committed transactions (a *history* $$\mathcal{H}$$) along with two relations over this set:
 
  - **Visibility** ($$\mathsf{VIS} \subseteq \mathcal{H} \times \mathcal{H}$$): acyclic relation where $$T \overset{\mathsf{VIS}}{\rightarrow} S$$ means that $$S$$ is aware of $$T$$.
  - **Arbitration** ($$\mathsf{AR} \subseteq \mathcal{H} \times \mathcal{H}$$): total order such that $$\mathsf{AR} \supseteq \mathsf{VIS}$$ where $$T \overset{\mathsf{AR}}{\rightarrow} S$$ means that the writes of $$S$$ supersede those written by $$T$$ (essentially only orders write by concurrent transactions).
@@ -60,9 +60,9 @@ A consistency model (e.g. isolation level) is then defined as a set of *consiste
 
 
 
-The weakest isolation level they define, *Read Atomic*, imposes only two conditions: *internal* and *external* consistency. 
+The weakest isolation level defined in the Cerone model, *Read Atomic*, imposes only two conditions: *internal* and *external* consistency, which are defined intuitively as: 
 
-- $$I\small{NT}$$ (internal consistency): read from an object returns the same value as the last write to or read from this object in the transaction.
+- $$I\small{NT}$$ (internal consistency): reads from an object returns the same value as the last write to or read from this object in the transaction.
 - $$E\small{XT}$$ (external consistency): the value returned by an external read in $$T$$ is determined by the transactions $$\mathsf{VIS}$$-preceding $$T$$ that write to $$x$$. If there are no such transactions, then $$T$$ reads the initial value 0. Otherwise it reads the final value written by the last such transaction in $$\mathsf{AR}$$.
 
 Internal consistency is a bit tedious from a formal perspective and is the less interesting condition, stating simply that you read your own writes within a transaction. External consistency is the more important condition and depends on the visibility relation, stating that a transaction will read the value written by the latest transaction preceding it in the visibility relation, with conflicts decided by the arbitration relation.
@@ -73,27 +73,26 @@ Internal consistency is a bit tedious from a formal perspective and is the less 
 
 
 
-So, at this weakest defined isolation level, *Read Atomic*, we can think about a whole batch of committed transactions, and the only restrictions that we are placing on their read values is that they observe the effects of some other transaction(s) in this set, determined by a transaction's incoming edges of the visibility ($$VIS$$) relation (e.g. as illustrated in <a href="#fig1">Figure 1</a>). If multiple transactions in its incoming visibility set wrote to conflicting key sets, then the $$AR$$ exists to arbitrate between them, determining which write is observed. Note sometimes $$AR$$ edges are omitted where they would not be directly relevant.
+So, at this weakest defined isolation level, *Read Atomic*, we can think about a whole batch of committed transactions, and the only restrictions that we are placing on their read values is that they observe the effects of some other transaction(s) in this set, determined by a transaction's incoming edges of the visibility ($$VIS$$) relation (e.g. as illustrated in <a href="#fig1">Figure 1</a>). If multiple transactions in its incoming visibility set wrote to conflicting key sets, then the $$AR$$ exists to arbitrate between them, determining which write is observed. Note that sometimes $$AR$$ edges are omitted where they would not be directly relevant.
 
-The underlying model does require the visibility relation to be acyclic, but there are still some unintuitive semantics allowed by this weakest definition, with *causality violations* being a notable example. Basically, the visibility relation is not, by default, required to be *transitive* in this weak model, so you can end up with transactions observing the effects of some other transaction that observed the effect of an "earlier" transaction, but you don't observe the effects of the "earlier" transaction e.g. as shown by example below with 3 transactions.
+The underlying model does require the visibility relation to be acyclic, but without any other restrictions there are still some unintuitive semantics allowed at this weakest definition, with *causality violations* as the notable example. Basically, the visibility relation is not, by default, required to be *transitive* in this weak model, so you can end up with transactions observing the effects of some other transaction that observed the effect of an "earlier" transaction, but you don't observe the effects of the "earlier" transaction e.g. as shown by example below with 3 transactions.
 
 <div style="text-align: center">
 <img src="/assets/diagrams/txn-isolation/txnvis1-Page-1.drawio.svg" alt="Transaction Isolation Models" width=420>
 </div>
 
 
-Moving up the isolation hierarchy from *Read Atomic*, we start strengthening requirements on what the reads in transactions can observe. In this paper, this starts first by adding a transitivity condition on visibility ($$T{\small{RANS}}V{\small{IS}}$$), to get *Causal Consistency*, which is then extended to *Parallel Snapshot Isolation (PSI)* and *Prefix Consistency*, two levels that are not strictly comparable to each other in the hierarchy (see <a href="#fig2">Figure 2</a>). Note that the $$C\small{ONFLICT}$$ condition enforced at PSI is the first condition that does not make a restriction on the values *observed by reads*. Rather, it places conditions on valid cases of conflicting writes between transactions. 
-
+Moving up the isolation hierarchy from *Read Atomic* in Cerone's model, we start strengthening requirements on what the reads in transactions can observe. In this paper, this starts first by adding a transitivity condition on visibility ($$T{\small{RANS}}V{\small{IS}}$$), to get *Causal Consistency*, which is then extended to *Parallel Snapshot Isolation (PSI)* and *Prefix Consistency*, two levels that are not strictly comparable to each other in the hierarchy (see <a href="#fig2">Figure 2</a>). 
 
 <figure style="text-align: center" id="fig2">
 <div style="text-align: center">
-<img src="/assets/fig1-framework-atomic-viz.png" alt="Transaction Isolation Models" width=770>
+<img src="/assets/fig1-framework-atomic-viz.png" alt="Transaction Isolation Models" width=790>
 </div>
 <figcaption>Figure 2: Consistency models in the Cerone framework.</figcaption>
 </figure>
 
-
-Also, there is a notable transition between PSI and Prefix Consistency + Snapshot Isolation (SI) which is related to a switch from a *partial* to *total* ordering requirements on the visibility relation. Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$AR$$ predecessors of $$S$$. In the example below, which illustrates the *long fork* anomaly of PSI, transactions $$T_3$$ and $$T_4$$ can be considered to observe the effects of $$T_1$$ and $$T_2$$ in "different orders" i.e. for $$T_3$$ it appears as if $$T_1 \rightarrow T_2$$, but for $$T_4$$ the opposite is true.
+Note that the $$N{\small{O}}C{\small{ONFLICT}}$$ condition enforced at PSI is the first condition that is not related to the *values observed by reads*. Rather, it places conditions on valid cases of conflicting writes between transactions. 
+Also, there is a notable transition from PSI to Prefix Consistency, which is related to a switch from a *partial* to *total* ordering requirements on the visibility relation. Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$AR$$ predecessors of $$S$$. In the example below, which illustrates the *long fork* anomaly of PSI, transactions $$T_3$$ and $$T_4$$ can be considered to observe the effects of $$T_1$$ and $$T_2$$ in "different orders" i.e. for $$T_3$$ it appears as if $$T_1 \rightarrow T_2$$, but for $$T_4$$ the opposite is true.
 
 <figure style="text-align: center">
 <img src="/assets/diagrams/txn-isolation/txnvis1-LongFork.drawio.svg" alt="Transaction Isolation Models" width=330 style="display: block; margin-left: auto; margin-right: auto;">
@@ -107,14 +106,14 @@ If you move all the way to serializability, then the conditions simply become st
 If we look at [A Critique of Snapshot Isolation](https://arxiv.org/abs/2405.18393), though, this offers another approach to formalizing serializability. That is, we instead alter snapshot isolation to prevent *read-write* conflicts instead of *write-write* conflicts i.e. if a transaction's read set is written to by a concurrent transaction, then we must abort it. This is an alternative way to formalize serializability i.e. instead of specifying it as 
 
 $$
-INT \wedge EXT \wedge {P\small{REFIX}} \wedge NOCONFLICT
+INT \wedge EXT \wedge {P\small{REFIX}} \wedge N{\small{O}}C{\small{ONFLICT}}
 $$
 
 as for snapshot isolation, we can specify it as 
 
 $$
 \begin{align}
-INT \wedge EXT \wedge {P\small{REFIX}} \wedge NORWCONFLICT
+INT \wedge EXT \wedge {P\small{REFIX}} \wedge N{\small{O}}R{\small{W}}C{\small{ONFLICT}}
 \end{align}
 $$
 
@@ -163,13 +162,16 @@ While Crooks and Cerone models are kind of different on the surface and in their
 
 Note that we can nearly map Cerone's model to Crooks' model as well. If we consider the $$AR$$ total order of Cerone, we could view this as the "execution order" required in the Crooks model, which is also a total order of transactions. Then, the $$VIS$$ relation of Cerone is akin to the *selection of read states* in Crooks' model. That is, each transaction in the chosen total order picks out some transactions that are visible to it, and reads values in accordance. In Crooks' model, based on the read state you pikc, the transactions visible to you (As in Cerone) would simply be all the transactions preceding that read state. And the total ordering of Crooks can then be used as the $$AR$$ arbitration ordering in Cerone's model.
 
-### Read vs. Write Restrictions
+### Restrictions on Reads vs. Writes
 
 A core aspect of the above models is how we define and formalize the values that transactions are able to *read*. But the values that a transaction can read don't capture the full picture of isolation definitions. Other than the values a transaction reads, what other restrictions are there to be made? Well, we may want to prevent a transaction from doing certain writes if they may break some "semantic" guarantees (which need to be defined a bit more carefully).
 **Up to certain isolation level strength, transactions will commit regardless of what they write, as long as their reads satisfy the appropriate validity conditions.** At snapshot isolation and stronger, though, we start to require transactions to abort in some cases based on what they *write*.
 This manifests notably in the write conflict condition for snapshot isolation, and also in the alternative, read-write conflict condition that we can use to make a serializable snapshot.
 
-Why does snapshot isolation really need to enforce write-write conflict checking? If it didn't, how would this be observable to other transaction reads?
+
+
+
+<!-- Why does snapshot isolation really need to enforce write-write conflict checking? If it didn't, how would this be observable to other transaction reads?
 
 ```
 t1: r(x,init) w(y,1) w(z, 1)
@@ -203,7 +205,7 @@ Other than restricting the values that can be observed by reads, what other rest
 
 <!-- e.g. *Read Atomic* is only making restrictions on  -->
 
-Restrictions on *what you can observe* vs. restrictions on *whether a transaction can proceed* (or, perhaps, *what you can write*)?
+<!-- Restrictions on *what you can observe* vs. restrictions on *whether a transaction can proceed* (or, perhaps, *what you can write*)?
 
 Depends on the semantics of "writes"?
 
@@ -232,7 +234,7 @@ T3: R(x0,0) R(y1,20) C3
 ```
 I think this is ultimately similar?
 
-If two updates are non-concurrent, then you should expect them to always behave "correctly". It is really concurrent updates whose effect you have to decide on and reason about.
+If two updates are non-concurrent, then you should expect them to always behave "correctly". It is really concurrent updates whose effect you have to decide on and reason about. --> -->
 
 <!-- 
 ## Partial vs. Total
