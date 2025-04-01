@@ -97,9 +97,23 @@ Also, there is a notable transition between PSI and Prefix Consistency + Snapsho
 
 Under the $$P\small{REFIX}$$ condition, the arbitration ordering between $$T_1$$ and $$T_2$$ comes into play, effectively enforcing a fixed order on how $$T_1$$ and $$T_2$$ are observed by $$T_3$$ and $$T_4$$. That is, in the above example, if $$T_3$$ observes $$T_1$$, then by $$P\small{REFIX}$$ it must observe its $$AR$$ predecessor $$T_2$$. Similarly, $$T_4$$ is then only required to observe $$T_2$$, conforming to the $$T_2 \rightarrow T_1$$ ordering enforced by $$AR$$. Recall that since $$AR$$ is a total order, this condition is basically saying that if you are ever going to observer a transaction, then you are also forced to observe all transactions preceding it in the $$AR$$ total ordering. So, this effectively forces visibility to be totally ordered for concurrent transactions.
 
-Hm, so if $$AR$$ is a total order always estalbished upfront, then is $$VIS$$ kind of just like the "**selection of read states**" in Crooks' model???? I guess it's like a "total order if you need it".
-
 If you move all the way to serializability, then the conditions simply become strengthened to $$T{\small{OTAL}}V{\small{IS}}$$, requiring simply that $$VIS$$ is a total order (along with $$I\small{NT}$$ and $$E\small{XT}$$ conditions).
+<!-- > Is there a way to alternatively specify serializability in terms of SI + prevention of write skew? Instead of saying it is just "total ordering of visibility relation"? (Will's Question) Can we specify it in terms of NoReadWriteConflict? instead of NoConflict (which is specific to write conflicts)? -->
+If we look at [A Critique of Snapshot Isolation](https://arxiv.org/abs/2405.18393), this offers another approach to formalizing serializability, though. That is, we instead alter snapshot isolation to prevent *read-write* conflicts instead of *write-write* conflicts. That is, if a transaction's read set is written to by a concurrent transaction, then we must abort it. This is an alternative way to formalize serializability i.e. instead of specifying it as 
+
+$$
+INT \wedge EXT \wedge {P\small{REFIX}} \wedge NOCONFLICT
+$$
+
+as for snapshot isolation, we can specify it as 
+
+$$
+\begin{align}
+INT \wedge EXT \wedge {P\small{REFIX}} \wedge NORWCONFLICT
+\end{align}
+$$
+
+Does this also mean the SI actually rules out some serializable executions?
 
  <!-- $$AR$$  -->
 
@@ -114,12 +128,11 @@ Note that the *read atomic* isolation model (the weakest in this formalism) can 
 Note that the read atomic model was actually first introduced in [Bailis' 2014 paper](http://www.bailis.org/papers/ramp-sigmod2014.pdf) on RAMP transactions. Note that Read Atomic is something similar to Snapshot Isolation but with an allowance for concurrent updates (e.g. allows write-write conflicts). This was preceded by their earlier proposal of [*monotonic atomic view*](https://www.vldb.org/pvldb/vol7/p181-bailis.pdf) which is strictly weaker than Read Atomic.
 
 
-> Is there a way to alternatively specify serializability in terms of SI + prevention of write skew? Instead of saying it is just "total ordering of visibility relation"? (Will's Question) Can we specify it in terms of NoReadWriteConflict? instead of NoConflict (which is specific to write conflicts)?
 
 
 ### Crooks 2017
 
-While the Cerone 2015 formalization starts with the visibility and arbitration ordering concepts, Crooks takes a different starting point, though there are ultimately similarities. Crooks again approaches isolation definitions over a set of committed transactions, but considers their definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
+While the Cerone 2015 formalization starts with the visibility and arbitration ordering concepts, Crooks takes a different starting point, though there are underlying similarities. Crooks similarly defines isolation over a set of committed transactions, but formalizes its definitions in terms of *executions*, which are simply a totally ordered sequence of these transactions.
 
 The basic idea of this formalism is centered around a *state-based* or *client-centric* view of isolation. That is, the values observed by any transactions will be determined based on *read states*, which are the states that the database passed through as it executed the transactions according to the execution ordering you defined. In a sense, this is more similar to the notion of serializability as classically defined i.e. in terms of your committed transactions conforming to *some* ordering that could have occurred which is consistent with the values observed by each transaction.
 
@@ -136,7 +149,7 @@ This is ultimately quite similar to the Cerone view, since the visibility relati
 
 Crooks does also have a technial difference from the Cerone model, in that it allows expression of weaker models like *Read Committed*, since it does not make the assumption of *atomic visibility* that Cerone does. It does this by allowing each read operation of a transaction to potentially read from a *different* read state, allowing for expression of the fractured reads anomaly the Cerone cannot represent.
 
-Crooks is able to represent *Read Atomic* as well, though. The formal definition (as shown in <a href="#fig2">Figure 2</a>) is somewhat dense (note that $$sf_o$$ represents the first read state for an operation $$o$$), but intuitively it is simplying saying that if an operation $$o$$ observes the writes of a transaction $$T_i$$, all subsequent operations reading a key in $$T_i$$'s write set must read from a state that include $$T_i$$'s effects.
+Crooks is also naturally able to represent *Read Atomic*, though. The formal definition (as shown in <a href="#fig2">Figure 2</a>) is somewhat dense (note that $$sf_o$$ represents the first read state for an operation $$o$$), but intuitively it is simplying saying that if an operation $$o$$ observes the writes of a transaction $$T_i$$, all subsequent operations reading a key in $$T_i$$'s write set must read from a state that include $$T_i$$'s effects.
 
 <figure style="text-align: center" id="fig2">
 <div style="text-align: center;padding:5px;">
@@ -146,13 +159,22 @@ Crooks is able to represent *Read Atomic* as well, though. The formal definition
 </figure>
 
 
+While Crooks and Cerone models are kind of different on the surface and in their formal details, they can really be viewed as quite similar in their core ideas, which are about first establishing what possible values a transaction can read!
+
+
+Note that we can nearly map Cerone's model to Crooks' model as well. If we consider the $$AR$$ total order of Cerone, we could view this as the "execution order" required in the Crooks model, which is also a total order of transactions. Then, the $$VIS$$ relation of Cerone is akin to the *selection of read states* in Crooks' model. That is, each transaction in the chosen total order picks out some transactions that are visible to it, and reads values in accordance. In Crooks' model, based on the read state you pikc, the transactions visible to you (As in Cerone) would simply be all the transactions preceding that read state. And the total ordering of Crooks can then be used as the $$AR$$ arbitration ordering in Cerone's model.
+
 ---------------------------
 
 <br>
 
-## Restrictions Beyond Reads
+## Read vs. Write Restrictions
 
-A core aspect of the above models is how we define and formalize the values that transactions are able to read. But the values that a transaction can read dont capture the full picture of isolation definitions. Other than the values a transaction reads, what other restrictions are there to be made? Well, we may want to prevent a transaction from doing certain writes if they may break some "semantic" guarantees (which need to be defined a bit more carefully).
+A core aspect of the above models is how we define and formalize the values that transactions are able to *read*. But the values that a transaction can read dont capture the full picture of isolation definitions. Other than the values a transaction reads, what other restrictions are there to be made? Well, we may want to prevent a transaction from doing certain writes if they may break some "semantic" guarantees (which need to be defined a bit more carefully).
+
+**Up to certain isolation level strength, transactions will commit regardless of what they write, as long as their reads satisfy the appropriate validity conditions.** At snapshot isolation and stronger, though, we start to require transactions to abort in some cases based on what they *write*.
+
+
 
 
 Also, *why* does snapshot isolation actually need to enforce write-write conflict checking? If it didn't, how would this be observable to other transaction reads?
