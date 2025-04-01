@@ -162,6 +162,11 @@ While Crooks and Cerone models are kind of different on the surface and in their
 
 Note that we can nearly map Cerone's model to Crooks' model as well. If we consider the $$AR$$ total order of Cerone, we could view this as the "execution order" required in the Crooks model, which is also a total order of transactions. Then, the $$VIS$$ relation of Cerone is akin to the *selection of read states* in Crooks' model. That is, each transaction in the chosen total order picks out some transactions that are visible to it, and reads values in accordance. In Crooks' model, based on the read state you pikc, the transactions visible to you (As in Cerone) would simply be all the transactions preceding that read state. And the total ordering of Crooks can then be used as the $$AR$$ arbitration ordering in Cerone's model.
 
+
+
+
+<!-- 
+
 ### Restrictions on Reads vs. Writes
 
 A core aspect of the above models is how we define and formalize the values that transactions are able to *read*. But the values that a transaction can read don't capture the full picture of isolation definitions. Other than the values a transaction reads, what other restrictions are there to be made? Well, we may want to prevent a transaction from doing certain writes if they may break some "semantic" guarantees (which need to be defined a bit more carefully).
@@ -169,6 +174,23 @@ A core aspect of the above models is how we define and formalize the values that
 This manifests notably in the write conflict condition for snapshot isolation, and also in the alternative, read-write conflict condition that we can use to make a serializable snapshot.
 
 
+ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- -------------------------------------- -->
 
 
 <!-- Why does snapshot isolation really need to enforce write-write conflict checking? If it didn't, how would this be observable to other transaction reads?
@@ -234,19 +256,5 @@ T3: R(x0,0) R(y1,20) C3
 ```
 I think this is ultimately similar?
 
-If two updates are non-concurrent, then you should expect them to always behave "correctly". It is really concurrent updates whose effect you have to decide on and reason about. --> -->
+If two updates are non-concurrent, then you should expect them to always behave "correctly". It is really concurrent updates whose effect you have to decide on and reason about. -->
 
-<!-- 
-## Partial vs. Total
-
-Partial or total ordering more natural?
-
-## Adya's formalism 
-
-I would argue that Adya style formalization perhaps moved slightly in the right direction, but ultimately still strayed far from any intuitive notion of how a user or client might being to understand or reason about an isolation level.
-
-But, I also somewhat disagree with Crooks' assertion that the client-centric model is:
-
-> the first to specify isolation without relying on some notion of history.
-
-since I feel the notion of a history (i.e. an ordering of transactions) is still quite central to the client-centric model, but it avoids the complexities and unintuitive details around partial ordered events and serialization graphs. -->
