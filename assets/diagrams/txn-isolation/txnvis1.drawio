@@ -394,7 +394,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="uQm-4dv30bmYEvx06W9f" name="ReadStates">
-    <mxGraphModel dx="477" dy="375" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="1" shadow="0">
+    <mxGraphModel dx="733" dy="576" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="1" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -425,7 +425,7 @@
             <mxPoint x="570" y="270" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="vnEJECslLKtDdsUNpcMM-38" value="$$s_1$$" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;" parent="1" vertex="1">
+        <mxCell id="vnEJECslLKtDdsUNpcMM-38" value="$$s_1$$" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="350" y="241" width="35" height="35" as="geometry" />
         </mxCell>
         <mxCell id="vnEJECslLKtDdsUNpcMM-39" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="vnEJECslLKtDdsUNpcMM-38" target="vnEJECslLKtDdsUNpcMM-7" edge="1">
@@ -434,7 +434,7 @@
             <mxPoint x="370" y="269" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="vnEJECslLKtDdsUNpcMM-40" value="$$s_2$$" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;" parent="1" vertex="1">
+        <mxCell id="vnEJECslLKtDdsUNpcMM-40" value="$$s_2$$" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="497" y="241.25" width="35" height="35" as="geometry" />
         </mxCell>
         <mxCell id="vnEJECslLKtDdsUNpcMM-41" value="$$s_3$$" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;" parent="1" vertex="1">
@@ -452,8 +452,8 @@
             <mxPoint x="370" y="269" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="4x95GaXsQE251ykliGBf-2" value="$$s_0$$" style="rounded=1;whiteSpace=wrap;html=1;align=center;spacingLeft=0;" vertex="1" parent="1">
-          <mxGeometry x="217" y="243.5" width="30" height="30" as="geometry" />
+        <mxCell id="4x95GaXsQE251ykliGBf-2" value="$$s_0$$" style="rounded=1;whiteSpace=wrap;html=1;align=center;spacingLeft=0;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="160" y="210" width="87" height="63.5" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
