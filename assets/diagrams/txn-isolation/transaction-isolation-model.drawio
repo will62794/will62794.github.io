@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.1.1 Chrome/132.0.6834.210 Electron/34.3.3 Safari/537.36" version="26.1.1">
   <diagram name="Page-1" id="NtG0qTXubIzRzJ-LV-hP">
-    <mxGraphModel dx="977" dy="768" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
+    <mxGraphModel dx="1266" dy="806" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -34,16 +34,16 @@
         <mxCell id="6nhi8PqKssiMJ2r7n0zs-14" value="Committed transactions \(\mathcal{T}\)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontFamily=Lucida Console;" parent="1" vertex="1">
           <mxGeometry x="100.5" y="255" width="254.5" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="648LUeA0mLOMaWqOP56g-1" value="$$T_3$$" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="648LUeA0mLOMaWqOP56g-1" value="$$T_3$$" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="180" y="313" width="40" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="648LUeA0mLOMaWqOP56g-2" value="$$T_1$$" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="648LUeA0mLOMaWqOP56g-2" value="$$T_1$$" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="143" y="370" width="40" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="648LUeA0mLOMaWqOP56g-3" value="$$T_4$$" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="648LUeA0mLOMaWqOP56g-3" value="$$T_4$$" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="254" y="342.5" width="40" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="648LUeA0mLOMaWqOP56g-4" value="$$T_2$$" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="648LUeA0mLOMaWqOP56g-4" value="$$T_2$$" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="220" y="397.5" width="40" height="40" as="geometry" />
         </mxCell>
       </root>
