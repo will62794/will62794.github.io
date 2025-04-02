@@ -16,7 +16,7 @@ A unifying concept of essentially any transaction isolation formalism is that an
 
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-isolation/transaction-isolation-model.drawio.svg" alt="Transaction Isolation Models" width=550>
+<img src="/assets/diagrams/txn-isolation/transaction-isolation-model.drawio.png" alt="Transaction Isolation Models" width=550>
 </div>
 
 
@@ -137,7 +137,7 @@ The basic idea of Crooks' formalism is centered on a *state-based* or *client-ce
 
 <figure style="text-align: center">
 <div style="text-align: center;padding:30px;">
-<img src="/assets/diagrams/txn-isolation/txnvis1-ReadStates.drawio.svg" alt="Transaction Isolation Models" width=550>
+<img src="/assets/diagrams/txn-isolation/txnvis1-ReadStates.drawio.png" alt="Transaction Isolation Models" width=550>
 </div>
 <figcaption>An <i>execution</i> of transactions with associated read states \(s_i\) in Crooks model.</figcaption>
 </figure>
