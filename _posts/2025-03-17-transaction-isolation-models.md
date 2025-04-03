@@ -16,7 +16,7 @@ A unifying concept of essentially any transaction isolation formalism is that an
 
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-isolation/transaction-isolation-model.drawio.png" alt="Transaction Isolation Models" width=550>
+<img src="/assets/diagrams/txn-isolation/txnvis1-CommittedTxns.drawio.png" alt="Transaction Isolation Models" width=550>
 </div>
 
 
