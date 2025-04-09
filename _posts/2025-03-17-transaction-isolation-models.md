@@ -100,7 +100,7 @@ Similarly, there is a notable transition from PSI to Prefix Consistency in this 
 Basically, the $$P\small{REFIX}$$ condition requires that if $$T$$ observes $$S$$, then it also observes all $$\mathsf{AR}$$ predecessors of $$S$$. In the example below, which illustrates the *long fork* anomaly of PSI, transactions $$T_3$$ and $$T_4$$ can be understood as observing the effects of $$T_1$$ and $$T_2$$ in "different orders" i.e. for $$T_3$$ it appears as if $$T_1 \rightarrow T_2$$, but for $$T_4$$ it observed $$T_2 \rightarrow T_1$$.
 
 <figure style="text-align: center">
-<img src="/assets/diagrams/txn-isolation/txnvis1-LongFork.drawio.svg" alt="Transaction Isolation Models" width=580 style="display: block; margin-left: auto; margin-right: auto;">
+<img src="/assets/diagrams/txn-isolation/txnvis1-LongFork.drawio.png" alt="Transaction Isolation Models" width=580 style="display: block; margin-left: auto; margin-right: auto;">
 <figcaption style="text-align: center;width:730px;margin:auto;margin-top:10px;">Case of long fork anomaly allowed under Parallel Snapshot Isolation. Omission of the dotted visibility edge \(\mathsf{VIS}_{\small{PREFIX}}\) enables this anomaly, but its existence is forced under the \(P\small{REFIX}\) condition (e.g. at full snapshot isolation).</figcaption>
 </figure>
 
