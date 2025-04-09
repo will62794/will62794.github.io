@@ -81,7 +81,7 @@ So, at this weakest defined isolation level, *Read Atomic*, we can think about a
 The underlying model requires that the visibility relation is acyclic, but without any other restrictions there are still some unintuitive semantics allowed at this weakest definition, with *causality violations* as the notable example. Basically, the visibility relation is not, by default, required to be transitive at *Read Atomic*, so you can end up with transactions observing the effects of some other transaction that observed the effect of an "earlier" transaction, but you don't observe the effects of the "earlier" transaction e.g. as shown by example below with 3 transactions (i.e. $$T_3$$ observes the effect of $$T_2$$ via $$y$$, and $$T_2$$ observes the effect of $$T_1$$ via $$x$$, but $$T_3$$ does not observe the effect of $$T_1$$'s write to $$x$$).
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-isolation/txnvis1-CausalViolation.drawio.svg" alt="Transaction Isolation Models" width=420>
+<img src="/assets/diagrams/txn-isolation/txnvis1-CausalViolation.drawio.png" alt="Transaction Isolation Models" width=420>
 </div>
 
 
