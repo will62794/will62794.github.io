@@ -48,7 +48,7 @@ Basically, $$\mathsf{VIS}$$ is a partial ordering of transactions in a history, 
 
 <figure style="text-align: center" id="fig1">
 <div style="text-align: center;padding:30px;">
-<img src="/assets/diagrams/txn-isolation/txnvis1-SampleHistory.drawio.svg" alt="Transaction Isolation Models" width=450>
+<img src="/assets/diagrams/txn-isolation/txnvis1-SampleHistory.drawio.png" alt="Transaction Isolation Models" width=450>
 </div>
 <figcaption>Figure 1: A history \(\mathcal{H}\) of committed transactions with a possible visibility and arbitration relation. Note that \(\mathsf{AR}\) is a total order, so we can visualize this by ordering all transactions in some linear (left-to-right) order.</figcaption>
 </figure>
