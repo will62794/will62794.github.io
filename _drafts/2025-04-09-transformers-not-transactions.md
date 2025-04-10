@@ -45,7 +45,7 @@ and when they go to define the *lost update* anomaly, it sort of requires a bit 
 In this particular case, I would argue that anomalies like *lost update* (which are the specific anomaly which SI write-write conflicts are supposed to prevent), aren't really "true" anomalies without expressing transactions in a higher level model like these state transformers. 
 
 Essentially, existing low level models can be viewed as those where all key transformers don't take in any key value dependencies (like $$f_y()$$) above. That is, they always write "constant" values, that are not actually dependent on the values read by that transaction. This is the case because a semantic notion of "dependence" is not even explicitly representable in most of these models.
-In such a world, I'd argue that "lost update" isn't a "true" anomaly at all, since if two transactions conflict by writing to the same key, what's the problem? One of them will commit after the other, and the database state will then reflect this as it should, and from an external observer's perspective (i.e. another transaction), this is no different than if the two transactions had executed in some serial order.
+In such a world, I'd argue that "lost update" isn't a "true" anomaly at all, since if two transactions conflict by writing to the same key, what's the problem? One of them will commit after the other, and the database state will then reflect this as it should, and from an external observer's perspective (i.e. another transaction), this is no different than if the two transactions had executed in some serial order. 
 
 A more accurate definition of *lost update*, which we can express in the state transformer model, is that an update may be "lost" if two transactions update the same key $$k$$ *and* the dependencies of key transformers $$f_k$$ in each transaction include $$k$$. That is, a lost update is only a problem due to the read-write dependency that exists between the two transactions, which creates a serializability anomaly because if you execute two transformer operations (for different transactions $$T_1$$ and $$T_2$$) like:
 
@@ -91,8 +91,18 @@ So, given this, we might consider both *lost update* and *write skew* both as su
 
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-transformers/cerone-write-skew.png" alt="Transaction Isolation Models" width=590>
+<img src="/assets/diagrams/txn-transformers/cerone-write-skew.png" alt="Transaction Isolation Models" width=670>
 </div>
+
+I would argue that this issue also arises in an obscured form elsewhere, for example in [A Critique of Snapshot Isolation](https://arxiv.org/abs/2405.18393), where they make the observation that detecting *read-write* conflicts (rather than *write-write*) is actually sufficient to make snapshot isolation serializable. But, they have to add a few special cases for read-only transactions e.g.
+
+> Plainly, since a read-only transaction does not perform any writes, it does
+not affect the values read by other trans- actions, and therefore does not
+affect the concurrent trans- actions as well. Because the reads in both snapshot isolation and write-snapshot isolation are performed on a fixed snapshot of the database that is determined by the trans- action start timestamp, the return
+value of a read operation is always the same, independent of the real time that the read is executed. Hence, a read-only transaction is not affected by concurrent transactions and intuitively does not have to be aborted....In other words, the read-only transactions are not checked for conflicts and hence never abort.
+
+Viewed in the state transformer model, there is no need to special case read-only transactions, since they already satisfy the condition we defined above which is about the dependency set of each key transformer. This provides a more unifying view to understand when serialization anomalies will arise. Furthermore, we can make a finer-grained distinction that allows transactions to proceed if the key transformer updates are "constant".
+
 
 
 ### Merging Transformers
