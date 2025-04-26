@@ -1,19 +1,23 @@
 ---
 layout: post
-title:  "Transformers vs. Transactions"
+title:  "Transactions as Transformers"
 categories: databases transactions isolation
 ---
 
-Database transactions are traditionally represented as a sequence of read/write operations
-on keys in a database. This is reflected in the formalisms that precisely define the semantics of various transaction isolation levels. In many cases, however, especially for most isolation levels used in practice in modern database systems, which are often snapshot isolation or stronger, this may not be the best model, and leads to some unnecessary confusion and complexity.
+Database transactions are traditionally modeled as a sequence of read/write operations
+on a set of keys, where reads return some value and writes set a key to some value. This is reflected in most of the formalisms that define various transactional isolation semantics. For most strong isolation levels used in practice in modern database systems, (e.g. snapshot isolation or above), we can alternatively view transactions as *state transformers*, rather than representing them at the low level of individual read and write operations.
 
-Most standard, existing transaction formalisms represents a transaction as a sequence of read/write operations over a subset of some fixed set of database keys and values e.g
+ <!-- this may not be the best model, and leads to some unnecessary confusion and complexity. -->
+
+Most standard formalisms represents a transaction as a sequence of read/write operations over a subset of some fixed set of database keys and values e.g
 
 $$
 T: r(x,v_0) \, r(y_0) \, w(x, v_1)
 $$
 
-For transactions oeprating at isolation levels that read from a consistent database snapshot, though, they don't really need to be modeled as a linear sequence of program steps, and can alternately be viewed as *state transformers*. That is, we can compact any transaction into the following object, illustrated by example, for a database with keys $$K=\{x,y,z\}$$:
+For transactions operating at isolation levels that read from a consistent database snapshot, though, we can think about transactions as more cleanly partitioned between its "read phase" and "update phase". That is, in many cases we can imagine that the "output" of a transaction are writes to some subset of keys, each of which, at most, can depend on some subset of keys that were read in that transaction's snapshot. Modeling a transaction as a linear sequence of program steps is a kind of lower level operational view of a transaction's effect at a high level. Thus, we can alternately model transactions as *state transformers*. 
+
+In this model, we compact any transaction into the following object, illustrated by example, for a database with keys $$K=\{x,y,z\}$$:
 
 $$
 T: 
@@ -24,9 +28,9 @@ T:
 \end{cases}
 $$
 
-where $$\mathcal{R}=\{x,y\}$$ is the set of keys read by the transaction upfront, and each $$f_v$$ is a *key transformer* function, which is a pure function describing the updates that get applied to each key in the subset of keys that are updated by that transaction. Each such function can optionally depend on the values read from the current snapshot state for that transaction.
+where $$\mathcal{R}=\{x,y\}$$ is the set of keys read by the transaction upfront, and each $$f_v$$ is a *key transformer* function i.e. a pure function describing the updates that get applied to each key that is being updated by that transaction. Each such function can optionally depend on the values read from the current snapshot state for that transaction.
 
-Notably, most traditional transaction formalisms don't make this operational view explicit in their models. For example, consider the way that papers treat the *lost update* anomaly. In the Cerone 2015 framework, they represent transactions as sequences of read/write operations over a set of keys, e.g.
+Most traditional transaction formalisms don't make this operational view explicit in their models. For example, consider the way that papers treat the *lost update* anomaly. In the Cerone 2015 framework, they represent transactions as sequences of read/write operations over a set of keys, e.g.
 
 <div style="text-align: center">
 <img src="/assets/diagrams/txn-transformers/cerone-defs.png" alt="Transaction Isolation Models" width=550>
