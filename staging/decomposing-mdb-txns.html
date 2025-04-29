@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Decomposing Transactions in MongoDB</title>
+  <meta name="description" content="Distributed transactions in MongoDB were developed incrementally, starting at the level of single-node WiredTiger transactions, and building up to single rep...">
+
+  <meta name="google-site-verification" content="Dz-TxZ5ISbYJeBidgnyTZYPTVd_filxXo3ZlPdOr2Hk" />
+  <meta property="og:site_name" content="William Schultz">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/default-syntax.css">
+  <link rel="canonical" href="http://localhost:4000/databases/transactions/isolation/2025/04/12/decomposing-mdb-txns.html">
+  <link rel="alternate" type="application/rss+xml" title="William Schultz" href="http://localhost:4000/feed.xml" />
+  <link rel="stylesheet" href="/css/academicons-1.9.4/css/academicons.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="bba9fb49-8108-4be6-8ae1-291f7a8379f8"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/main.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js"></script>
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Decomposing Transactions in MongoDB | William Schultz</title>
+<meta name="generator" content="Jekyll v4.3.4" />
+<meta property="og:title" content="Decomposing Transactions in MongoDB" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Distributed transactions in MongoDB were developed incrementally, starting at the level of single-node WiredTiger transactions, and building up to single replica set transactions and finally distributed, cross-shard transactions which were first introduced in version 4.2. In the EOVP framework recently discussed by Alex Miller, transactions at each layer conform to slightly different classifications within this framework." />
+<meta property="og:description" content="Distributed transactions in MongoDB were developed incrementally, starting at the level of single-node WiredTiger transactions, and building up to single replica set transactions and finally distributed, cross-shard transactions which were first introduced in version 4.2. In the EOVP framework recently discussed by Alex Miller, transactions at each layer conform to slightly different classifications within this framework." />
+<link rel="canonical" href="http://localhost:4000/databases/transactions/isolation/2025/04/12/decomposing-mdb-txns.html" />
+<meta property="og:url" content="http://localhost:4000/databases/transactions/isolation/2025/04/12/decomposing-mdb-txns.html" />
+<meta property="og:site_name" content="William Schultz" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-12T00:00:00-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Decomposing Transactions in MongoDB" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-04-12T00:00:00-04:00","datePublished":"2025-04-12T00:00:00-04:00","description":"Distributed transactions in MongoDB were developed incrementally, starting at the level of single-node WiredTiger transactions, and building up to single replica set transactions and finally distributed, cross-shard transactions which were first introduced in version 4.2. In the EOVP framework recently discussed by Alex Miller, transactions at each layer conform to slightly different classifications within this framework.","headline":"Decomposing Transactions in MongoDB","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/databases/transactions/isolation/2025/04/12/decomposing-mdb-txns.html"},"url":"http://localhost:4000/databases/transactions/isolation/2025/04/12/decomposing-mdb-txns.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <script>
+    MathJax = {
+        "jax": ["input/TeX", "output/HTML-CSS"],
+        chtml: {
+            scale: 0.9
+        },
+        options:{
+            enableMenu: false
+        }
+    };
+  </script>
+  <script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+    <!-- <div class="site-title"><a class="site-title" href="/">willy schultz</a></div> -->
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link active-link" href="/">Home</a>
+        <a class="page-link active-link" href="/posts">Writing</a>
+<!--         
+              
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+                <a class="page-link" href="/posts/">Writing</a>
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+         -->
+      </div>
+      
+    </nav>
+
+  </div>
+
+
+   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0MVL3YF9HQ"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-0MVL3YF9HQ');
+    </script>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        
+<div class="post blog">
+  <header class="post-header">
+    <h1 class="post-title">Decomposing Transactions in MongoDB</h1>
+    <p class="post-meta">
+    	Apr 12, 2025
+      
+    	<br>
+    </p>
+  </header>
+  <article class="post-content">
+    <p>Distributed transactions in MongoDB were developed incrementally, starting at the level of single-node WiredTiger transactions, and building up to single replica set transactions and finally distributed, cross-shard transactions which were first introduced in version 4.2. In the <a href="https://transactional.blog/blog/2025-decomposing-transactional-systems">EOVP framework</a> recently discussed by Alex Miller, transactions at each layer conform to slightly different classifications within this framework.</p>
+
+<h2 id="single-node-and-replica-set-transactions">Single Node and Replica Set Transactions</h2>
+
+<p><a href="https://source.wiredtiger.com/develop/overview.html">WiredTiger</a> is a multi-version (optimistic) concurrency control system that supports snapshot isolated transactions. At a single MongoDB node, transactions are executed against WiredTiger and are ordered based on commit timestamps assigned above the storage layer, and these commit timestamps are used to order transactions in the storage layer. Commit timestamp selection occurs essentially via an “oracle”, which at the single node level is effectively an atomic counter. These timestamps are assigned at some point near the start of the transaction, and when a transaction commits, it uses this timestamp to determine its visibility ordering. Validation of concurrency/isolation semantics happens online in these transactions, with write conflicts manifested eagerly at the time the conflict occurs. Similarly, persistence occurs upon commit, which requires a flush to the WiredTiger WAL (?)</p>
+
+<p>Replica set transactions don’t really change the underlying picture, since essentially all behaviors are the same except they occur at the primary while a transaction is being executed. Once a transaction commits, it will be written into the oplog and replicated to a secondary, which serves a higher level (consensus level) durability/persistence guarantee.</p>
+
+<div style="text-align: center">
+<svg version="1.1" width="37ch" height="95.0px" xmlns="http://www.w3.org/2000/svg">
+<defs>
+    <style type="text/css">
+        @media (prefers-color-scheme: dark) {
+            text {
+                fill: #eceff4;
+            }
+            line {
+                stroke: #eceff4;
+            }
+        }
+    </style>
+</defs>
+<text x="6ch" y="31.0px" text-anchor="end" alignment-baseline="middle"></text>
+<line x1="10ch" y1="59.0px" x2="10ch" y2="3.0px" stroke="black"></line>
+<line x1="14ch" y1="21px" x2="23ch" y2="21px" stroke="black"></line>
+<line x1="14ch" y1="13px" x2="14ch" y2="29px" stroke="black"></line>
+<line x1="23ch" y1="13px" x2="23ch" y2="29px" stroke="black"></line>
+<text x="18.5ch" y="15px" text-anchor="middle" alignment-baseline="baseline">Validate</text>
+<line x1="14ch" y1="51px" x2="23ch" y2="51px" stroke="black"></line>
+<line x1="14ch" y1="43px" x2="14ch" y2="59px" stroke="black"></line>
+<line x1="23ch" y1="43px" x2="23ch" y2="59px" stroke="black"></line>
+<text x="18.5ch" y="45px" text-anchor="middle" alignment-baseline="baseline">Execute</text>
+<line x1="27ch" y1="21px" x2="36ch" y2="21px" stroke="black"></line>
+<line x1="27ch" y1="13px" x2="27ch" y2="29px" stroke="black"></line>
+<line x1="36ch" y1="13px" x2="36ch" y2="29px" stroke="black"></line>
+<text x="31.5ch" y="15px" text-anchor="middle" alignment-baseline="baseline">Order</text>
+<line x1="27ch" y1="51px" x2="36ch" y2="51px" stroke="black"></line>
+<line x1="27ch" y1="43px" x2="27ch" y2="59px" stroke="black"></line>
+<line x1="36ch" y1="43px" x2="36ch" y2="59px" stroke="black"></line>
+<text x="31.5ch" y="45px" text-anchor="middle" alignment-baseline="baseline">Persist</text>
+</svg>
+</div>
+
+<!-- 
+
+[
+Actor: Validate A
+Actor: Execute B
+]
+[
+Actor: END A
+Actor: END B
+]
+
+[
+Actor: Order C
+Actor: Persist D
+]
+[
+Actor: END C
+Actor: END D
+]
+
+-->
+
+<h2 id="distributed-cross-shard-transactions">Distributed, Cross-Shard Transactions</h2>
+
+<p>Distributed transactions in MongoDB generalize a few of the components in the lower level transaction models e.g. validation and execution essentially occur concurrently, and for mostly the same windows of time. As a transaction proceeds in its <em>execution</em> phase, its operations are routed to the appropriate shards that own keys for the data being read/written, and <em>validation</em> occurs online, at each shard. In particular, this involves checking of write-write conflicts per SI requirements and also <em>prepare</em> conflicts, which are manifested in MongoDB as a way to ensure that concurrent transactions become visible atomically across shards.</p>
+
+<p>Once a transaction is ready to commit, it initiates a variant of two-phase commit, which conducts the main sections of the <em>ordering</em> and <em>persistence</em> phases for the transaction. Commit timestamp selection for distributed transactions in MongoDB is a partially distributed process, since there is no centralized timestamp oracle. That is, during the prepare phase, the transaction coordinator will collect prepare timestamps from each shard participating in the transaction, and a commit timestamp is then computed as some timestamps \(\geq\) the maximum of these prepare timestamps. This serves as a way to guarantee monotonicity of commit timestamps between dependent transactions across shards, without requiring a centralized timestamp oracle. Once this commit timestamp is computed, determining visibility ordering, the transaction can commit at each shard, making its commit record durable/persistent within a replica set and becoming visible to other transactions.</p>
+
+<p>TODO: Read timestamp chosen upfront also plays a part in ordering, as mentioned by Marc and Alex.</p>
+
+  </article>
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">
+</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+        </ul>
+      </div>
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <!-- <i class="ai ai-google-scholar"></i> -->
+          <!-- <li>
+            <a href="https://scholar.google.com/citations?user=Lh8RrHIAAAAJ">
+              <span class="icon ai ai-google-scholar">
+              </span>
+            </a>
+          </li> -->
+          
+        </ul>
+      </div>
+
+    <div class="footer-col footer-col-3">
+        <a href="https://github.com/will62794" style="text-decoration: none;">
+            <i class="fa-brands fa-github fa-lg"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/william-schultz-a22714a2/" style="text-decoration: none;">
+            <i class="fa-brands fa-linkedin fa-lg"></i>
+        </a>
+        <a href="https://scholar.google.com/citations?hl=en&user=Lh8RrHIAAAAJ&view_op=list_works&sortby=pubdate" style="text-decoration: none;">
+            <i class="ai ai-google-scholar-square ai-lg"></i>
+        </a>
+        <a href="mailto:will62794@gmail.com" style="text-decoration: none;">
+            <i class="fa-solid fa-envelope fa-lg"></i>
+        </a>
+    </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
