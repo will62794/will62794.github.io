@@ -30,28 +30,26 @@ $$
 
 where $$\mathcal{R}=\{x,y\}$$ is the set of keys read by the transaction upfront, and each $$f_v$$ is a *key transformer* function i.e. a pure function describing the updates that get applied to each key that is being updated by that transaction. Each such function can optionally depend on the values read from the current snapshot state for that transaction.
 
+## Modeling Isolation Anomalies
+
 Most traditional transaction formalisms don't make this operational view explicit in their models. For example, consider the way that papers treat the *lost update* anomaly. In the Cerone 2015 framework, they represent transactions as sequences of read/write operations over a set of keys, e.g.
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-transformers/cerone-defs.png" alt="Transaction Isolation Models" width=550>
+<img src="/assets/diagrams/txn-transformers/cerone-defs.png" alt="Transaction Isolation Models" width=590>
 </div>
 
 and when they define the *lost update* anomaly, it sort of requires skirting the issue a bit by resorting to a notion of "application code" that could have produced this sequence of writes:
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-transformers/cerone-lost-update-explanation.png" alt="Transaction Isolation Models" width=530>
+<img src="/assets/diagrams/txn-transformers/cerone-lost-update-explanation.png" alt="Transaction Isolation Models" width=730 style="border: 1px solid gray;padding: 5px;margin-bottom: 25px;">
 </div>
-
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-transformers/cerone-lost-update.png" alt="Transaction Isolation Models" width=390>
+<img src="/assets/diagrams/txn-transformers/cerone-lost-update.png" alt="Transaction Isolation Models" width=430 style="border: 1px solid gray;padding: 2px;">
 </div>
 
 In this particular case, one view is that anomalies like *lost update* (which are the specific anomaly which SI write-write conflicts are supposed to prevent), aren't really "true" anomalies without expressing transactions in a higher level model like these state transformers. 
 
-In this state transformer view, existing models can essentially be seen as those where all key transformers don't take in any key dependencies (like $$f_y()$$) above. That is, they always write "constant" values i.e. those that are not dependent on any values read by the transaction. This is the case because a semantic notion of "dependence" is not explicitly representable in most of these formalisms.
-In such a world, we might argue that "lost update" isn't a "true" anomaly at all, since if two transactions conflict by writing to the same key, what's the problem? One of them will commit after the other, and the database state will then reflect this as it should, and from an external observer's perspective (i.e. another transaction), this is no different than if the two transactions had executed in some serial order. 
-
-A more accurate definition of *lost update*, which we can express more precisely in the state transformer model, is that an update may be "lost" if two transactions $$T_1$$ and $$T_2$$ update the same key $$k$$ via key transformers $$f^{T_1}_x$$ and $$f^{T_2}_x$$ *and* $$k$$ is a dependency of one of these transformer functions. That is, a lost update is only a problem due to the read-write dependency that exists between the two transactions, which creates a serializability anomaly because if you execute two transformers (for different transactions $$T_1$$ and $$T_2$$) like:
+A more accurate definition of *lost update*, which we can express more precisely in the state transformer model, is that an update may be "lost" if two transactions $$T_1$$ and $$T_2$$ update the same key $$k$$ via key transformers $$f^{T_1}_x$$ and $$f^{T_2}_x$$ *and* $$k$$ is a dependency of one of these transformer functions. That is, a lost update is only a problem due to the read-write dependency that exists between the two transactions, which creates a serializability anomaly because if you execute two transactions with transformers
 
 $$
 \begin{aligned}
@@ -60,27 +58,35 @@ f^{T_2}_x(x) = x + 3
 \end{aligned}
 $$
 
-their order obviously matters for the final outcome, since they incur a semantic (read-write) dependency on each other. If they both execute on the same data snapshot and are allowed to commit, the result will be semantically incorrect i.e. you really have "lost" one of the updates, since the outcome will be either $$x=1$$ or $$x=3$$, but not $$x=4$$ as it should be. Similarly, such an anomaly can also arise even with one fewer key transformer dependency e.g.
+their order obviously matters for the final outcome, since they incur a semantic (read-write) dependency on each other. That is, if they both execute on the same data snapshot and are allowed to commit, the result will be semantically incorrect i.e. you really have "lost" one of the updates, since the outcome will be either $$x=1$$ or $$x=3$$, but not $$x=4$$ as it should be (assuming $$x=0$$ in the shared snapshot). Similarly, such an anomaly can also arise with a different dependency structure e.g.
 
 $$
 \begin{aligned}
-f^{T_1}_x() = 6 \\
-f^{T_2}_x(x) = x + 3
+f^{T_1}_x&() = 6 \\
+f^{T_2}_x&(x) = x + 3
 \end{aligned}
 $$
 
-since the dependency still exists and so order of execution still matters. If both write to the same key but neither transformer has a dependency, though
+In this case, the order of execution *can* matter, but if $$T_1$$'s write "wins", then we end up in a state where $$x=6$$ which is equivalent to a scenario where the transactions executed serially, but $$T_1$$ went first. If $$T_2$$'s write "wins", though, then we end up in a state where $$x=3$$ which is not equivalent to any serial execution of these transactions.
+
+The order of execution here still matters even though there is no longer a mutual dependency between both transformer functions. Clearly, executing both such transactions against the same snapshot will end up with something semantically incorrect, since the final state will be either $$x=6$$ or $$x=9$$, but not $$x=12$$ as it should be (assuming $$x=0$$ in the shared snapshot).
+
+Finally, if both transactions write to the same key but neither transformer has a dependency,
 
 $$
 \begin{aligned}
-f^{T_1}_x() = 6 \\
-f^{T_2}_x() = 3
+f^{T_1}_x() &= 6 \\
+f^{T_2}_x() &= 3
 \end{aligned}
 $$
 
-then no "true" anomaly can manifest, since the resulting state after commit of both transactions will be equivalent to their execution in some sequential order.
+then no "true" lost update anomaly can manifest, since the resulting state after commit of both transactions will always be equivalent to their execution in some sequential order.
+
+In fact, in this state transformer view, existing transaction formalisms can essentially be seen as those where all key transformers don't take in any key dependencies (like the last example above). That is, they always write "constant" values i.e. those that are not dependent on any values read by the transaction. This is the case because a semantic notion of "dependence" is not explicitly representable in most of these formalisms.
+In such a world, we might argue that "lost update" isn't a "true" anomaly at all, since if two transactions conflict by writing to the same key, what's the problem? One of them will commit after the other, and the database state will then reflect this as it should, and from an external observer's perspective (i.e. another transaction), this is no different than if the two transactions had executed in some serial order. 
 
 
+### Write Skew
 
 
 This transformer model also gives us a nice way to see that *lost update* can be seen as a special case of a more general class of anomalies. For example, we can also consider *write skew*, the canonical anomaly allowed under snapshot isolation. Essentially, write skew manifests when two transactions don't write to intersecting key sets, but they both update keys in a way that may break some "semantic" constraint. As illustrated again in Cerone via the standard example:
