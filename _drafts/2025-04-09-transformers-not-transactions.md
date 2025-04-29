@@ -124,7 +124,10 @@ T_1:
 \begin{cases}
 &\mathcal{R}=\{x,y\} \\
 &x' = f_x(y)
-\end{cases} \quad\quad
+\end{cases}
+$$
+
+$$
 T_2: 
 \begin{cases}
 &\mathcal{R}=\{x,y\} \\
@@ -144,7 +147,75 @@ $$
 
 This isn't quite the same as the classical write skew constraint violation example, but it can still lead to a serialization anomaly.
 
+Finally, what about Fekete's [read-only transaction anomaly](https://www.cs.umb.edu/~poneil/ROAnom.pdf)? The state transformer view also provides clarity on this, simplifying various views on this issue. Basically, Fekete's example is given as follows:
 
+$$
+T_1:
+\begin{cases}
+&r(x,0) \\
+&r(y,0) \\
+&w(x,-11)
+\end{cases}
+$$
+
+$$
+T_2:
+\begin{cases}
+&r(x,0) \\
+&r(y,0) \\
+&w(y,20)
+\end{cases}
+$$  
+
+$$
+T_3:
+\begin{cases}
+&r(x,0) \\
+&r(y,20) \\
+\end{cases}
+$$
+
+He claims that this is a "read-only" transaction anomaly since if you remove $$T_3$$ then the execution of $$T_1$$ and $$T_2$$ in isolation is serializable. But I think this argument is a bit misleading, since if you look at a prior example from the same paper of basic *write skew*, it is shown as follows, for 2 transactions:
+
+$$
+T_1:
+\begin{cases}
+&r(x,70) \\
+&r(y,80) \\
+&w(x,-30)
+\end{cases}
+$$
+
+$$
+T_2:
+\begin{cases}
+&r(x,70) \\
+&r(y,80) \\
+&w(y,-20)
+\end{cases}
+$$
+
+Doesn't the same argument apply here? That is, why can't we say that $$T_1$$ and $$T_2$$ serializable for the same reason as in the ROA scenario? Again, the problem here is that with "blind writes" there isn't a formal way to define these type of anomalies without resorting to explicit, operation level "update" semantics. In the state transformer model, Fekete's write skew example is more accurately represented as:
+
+$$
+T_1: 
+\begin{cases}
+&\mathcal{R}=\{x,y\} \\
+&x' = \text{if } x + y > 100 \text{ then } (x - 100) \text{ else } x
+\end{cases}
+$$
+
+$$
+T_2: 
+\begin{cases}
+&\mathcal{R}=\{x,y\} \\
+&y' = \text{if } x + y > 100 \text{ then } (y - 100) \text{ else } y \\ 
+\end{cases}
+$$
+
+So, one way to view this is that the read-only anomaly is really just a way that write skew becomes "visible" in the default existing formal model (???)
+
+-----------------------
 
 Note that a related issue also arises in a somewhat obscured form elsewhere e.g. in [A Critique of Snapshot Isolation](https://arxiv.org/abs/2405.18393), where they make the observation that detecting *read-write* conflicts (rather than *write-write*) is sufficient to make snapshot isolation serializable. But, they have to add a few special cases for read-only transactions e.g.
 
