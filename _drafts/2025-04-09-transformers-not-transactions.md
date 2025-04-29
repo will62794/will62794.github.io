@@ -158,7 +158,6 @@ What about Fekete's [read-only transaction anomaly](https://www.cs.umb.edu/~pone
 $$
 T_1:
 \begin{cases}
-&r(x,0) \\
 &r(y,0) \\
 &w(x,-11)
 \end{cases}
@@ -201,7 +200,7 @@ T_2:
 \end{cases}
 $$
 
-It seems the same argument would apply here. That is, why can't we say that $$T_1$$ and $$T_2$$ serializable for the same reason as in the ROA scenario, even though this is claimed to exhibit a "write skew" anomaly? Again, the problem here is that with "blind writes" there isn't a precise way to define these type of anomalies without resorting to explicit, operation level "update" semantics. In the state transformer model, Fekete's write skew example would more accurately be represented as:
+It seems that almost the same argument would apply here. That is, why can't we say that $$T_1$$ and $$T_2$$ serializable (if we remove $$T_1$$'s read of $$x$$) for the same reason as in the ROA scenario, even though this is claimed to exhibit a "write skew" anomaly? Again, the problem here is that with "blind writes" there isn't a precise way to define these type of anomalies without resorting to explicit, operation level "update" semantics. In the state transformer model, Fekete's write skew example would more accurately be represented as:
 
 $$
 T_1: 
