@@ -89,20 +89,18 @@ In such a world, we might argue that "lost update" isn't a "true" anomaly at all
 ### Write Skew
 
 
-This transformer model also gives us a nice way to see that *lost update* can be seen as a special case of a more general class of anomalies. For example, we can also consider *write skew*, the canonical anomaly allowed under snapshot isolation. Essentially, write skew manifests when two transactions don't write to intersecting key sets, but they both update keys in a way that may break some "semantic" constraint. As illustrated again in Cerone via the standard example:
+This transformer model also gives us a nice way to see that *lost update* can be seen as a special case of a more general class of anomalies. For example, we can also consider *write skew* within this framework, the canonical anomaly allowed under snapshot isolation. Essentially, write skew manifests when two transactions don't write to intersecting key sets, but they both update keys in a way that may break some external "semantic" constraint. As illustrated again in Cerone via the standard example:
 
 <div style="text-align: center">
-<img src="/assets/diagrams/txn-transformers/cerone-write-skew.png" alt="Transaction Isolation Models" width=710>
+<img src="/assets/diagrams/txn-transformers/cerone-write-skew.png" alt="Transaction Isolation Models" width=710 style="border: 1px solid gray;padding: 2px;">
 </div>
 
 
-
-The transformer model representation for this canonical write skew example would look something like:
+We can represent this example in the state transformer model as:
 
 $$
 T_1: 
 \begin{cases}
-&\mathcal{R}=\{x,y\} \\
 &x' = f_x(x,y)
 \end{cases} 
 $$
@@ -110,7 +108,6 @@ $$
 $$
 T_2: 
 \begin{cases}
-&\mathcal{R}=\{x,y\} \\
 &y' = f_y(x,y) \\ 
 \end{cases}
 $$
@@ -118,17 +115,19 @@ $$
 In this case, we can see that the key transformers in each transaction depend on both keys, $$x$$ and $$y$$, since the conditional logic in the example can be represented as a logical if-then-else that reads values of both keys $$x$$ and $$y$$ i.e. 
 
 $$
-f_y(x,y) = \text{if } (x + y) > 100 \text{ then } (y - 100) \text{ else } y
+\begin{aligned} 
+f_x(x,y) &= \text{if } (x + y) > 100 \text{ then } (x - 100) \text{ else } x \\
+f_y(x,y) &= \text{if } (x + y) > 100 \text{ then } (y - 100) \text{ else } y
+\end{aligned}
 $$
 
-Again, the problem arises at the core due to the read-write dependencies between these transactions i.e. the writes of one transaction affect the dependency key set of the writes (i.e. key transformers) of the other. Thus, their order of execution matters.
+Again, the problem arises at the core due to the read-write dependencies between these transactions i.e. the writes of one transaction affect the dependency key set of the writes (i.e. key transformers) of the other. Thus, their order of execution matters, and so the resulting state will not be equivalent to some serial execution.
 
-From this perspective, we may consider both *lost update* and *write skew* as special cases of a more general class of anomalies that can arise when there is a data dependency between the *write set* of a transaction and the *dependency key set* of another transaction. This provides a more general view of this type of anomaly e.g. we can also have cases that differ from the classical examples, like
+When viewed in this perspective, it is clearer to understand *lost update* and *write skew* as special cases of a more general class of anomalies that can arise when there is a data dependency between the *write set* of a transaction and the *dependency key set* of another transaction. This provides a more general view of this type of anomaly e.g. we can also have cases that differ from the classical examples, like
 
 $$
 T_1: 
 \begin{cases}
-&\mathcal{R}=\{x,y\} \\
 &x' = f_x(y)
 \end{cases}
 $$
@@ -136,7 +135,6 @@ $$
 $$
 T_2: 
 \begin{cases}
-&\mathcal{R}=\{x,y\} \\
 &y' = f_y() \\ 
 \end{cases}
 $$
@@ -153,7 +151,9 @@ $$
 
 This isn't quite the same as the classical write skew constraint violation example, but it can still lead to a serialization anomaly.
 
-Finally, what about Fekete's [read-only transaction anomaly](https://www.cs.umb.edu/~poneil/ROAnom.pdf)? The state transformer view also provides clarity on this, simplifying various views on this issue. Basically, Fekete's example is given as follows:
+### Read-Only Anomaly
+
+What about Fekete's [read-only transaction anomaly](https://www.cs.umb.edu/~poneil/ROAnom.pdf)? The state transformer view also provides clarity on this, simplifying various views on this issue. Fekete's original example is given as follows:
 
 $$
 T_1:
@@ -201,7 +201,7 @@ T_2:
 \end{cases}
 $$
 
-Doesn't the same argument apply here? That is, why can't we say that $$T_1$$ and $$T_2$$ serializable for the same reason as in the ROA scenario? Again, the problem here is that with "blind writes" there isn't a formal way to define these type of anomalies without resorting to explicit, operation level "update" semantics. In the state transformer model, Fekete's write skew example is more accurately represented as:
+It seems the same argument would apply here. That is, why can't we say that $$T_1$$ and $$T_2$$ serializable for the same reason as in the ROA scenario, even though this is claimed to exhibit a "write skew" anomaly? Again, the problem here is that with "blind writes" there isn't a precise way to define these type of anomalies without resorting to explicit, operation level "update" semantics. In the state transformer model, Fekete's write skew example would more accurately be represented as:
 
 $$
 T_1: 
@@ -220,6 +220,8 @@ T_2:
 $$
 
 So, one way to view this is that the read-only anomaly is really just a way that write skew becomes "visible" in the default existing formal model (???)
+
+This demystifies the "read-only" anomaly somewhat, showing that it isn't really fundamentally different from write skew case, but just an awkward artifact of the way that many default formalisms express transactions and anomalies.
 
 -----------------------
 
