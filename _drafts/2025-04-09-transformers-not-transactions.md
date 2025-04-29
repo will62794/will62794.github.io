@@ -5,9 +5,11 @@ categories: databases transactions isolation
 ---
 
 Database transactions are traditionally modeled as a sequence of read/write operations
-on a set of keys, where reads return some value and writes set a key to some value. This is reflected in most of the formalisms that define various transactional isolation semantics. For most strong isolation levels used in practice in modern database systems, (e.g. snapshot isolation or above), we can alternatively view transactions as *state transformers*, rather than representing them at the low level of individual read and write operations.
+on a set of keys, where reads return some value and writes set a key to some value. This is reflected in most of the formalisms that define various transactional isolation semantics. For most strong isolation levels used in practice in modern database systems, (e.g. snapshot isolation or above), we can alternatively view transactions as *state transformers*, rather than representing them at the low level of individual read and write operations. Essentially, at a very high level, a transaction in this model is viewed as a function that takes in a current state, and returns a set of modifications to a subset of database keys, based on values in the current state that it read.
 
  <!-- this may not be the best model, and leads to some unnecessary confusion and complexity. -->
+
+## A Transformer Model
 
 Most standard formalisms represents a transaction as a sequence of read/write operations over a subset of some fixed set of database keys and values e.g
 
