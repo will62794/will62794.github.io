@@ -4,14 +4,13 @@ title:  "Transactions as Transformers"
 categories: databases transactions isolation
 ---
 
-Database transactions are traditionally modeled as a sequence of read/write operations
-on a set of keys, where each read operation return some value and each write sets a key to some value. This is reflected in most of the formalisms that define various transactional isolation semantics ([Adya](https://pmg.csail.mit.edu/papers/icde00.pdf), [Crooks](https://www.cs.cornell.edu/lorenzo/papers/Crooks17Seeing.pdf), etc.). For most isolation levels used in practice in modern database systems, (e.g. snapshot isolation or above), we can alternatively view transactions as *state transformers*.That is, at a high level, instead of a lower-level sequence of read/write operations, a transaction can be viewed as a function that takes in a current state, and returns a set of modifications to a subset of database keys, based on values in the current state that it read. We can explore this perspective and how it simplified various aspects of reasoning about existing isolation levels and anomalies.
+Database transactions are traditionally modeled as a sequence of read/write operations on a set of keys, where each read operation return some value and each write sets a key to some value. This is reflected in most of the formalisms that define various transactional isolation semantics ([Adya](https://pmg.csail.mit.edu/papers/icde00.pdf), [Crooks](https://www.cs.cornell.edu/lorenzo/papers/Crooks17Seeing.pdf), etc.). For most isolation levels used in practice in modern database systems, (e.g. snapshot isolation or above), we can alternatively view transactions as *state transformers*.That is, at a high level, instead of a lower-level sequence of read/write operations, a transaction can be viewed as a function that takes in a current state, and returns a set of modifications to a subset of database keys, based on values in the current state that it read. We can explore this perspective and how it simplified various aspects of reasoning about existing isolation levels and anomalies.
 
  <!-- this may not be the best model, and leads to some unnecessary confusion and complexity. -->
 
 ## State Transformer Model
 
-Most standard formalisms represents a transaction as a sequence of read/write operations over a subset of some fixed set of database keys and values e.g
+Most standard formalisms represent a transaction as a sequence of read/write operations over a subset of some fixed set of database keys and values e.g
 
 $$
 T: 
@@ -22,7 +21,7 @@ T:
 \end{cases}
 $$
 
-For transactions operating at isolation levels that read from a consistent database snapshot, though (e.g. [Read Atomic](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf) and stronger), we can think about transactions as more cleanly partitioned between a "read phase" and "update phase". That is, we can consider the "output" of a transaction as writes to some subset of keys, each of which, at most, can depend on some subset of keys that were read from that transaction's snapshot. We can formalize this idea into the view of transactions as *state transformers*. For example, for a database with a key set $$\mathcal{K}=\{x,y,z\}$$, we can consider an example of a transaction modeled in this way:
+For transactions operating at isolation levels that read from a consistent database snapshot, though (e.g. [Read Atomic](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf) and stronger), we can think about transactions as more cleanly partitioned between a "read phase" and "update phase". That is, we can consider the "input" of a transaction as the subset of keys it reads from its snapshot, and its "output" as writes to some subset of keys, each of which, at most, can depend on some subset of keys that were read from that transaction's snapshot. We can formalize this idea into the view of transactions as *state transformers*. For example, for a database with a key set $$\mathcal{K}=\{x,y,z\}$$, we can consider an example of a transaction modeled in this way:
 
 $$
 T: 
@@ -33,13 +32,13 @@ T:
 \end{cases}
 $$
 
-where $$\mathcal{R}=\{x,y\}$$ is the set of keys read by the transaction upfront, and each $$f_v$$ is a *key transformer* function i.e. a pure function describing the updates that get applied to each key that is being updated by that transaction. Each such function can optionally depend on the values read from the current snapshot state for that transaction. 
+In this representation, $$\mathcal{R}=\{x,y\}$$ is the set of keys read by the transaction upfront, and each $$f_v$$ is a *key transformer* function i.e. a pure function describing the updates that get applied to each key that is being updated by that transaction. Each such function can optionally depend on the values read from the current snapshot state for that transaction. 
 
-More formally, we simply define a transaction as a set of key transformer functions $$F_\mathcal{W_T}$$, where $$\mathcal{W_T} \subseteq \mathcal{K}$$ is the set of keys that the transaction updates, and each transformer function $$f_k$$ for $$k \in \mathcal{W_T}$$ is a function over some subset of key dependencies $$\mathcal{D_k} \subseteq \mathcal{K}$$.
+<!-- More formally, we simply define a transaction as a set of key transformer functions $$F_\mathcal{W_T}$$, where $$\mathcal{W_T} \subseteq \mathcal{K}$$ is the set of keys that the transaction updates, and each transformer function $$f_k$$ for $$k \in \mathcal{W_T}$$ is a function over some subset of key dependencies $$\mathcal{D_k} \subseteq \mathcal{K}$$. -->
 
 ## Modeling Isolation Anomalies
 
-Viewing transaction operations as fundamentally built from key transformer functions i.e. functions that read some values and produce some writes, helps clarify some awkward aspects of existing transaction isolation models and their treatment of anomalies. Particularly due to the fact that most traditional transaction formalisms don't make these kind of update/transformer operations an explicit first-class member of the model. 
+Viewing transaction operations as fundamentally built from key transformer functions i.e. functions that read some values and produce some writes, helps clarify some awkward aspects of existing transaction isolation models and their treatment of anomalies. Particularly due to the fact that most traditional transaction formalisms don't make these kind of update/transformer operations an explicit first-class member of their model. 
 
 For example, consider the way that papers treat the *lost update* anomaly. In the [Cerone 2015](https://software.imdea.org/~andrea.cerone/works/Framework.pdf) framework, they represent transactions as sequences of read/write operations over a set of keys, e.g.
 
@@ -56,11 +55,12 @@ When they define the *lost update* anomaly in their model, it sort of requires s
 <img src="/assets/diagrams/txn-transformers/cerone-lost-update.png" alt="Transaction Isolation Models" width=430 style="border: 1px solid gray;padding: 2px;">
 </div>
 
-This is common across many [other descriptions of the *lost update* anomaly](https://www.cs.umb.edu/~poneil/ROAnom.pdf). One reasonable view here is that anomalies like *lost update* (which are the specific anomaly which write-write conflicts in snapshot isolation are supposed to prevent), are fundamentally unnatural to express without resorting to some model that can take into account the true "update" semantics (e.g. read-write dependencies) between transactions. In other words, if two transactions conflict by writing to the same key, what's the problem? One of them will commit after the other, and the database state will then reflect this as it should, and from an external observer's perspective (i.e. another transaction), this is no different than if the two transactions had executed in some serial order. These type of anomalies only "make sense" by resorting to some vague higher level "application code" notion. What we really care about is whether the value of that write was computed based specifically on the values that it read. Most existing formalisms don't make this explicit, and just kind of gloss over it with the mention of "application code".
+This is common across many [other descriptions of the *lost update* anomaly](https://www.cs.umb.edu/~poneil/ROAnom.pdf). One reasonable view here is that anomalies like *lost update* (which are the specific anomaly which write-write conflicts in snapshot isolation are supposed to prevent), are fundamentally unnatural to express without resorting to some model that can take into account the true "update" semantics (e.g. read-write dependencies) between transactions. In other words, the underlying problem of "lost update" arises due specifically to a case where a write is done that is dependent on a value that was read in that transaction. But, most formalisms don't make this "write that depends on a read" semantics explicit, and resort to a kind of vague notion of "application code" that might have done such updates.
+
+<!-- In other words, if two transactions conflict by writing to the same key, what's the problem? One of them will commit after the other, and the database state will then reflect this as it should, and from an external observer's perspective (i.e. another transaction), this is no different than if the two transactions had executed in some serial order. These type of anomalies only "make sense" by resorting to some vague higher level "application code" notion. What we really care about is whether the value of that write was computed based specifically on the values that it read. Most existing formalisms don't make this explicit, and just kind of gloss over it with the mention of "application code". -->
 
 
-We can try to remedy this awkardness using the transformer model.
-That is, a more accurate definition of *lost update*, which we can express more precisely in the state transformer model, may be that an update may be "lost" if two transactions $$T_1$$ and $$T_2$$ update the same key $$k$$ via key transformers $$f^{T_1}_x$$ and $$f^{T_2}_x$$ *and* $$k$$ is a dependency of one of these transformer functions e.g. 
+In the state transformer model, we may say that a more precise definition of *lost update* is in a case where two transactions $$T_1$$ and $$T_2$$ update the same key $$k$$ via key transformers $$f^{T_1}_x$$ and $$f^{T_2}_x$$ *and* $$k$$ is a dependency of one of these transformer functions e.g. 
 
 $$
 \begin{aligned}
@@ -156,6 +156,22 @@ $$
 
 This isn't quite the same as the classical write skew constraint violation example, but it can still lead to a serialization anomaly.
 
+
+### Generalized View of Dependency Anomalies
+
+A more general view of this class of anomalies is that they all arise when there exists some read-write dependencies between a set of transactions. From one perspective, we could say this is simply the case that occurs when transactions "read set" and "write set" intersect. This is not quite precise enough, though, since, for 
+
+The model we describe abvoe also helps us see why there are various quirks of default transaction isolation definitions and implementation that don't actually seem to make total sense when you examine them in more detail. For example, in classic snapshot isolation, write-conflicts force two transactions to conflict and one to abort if they both write to the same key. In theory, this behavior exists to prevent lost update anomalies. But, in reality, this is basically just a very coarse-grained and conservative way of preventing this. Really, what we care about is aborting a write that *depended* on a value read that was written by another transaction. Aborting write conflicts is just one way to prevent the particular special case that is "lost update" (i.e. when two transaction directly write to the same key), and they also do this in an overly conservative way e.g. if two transactions do no reads but write to the same key, there is no strict need to abort one of them.
+
+Similarly, there are workarounds in other models where a simple notion even of "read-write" conflicts is not precise enough. For example, in [A Critique of Snapshot Isolation](https://arxiv.org/abs/2405.18393), where they make the simple but clever observation that detecting *read-write* conflicts (rather than *write-write*) is sufficient to make snapshot isolation serializable. But, even here, they have to add a particular special case for read-only transactions e.g.
+
+> Plainly, since a read-only transaction does not perform any writes, it does not affect the values read by other transactions, and therefore does not affect the concurrent transactions as well. Because the reads in both snapshot isolation and write-snapshot isolation are performed on a fixed snapshot of the database that is determined by the transaction start timestamp, the return value of a read operation is always the same, independent of the real time that the read is executed. Hence, a read-only transaction is not affected by concurrent transactions and intuitively does not have to be aborted....In other words, the read-only transactions are not checked for conflicts and hence never abort.
+
+Viewed in the state transformer model, there is no need to special case read-only transactions, since they already satisfy the condition we defined above which is about the dependency set of each key transformer. This provides a more unifying view to understand when serialization anomalies will arise. Furthermore, we can make a finer-grained distinction that allows transactions to proceed if the key transformer updates are "constant".
+
+
+<!-- 
+
 ### Fekete's Read-Only Anomaly
 
 What about Fekete's [read-only snapshot transaction anomaly](https://www.cs.umb.edu/~poneil/ROAnom.pdf)? The state transformer view also provides a simplified view on this. Fekete's original example is given as follows:
@@ -225,15 +241,9 @@ $$
 
 So, one way to view this is that the read-only anomaly is really just a way that write skew becomes "visible" in the default existing formal model (???)
 
-This demystifies the "read-only" anomaly somewhat, showing that it isn't really fundamentally different from write skew case, but just an awkward artifact of the way that many default formalisms express transactions and anomalies.
+This demystifies the "read-only" anomaly somewhat, showing that it isn't really fundamentally different from write skew case, but just an awkward artifact of the way that many default formalisms express transactions and anomalies. -->
 
------------------------
 
-Note that a related issue also arises in a somewhat obscured form elsewhere e.g. in [A Critique of Snapshot Isolation](https://arxiv.org/abs/2405.18393), where they make the observation that detecting *read-write* conflicts (rather than *write-write*) is sufficient to make snapshot isolation serializable. But, they have to add a few special cases for read-only transactions e.g.
-
-> Plainly, since a read-only transaction does not perform any writes, it does not affect the values read by other transactions, and therefore does not affect the concurrent transactions as well. Because the reads in both snapshot isolation and write-snapshot isolation are performed on a fixed snapshot of the database that is determined by the transaction start timestamp, the return value of a read operation is always the same, independent of the real time that the read is executed. Hence, a read-only transaction is not affected by concurrent transactions and intuitively does not have to be aborted....In other words, the read-only transactions are not checked for conflicts and hence never abort.
-
-Viewed in the state transformer model, there is no need to special case read-only transactions, since they already satisfy the condition we defined above which is about the dependency set of each key transformer. This provides a more unifying view to understand when serialization anomalies will arise. Furthermore, we can make a finer-grained distinction that allows transactions to proceed if the key transformer updates are "constant".
 
 
 
@@ -244,3 +254,5 @@ This view of transactions also opens up a few interesting questions about whethe
 Similarly, if transactions can be represented in this fashion for most practical systems/isolation levels, this also seems to raise the question of whether we can also move back to a world where we apply ideas from deterministic transaction scheduling (i.e. [Calvin](https://cs.yale.edu/homes/thomson/publications/calvin-sigmod12.pdf) style), since in theory the read/write sets of a transaction are known upfront. In practice, some transactions may still determine their full read/write sets dynamically, as they execute, but there may be some opportunities to apply some of these ideas.
 
 Also, even in Adya type models, which explicitly model read and write dependencies between transactions, they still don't make explicit this finer-grained notion of update dependencies, since they just determine a "read dependency" as one that may lead to an update based anomaly if the transaction uses that read value in an update expression. For read only transactions, though, we don't need to be worried about these anomalies, since the values read are not being used in update computations. (???)
+
+Note that the existing world of stored procedure transactions, and in one-shot transaction systems like [Spanner](https://research.google/pubs/spanner-googles-globally-distributed-database-2/), that share similarities with this state transformer view of transactions. I think it helps, however, to, in some cases, consider this as a more fundamental part of the formalism itself, rather than an implementation approach.
