@@ -6,7 +6,7 @@ categories: databases transactions isolation
 
 Database transactions are traditionally modeled as a sequence of read/write operations on a set of keys, where each read operation returns some value and each write sets a key to some value. This is reflected in most of the formalisms that define various transactional isolation semantics ([Adya](https://pmg.csail.mit.edu/papers/icde00.pdf), [Crooks](https://www.cs.cornell.edu/lorenzo/papers/Crooks17Seeing.pdf), etc.). 
 
-For many isolation levels used in practice in modern database systems, (e.g. snapshot isolation or above), we can alternatively consider viewing transactions as *state transformers*. That is, instead of a lower-level sequence of read/write operations, a transaction can be viewed as a function that takes in a current state, and returns a set of modifications to a subset of database keys, based on values in the current state that it read. We can explore this perspective and how it simplifies various aspects of reasoning about existing isolation levels and their anomalies.
+For many isolation levels used in practice in modern database systems, (e.g. snapshot isolation or above), we can alternatively consider viewing transactions as *state transformers*. That is, instead of a lower-level sequence of read/write operations, a transaction can be viewed as a function that takes in a current state, and returns a set of modifications to a subset of database keys, based on values in the current state that it read. This view is not fully general in its applicability to all isolation levels (e.g. read committed), but we can explore this perspective and how it simplifies various aspects of reasoning about existing isolation levels and their anomalies.
 
  <!-- this may not be the best model, and leads to some unnecessary confusion and complexity. -->
 
@@ -24,7 +24,8 @@ T:
 \end{cases}
 $$
 
-For transactions operating at isolation levels that read from a consistent database snapshot, though (e.g. [Read Atomic](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf) and stronger), we can think about transactions as more cleanly partitioned between a "read phase" and "update phase". That is, we can consider the "input" of a transaction as the subset of keys it reads from its snapshot, and its "output" as writes to some subset of keys, each of which, at most, can depend on some subset of keys that were read from that transaction's snapshot. 
+For transactions operating at isolation levels that read from a consistent database snapshot, though (e.g. [Read Atomic](https://drops.dagstuhl.de/storage/00lipics/lipics-vol042-concur2015/LIPIcs.CONCUR.2015.58/LIPIcs.CONCUR.2015.58.pdf) and stronger), we can think about transactions as more cleanly partitioned between a "read phase" and "update phase". That is, we can consider the "input" of a transaction as the subset of keys it reads from its snapshot, and its "output" as writes to some subset of keys, each of which, at most, can depend on some subset of keys that were read from that transaction's snapshot. In other words, at levels like snapshot isolation, although a transaction seems to pass through many stages, doing reads and writes internally, we can compact these stages down into a single read and update phase.
+
 
 We can formalize this idea into the view of transactions as *state transformers*. For example, for a database with a key set $$\mathcal{K}=\{x,y,z\}$$, we can consider an example of a transaction modeled in this way:
 
