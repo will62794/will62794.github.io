@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Notes on Raft's Reconfiguration Bug"
+title:  "On Raft's Reconfiguration Bug"
 categories: distributed-systems
 ---
 
