@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "A Tool for Exploring Formal Specifications"
+title:  "Interactive Formal Specifications"
 categories: formal-methods specification
 ---
 
