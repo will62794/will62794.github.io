@@ -24,7 +24,7 @@ A basic lock-free implementation of snapshot isolation can be done using a centr
 <img src="/assets/diagrams/critique-of-si/lock-free-si.png" alt="Write-snapshot isolation lock-free algorithm" width="480px">
 </div>
 
-This algorithm checks, for each row modified by a transaction, $$R$$, whether there is temporal overlap with any other transaction on that row i.e. has any other transaction concurrently written to it. If so, the transaction must be aborted. Otherwise, it is assigned a new commit timestamp and allowed to commit, marking each of its modified row with the newly chosen commit timestamp.
+This algorithm checks, for each row modified by a transaction, $$R$$, whether there is temporal overlap with any other transaction on that row i.e. has any other transaction concurrently written to it. If so, the transaction must be aborted. Otherwise, it is assigned a new commit timestamp and allowed to commit, marking each of its modified rows with the newly chosen commit timestamp.
 
 ## Serializability
 
