@@ -51,7 +51,7 @@ Instead of detecting write-write conflicts of concurrent transactions, as done u
 Essentially, if a transaction $$T_j$$ is concurrent with $$T_i$$ and writes a key $$k$$ that $$T_i$$ reads from, this is manifested as a conflict and $$T_i$$ must be prevented from committing. Most importantly, write-snapshot isolation is sufficient to strengthen snapshot isolation to be fully serializable. Note also, though, that this condition is not symmetric as in classic SI.
 
 <div style="text-align: center">
-<img src="/assets/diagrams/critique-of-si/write-si-diagram.png" alt="Write-snapshot isolation lock-free algorithm" width="480px">
+<img src="/assets/diagrams/critique-of-si/write-si-diagram.png" alt="Write-snapshot isolation lock-free algorithm" width="380px">
 </div>
 
 <!-- ### Read-Only Transactions -->
@@ -59,7 +59,7 @@ Essentially, if a transaction $$T_j$$ is concurrent with $$T_i$$ and writes a ke
 They also point out that the simple condition of checking for read-write conflicts is not quite precise enough, and would, by default, lead to unnecessary aborts of read-only transactions. For example, read-only transactions needn't abort, even if they fall into the conflict detection condition for write-snapshot isolation i.e. if someone concurrently wrote into your read set.
 
 
-They prove that write-snapshot isolation is serializable, by basically showing that you can use commit timestamps of transactions for a serial ordering, and that read-write conflict detection is sufficient to ensure that all transaction reads would be equivalent to those read in a serial history, since they are not allowed to proceed if they conflict with a concurrent write that is into their read set.
+They prove that write-snapshot isolation is serializable, by basically showing that you can use commit timestamps of transactions for a serial ordering, and that read-write conflict detection is sufficient to ensure that all transaction reads would be equivalent to those read in a serial history, since they are not allowed to proceed if they conflict with a concurrent write into their read set.
 
 
 They present a lock-free implementation of write-snapshot isolation, which augments the classic SI approach by recording both the read sets $$R_w$$ and write sets $$R_r$$ of each transaction that is used upon transaction commit at an "oracle".
@@ -74,7 +74,7 @@ This is a nice idea since it is mostly the same as write-write conflict detectio
 
 Their approach raises the question of how different classic SI is from write-snapshot isolation in terms of histories that are allowed or proscribed. Intuitively, it doesn't seem that there would be something inherently more restrictive about the prevention of read-write conflicts vs. write-write conflicts. 
 
-They compare the concurrency level offered by a centralized, lock-free implementation of write-snapshot isolation with that of [standard snapshot isolation implementation](https://dl.acm.org/doi/10.1109/DSNW.2011.5958809). They implemented both snapshot isolation and write-snapshot isolation in HBase to test this. Overall, they test with both normally distributed and zipfian (modeling case where some items are extremely popular) workloads, and find that essentially there is minimal performance difference between the two, at least for these (somewhat artificial) workloads.
+They compare the concurrency level offered by a centralized, lock-free implementation of write-snapshot isolation with that of [standard snapshot isolation implementation](https://dl.acm.org/doi/10.1109/DSNW.2011.5958809). They implemented both snapshot isolation and write-snapshot isolation in HBase (an open-source clone of [BigTable](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)) to test this. Overall, they test with both normally distributed and zipfian (modeling case where some items are extremely popular) workloads, and find that essentially there is minimal performance difference between the two, at least for these (somewhat artificial) workloads.
 
 
 <!-- ## Comparison with Other Approahces -->
