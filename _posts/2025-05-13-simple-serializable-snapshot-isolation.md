@@ -33,7 +33,7 @@ The paper first examines the question of what role write-write conflicts play in
 They note, though, that aborting transactions on write-write conflict is also overly restrictive in some ways i.e. transactions will be aborted in some cases even if no serialization anomaly would manifest. They consider a modified variant of the *lost update* anomaly, like
 
 $$
-r_1(x) \, \, w_2(x) \, \, w_1(x) \, \, r_2(x) \, \, c_1 \, \, c_2
+r_1(x) \, \, w_2(x) \, \, w_1(x) \, \, c_1 \, \, c_2
 $$
 
 Standard write-write conflict checks will abort one of these transactions unncessarily, since a lost update anomaly won't actually manifest here.
