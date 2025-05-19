@@ -30,7 +30,7 @@ This algorithm checks, for each row modified by a transaction, $$R$$, whether th
 
 The paper first examines the question of what role write-write conflicts play in snapshot isolation and serializability. The most standard example of non-serializable snapshot isolation histories are those containing *[write skew](https://jepsen.io/consistency/phenomena/a5b)* anomalies, where transactions don't write to conflicting keys, but may update keys in a way that violates some global constraint.
 
-They note, though, that aborting transactions on write-write conflict is also overly restrictive in some ways i.e. transactions will be aborted in some cases even if no serialization anomaly would manifest. They consider a modified variant of the *lost update* anomaly, like
+They note, though, that aborting transactions on write-write conflicts is also overly restrictive in some ways i.e. transactions will be aborted in some cases even if no serialization anomaly would manifest. They consider a modified variant of the *[lost update](https://jepsen.io/consistency/phenomena/p4)* anomaly, like
 
 $$
 r_1(x) \, \, w_2(x) \, \, w_1(x) \, \, c_1 \, \, c_2
@@ -48,7 +48,7 @@ Instead of detecting write-write conflicts of concurrent transactions, as done u
 1.  RW-spatial overlap: $$T_j$$ writes into row $$r$$ and $$T_i$$ reads from row $$r$$;
 2.  RW-temporal overlap: $$T_s(T_i) < T_c(T_j) < T_c(T_i)$$.
 
-Essentially, if a transaction $$T_j$$ is concurrent with $$T_i$$ and writes a key $$k$$ that $$T_i$$ reads from, this is manifested as a conflict and $$T_i$$ must be prevented from committing. Most importantly, write-snapshot isolation is sufficient to strengthen snapshot isolation to be fully serializable. Note also, though, that this condition is not symmetric as in classic SI.
+Essentially, if a transaction $$T_j$$ is concurrent with $$T_i$$ and writes a key $$k$$ that $$T_i$$ reads from, this is manifested as a conflict and $$T_i$$ must be prevented from committing. Most importantly, write-snapshot isolation is sufficient to strengthen snapshot isolation to be fully serializable.
 
 <div style="text-align: center">
 <img src="/assets/diagrams/critique-of-si/write-si-diagram.png" alt="Write-snapshot isolation lock-free algorithm" width="380px">
@@ -56,11 +56,9 @@ Essentially, if a transaction $$T_j$$ is concurrent with $$T_i$$ and writes a ke
 
 <!-- ### Read-Only Transactions -->
 
-They also point out that the simple condition of checking for read-write conflicts is not quite precise enough, and would, by default, lead to unnecessary aborts of read-only transactions. For example, read-only transactions needn't abort, even if they fall into the conflict detection condition for write-snapshot isolation i.e. if someone concurrently wrote into your read set.
+They also point out that the simple condition of checking for read-write conflicts is not quite precise enough, and would, by default, lead to unnecessary aborts of read-only transactions. Read-only transactions needn't abort even if they fall into the conflict detection condition for write-snapshot isolation, since they don't affect the values read by other transactions, and/or concurrent transactions as well.
 
-
-They prove that write-snapshot isolation is serializable, by basically showing that you can use commit timestamps of transactions for a serial ordering, and that read-write conflict detection is sufficient to ensure that all transaction reads would be equivalent to those read in a serial history, since they are not allowed to proceed if they conflict with a concurrent write into their read set.
-
+They prove that write-snapshot isolation is serializable, by basically showing that you can use commit timestamps of transactions for a serial ordering, and that read-write conflict detection is sufficient to ensure that all transaction reads would be equivalent to those read in a serial history, since they are not allowed to proceed if they conflict with a concurrent write into their read set. And, similarly, the output of writes from each transaction is maintained and respects the commit timestamp ordering.
 
 They present a lock-free implementation of write-snapshot isolation, which augments the classic SI approach by recording both the read sets $$R_w$$ and write sets $$R_r$$ of each transaction that is used upon transaction commit at an "oracle".
 
@@ -74,7 +72,7 @@ This is a nice idea since it is mostly the same as write-write conflict detectio
 
 Their approach raises the question of how different classic SI is from write-snapshot isolation in terms of histories that are allowed or proscribed. Intuitively, it doesn't seem that there would be something inherently more restrictive about the prevention of read-write conflicts vs. write-write conflicts. 
 
-They compare the concurrency level offered by a centralized, lock-free implementation of write-snapshot isolation with that of [standard snapshot isolation implementation](https://dl.acm.org/doi/10.1109/DSNW.2011.5958809). They implemented both snapshot isolation and write-snapshot isolation in HBase (an open-source clone of [BigTable](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)) to test this. Overall, they test with both normally distributed and zipfian (modeling case where some items are extremely popular) workloads, and find that essentially there is minimal performance difference between the two, at least for these (somewhat artificial) workloads.
+They compare the concurrency level offered by a centralized, lock-free implementation of write-snapshot isolation with that of [standard snapshot isolation implementation](https://dl.acm.org/doi/10.1109/DSNW.2011.5958809). They implemented both snapshot isolation and write-snapshot isolation in HBase (an open-source clone of [BigTable](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf)) to test this. Overall, they test a YCSB workload variant with both normally distributed and zipfian (modeling case where some items are extremely popular) row selection, and find that essentially there is minimal performance difference between the two, at least for these (somewhat artificial) workloads.
 
 
 <!-- ## Comparison with Other Approahces -->
