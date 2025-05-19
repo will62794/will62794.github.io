@@ -10,9 +10,14 @@ At the highest level, the idea of this paper is that instead of detecting and ab
 
 ## Snapshot Isolation
 
-Classic snapshot isolation ensures that each transaction observes a consistent snapshot of the database, and prevents conflicting writes by concurrent transactions. There are standard lock-based and lock-free implementations of SI, which both basically rely on assignment of a "read" and "commit" timestamp to each transaction. That is, a centralized *timestamp oracle* is used to assign timestamps for ordering transactions. For a transaction $$T_i$$ with read timestamp  $$T_s(T_i)$$, it will read the latest version of data with commit timestamp $$\delta < T_s(T_i)$$. Two transactions conflict if they (1) write to the same row $$r$$ and (2) they have temporal overlap i.e. their read and commit timestamp spans intersect.
+Classic snapshot isolation ensures that each transaction observes a consistent snapshot of the database, and prevents conflicting writes by concurrent transactions. There are standard lock-based and lock-free implementations of SI, which both basically rely on assignment of a "read" and "commit" timestamp to each transaction. That is, a centralized *timestamp oracle* is used to assign timestamps for ordering transactions. For a transaction $$T_i$$ with read timestamp  $$T_s(T_i)$$, it will read the latest version of data with commit timestamp $$\delta < T_s(T_i)$$. Two transactions conflict if they (1) write to the same row $$r$$ and (2) they have temporal overlap: $$T_s(T_i) < T_c(T_j)$$ and $$T_s(T_j) < T_c(T_i)$$ (i.e. their read and commit timestamp spans overlap).
 
-Google's [Percolator system](https://www.usenix.org/legacy/event/osdi10/tech/full_papers/Peng.pdf) implemented a standard lock-based implementation of SI, which adds *lock* and *write* columns, where the *write* column maintains the commit timestamp. 
+<div style="text-align: center">
+<img src="/assets/diagrams/critique-of-si/classic-si.png" alt="Write-snapshot isolation lock-free algorithm" width="400px">
+</div>
+
+Google's [Percolator system](https://www.usenix.org/legacy/event/osdi10/tech/full_papers/Peng.pdf) implemented a standard lock-based implementation of SI, which adds *lock* and *write* columns, where the *write* column maintains the commit timestamp. Basically, it runs a 2PC algorithm, and updates the *lock* column on all modified rows during a first phase of 2PC. If a transaction tries to write into a locked item it may either wait, abort, or force the transaction holding that lock to abort. In second phase of 2PC, the data is then updated with the commit timestamp and the locks removed. Slow or failed transactions that are holding locks, though, may prevent others from making progress.
+
 A basic lock-free implementation of snapshot isolation can be done using a centralized oracle, that is responsible for receiving commit requests from all transactions and checking for conflicts.
 
 <div style="text-align: center">
@@ -38,11 +43,20 @@ As they summarize:
 
 ## Making Snapshot Isolation Serializable
 
-Instead of detecting write-write conflicts of concurrent transactions, as done under classic snapshot isolation, they introduce *write-snapshot isolation* (WSI), which instead detects and aborts *read-write* conflicts. Essentially, if a transaction $$T_1$$ is concurrent with $$T_2$$ and writes a key $$k$$ that $$T_2$$ reads from, this is manifested as conflict and $$T_2$$ must be prevented from committing. Most importantly, write-snapshot isolation is sufficient to strengthen snapshot isolation to be fully serializable.
+Instead of detecting write-write conflicts of concurrent transactions, as done under classic snapshot isolation, they introduce *write-snapshot isolation* (WSI), which instead detects and aborts *read-write* conflicts. They state the conflict conditions more formally as:
+
+1.  RW-spatial overlap: $$T_j$$ writes into row $$r$$ and $$T_i$$ reads from row $$r$$;
+2.  RW-temporal overlap: $$T_s(T_i) < T_c(T_j) < T_c(T_i)$$.
+
+Essentially, if a transaction $$T_j$$ is concurrent with $$T_i$$ and writes a key $$k$$ that $$T_i$$ reads from, this is manifested as a conflict and $$T_i$$ must be prevented from committing. Most importantly, write-snapshot isolation is sufficient to strengthen snapshot isolation to be fully serializable. Note also, though, that this condition is not symmetric as in classic SI.
+
+<div style="text-align: center">
+<img src="/assets/diagrams/critique-of-si/write-si-diagram.png" alt="Write-snapshot isolation lock-free algorithm" width="480px">
+</div>
 
 <!-- ### Read-Only Transactions -->
 
-They also point out that the simple condition of checking for read-write conflicts is not quite precise enough, and would by default lead to many, potentially unnecessary aborts of read-only transactions. For example, read-only transactions needn't abort, even if they fall into the conflict detection condition for write-snapshot isolation i.e. if someone concurrently wrote into your read set.
+They also point out that the simple condition of checking for read-write conflicts is not quite precise enough, and would, by default, lead to unnecessary aborts of read-only transactions. For example, read-only transactions needn't abort, even if they fall into the conflict detection condition for write-snapshot isolation i.e. if someone concurrently wrote into your read set.
 
 
 They prove that write-snapshot isolation is serializable, by basically showing that you can use commit timestamps of transactions for a serial ordering, and that read-write conflict detection is sufficient to ensure that all transaction reads would be equivalent to those read in a serial history, since they are not allowed to proceed if they conflict with a concurrent write that is into their read set.
