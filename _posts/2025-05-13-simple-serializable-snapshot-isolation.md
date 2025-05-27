@@ -36,7 +36,7 @@ $$
 r_1(x) \, \, w_2(x) \, \, w_1(x) \, \, c_1 \, \, c_2
 $$
 
-Standard write-write conflict checks will abort one of these transactions unncessarily, since a lost update anomaly won't actually manifest here.
+Standard write-write conflict checks will abort one of these transactions unnecessarily, since a lost update anomaly won't actually manifest here.
 As they summarize:
 
 > In other words, write-write conflict avoidance of snapshot isolation, besides allowing some histories that are not serializable, unnecessarily lowers the concurrency of transactions by preventing some valid, serializable histories.
