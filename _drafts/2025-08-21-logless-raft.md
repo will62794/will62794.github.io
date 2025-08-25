@@ -25,6 +25,6 @@ Extending this perspective, we can now imagine a variant of Raft that simply cho
 Linearizability? Read your latest write?
 
 
-## Related Approaches
+### Related Work
 
-The notion of logless or "register"-based consensus algorithms is not new. Recent proposal slike CASPaxos try to do something similar for Paxos based systems, and there is also a history of literatue on so classed "atomic registers" or "multi-write, multi-reader" (MWMR) registers, which implement this type of primitive in distributed fashion. Notably I haven't seen the logless variation specifically appear in the context of a Raft-based protocol, though, it is essentially similar to the ideas that arose when designing a [new reconfiguration protocol](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.OPODIS.2021.26) within MongoDB's Raft-based consensus system.
+The notion of logless or "register"-based consensus algorithms is not new. Recent proposal slike CASPaxos try to do something similar for Paxos based systems, and there is also a history of literature on so classed "[atomic registers](https://groups.csail.mit.edu/tds/papers/Lynch/FTCS97.pdf)" or "multi-write, multi-reader" (MWMR) registers, which implement this type of primitive in distributed fashion. Notably I haven't seen the logless variation specifically appear in the context of a Raft-based protocol, though, it is essentially similar to the ideas that arose when designing a [new reconfiguration protocol](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.OPODIS.2021.26) within MongoDB's Raft-based consensus system.
