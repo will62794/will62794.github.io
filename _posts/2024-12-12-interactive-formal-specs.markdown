@@ -20,13 +20,15 @@ The development of a Javascript interpreter for TLA+ was enabled by earlier work
 
 A benefit of this interpreter implementation is its ability to dynamically evaluate TLA+ specifications and expressions in the browser. For example, the demo below shows the dynamic evaluation of initial states for a single variable declaration (e.g `VARIABLE x`):
 
-<div style="display: flex; justify-content: center;padding:20px;font-size:16px;">
-    <input type="text" id="tla-repl-input" placeholder="Enter initial state expression (e.g. x \in {1,2,3})" style="font-size: 18px;padding:10px;width:600px;font-family:monospace;" />
+<div style="display: flex; justify-content: space-between; padding: 20px; font-size: 16px; width: 90%; margin: 0 auto;">
+    <div style="flex: 1; margin-right: 10px;">
+        <textarea id="tla-repl-input" placeholder="Enter initial state expression (e.g. x \in {1,2,3})" style="font-size: 16px; padding: 10px; width: 92%; height: 140px; font-family: monospace; border-radius: 10px;"></textarea>
+    </div>
+    <div style="flex: 1;">
+        <div style="margin-left: 10px;margin-bottom: 10px;text-align: center;">Generated states:</div>
+        <div id="tla-init-states" style="font-size: 14px; font-family: monospace; border: solid 1px gray; padding: 20px; border-radius: 10px; min-height: 70px;"></div>
+    </div>
 </div>
-
-<div style="display: flex; justify-content: center;">Generated states:</div>
-
-<div id="tla-init-states" style="display: flex; justify-content: center;align-items:center;font-size:14px;font-family:monospace;border:solid 1px gray;padding:20px;margin:15px;margin-bottom:32px;width:50%;margin-left:auto;margin-right:auto;border-radius:10px;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <script src="/assets/tla-web-embed/js/hash-sum/hash-sum.js"></script>
