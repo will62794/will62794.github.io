@@ -4,11 +4,11 @@ title:  "Logless Raft"
 categories: databases transactions isolation
 ---
 
-The standard use of Raft is as an algorithm for implementing a fault tolerant, replicated state machine by means of a replicated *log*, maintained at each server within a replication group. Depending on the nature of the state we want to replicate, we can employ a simpler variant of Raft that achieves the same essential correctness properties. We can call this *logless Raft* and it can be useful when we are only replicating a single, small piece of state (e.g. configuration, metadata, etc.) between servers. 
+The standard use of Raft is for implementing a fault tolerant, replicated state machine by means of a replicated *log*, maintained at each server within a replication group. Depending on the nature of the state we want to replicate, we can employ a simpler variant of Raft that achieves the same essential correctness properties. We can call this *logless Raft* and it can be useful when we are only replicating a single, small piece of state (e.g. configuration, metadata, etc.) between servers. 
 
 ### Simplifying Log Management
 
-There are a lot of machinery details included in the standard descriptions of Raft related to the intricacies of replicating log entries between servers, recording the applied indices of the log on each server, etc. (e.g. `matchIndex`,`nextIndex`,`commitIndex`). There are also strategies for specifically dealing with clean up and garbage collection of stale, divergent logs, [handled](https://github.com/ongardie/raft.tla/blob/6ecbdbcf1bcde2910367cdfd67f31b0bae447ddd/raft.tla#L375-L382) as part of the `AppendEntries` request/response flow.  
+There is a lot of machinery included in the standard descriptions of Raft related to the intricacies of replicating log entries between servers, recording the applied indices of the log on each server, etc. (e.g. `matchIndex`,`nextIndex`,`commitIndex`). There are also strategies for specifically dealing with clean up and garbage collection of stale, divergent logs, [handled](https://github.com/ongardie/raft.tla/blob/6ecbdbcf1bcde2910367cdfd67f31b0bae447ddd/raft.tla#L375-L382) as part of the `AppendEntries` request/response flow.  
 
 <div style="text-align: center">
 <img src="/assets/logless-raft/raft-algo1.png" alt="Logless Raft Diagram" width="260">
