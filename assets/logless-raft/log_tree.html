@@ -1,0 +1,106 @@
+<table style="margin: 0 auto;">
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 2 - ClientRequest(n1)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_2.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 3 - ClientRequest(n1)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_3.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 4 - ClientRequest(n1)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_4.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 5 - MergeEntries(n2, n1)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_5.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 6 - MergeEntries(n3, n1)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_6.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 7 - CommitEntry(n1, ['n1', 'n2', 'n3'])</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_7.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 8 - BecomeLeader(n2, ['n2', 'n3', 'n4'])</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_8.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 9 - ClientRequest(n1)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_9.png" alt="Logless Raft Diagram" height="48.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 10 - ClientRequest(n2)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_10.png" alt="Logless Raft Diagram" height="93.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 11 - MergeEntries(n3, n2)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_11.png" alt="Logless Raft Diagram" height="93.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 12 - MergeEntries(n4, n2)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_12.png" alt="Logless Raft Diagram" height="93.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 13 - CommitEntry(n2, ['n2', 'n3', 'n4'])</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_13.png" alt="Logless Raft Diagram" height="93.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 14 - ClientRequest(n2)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_14.png" alt="Logless Raft Diagram" height="93.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 15 - BecomeLeader(n3, ['n1', 'n3', 'n4'])</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_15.png" alt="Logless Raft Diagram" height="93.0">
+</td>
+</tr>
+
+<tr>
+<td style="text-align: left; font-size: 12px; padding-right: 20px;padding: 20px">State 16 - ClientRequest(n3)</td>
+<td style="text-align: left;padding: 20px">
+<img src="/assets/logless-raft/imgs/log_tree_16.png" alt="Logless Raft Diagram" height="115.4">
+</td>
+</tr>
+</table>
