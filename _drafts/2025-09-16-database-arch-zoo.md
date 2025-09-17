@@ -1,13 +1,15 @@
 ---
 layout: post
-title:  "Database Architecture Zoo"
+title:  "The Modern Database Architecture Zoo"
 categories: databases transactions isolation
 ---
 
 ### CockroachDB
 
-    - [Pebble](https://www.cockroachlabs.com/blog/pebble-rocksdb-kv-store/)
-    - Transactions in storage layer?
+Another Spanner derived architecture?
+
+- [Pebble](https://www.cockroachlabs.com/blog/pebble-rocksdb-kv-store/)
+- Transactions in storage layer?
 
 <div style="text-align: center;">
 <img src="/assets/db-arch-zoo/cockroach-db-arch.png" alt="CockroachDB Architecture" width="500">
@@ -15,7 +17,7 @@ categories: databases transactions isolation
 
 
 ### TiDB
-    - TiKV
+- TiKV
   
 <div style="text-align: center;">
 <img src="/assets/db-arch-zoo/tidb-arch.png" alt="TiDB Architecture" width="500">
@@ -26,7 +28,8 @@ categories: databases transactions isolation
 [arch docs](https://www.yugabyte.com/wp-content/uploads/2020/05/For-PGconf_-YugabyteDB_-a-distributed-PostgreSQL-database.pdf)
 
 ### MongoDB
-    - WiredTiger
+- Sharding + replication
+- WiredTiger
 
 ### Spanner
 
