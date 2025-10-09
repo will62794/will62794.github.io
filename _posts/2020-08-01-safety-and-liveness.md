@@ -6,7 +6,7 @@ categories: formal-methods
  
 Temporal logic properties can be broadly categorized into *safety* and *liveness* properties. Informally, safety properties state that a "bad thing" never happens whereas liveness properties state that a "good thing" must eventually happen. These informal definitions are made precise in the paper *[Defining Liveness](https://www.cs.cornell.edu/fbs/publications/DefLiveness.pdf)* (Alpern, Schneider, 1985), and are also discussed in a later paper, *[Decomposing Properties into Safety and Liveness using Predicate Logic](https://ecommons.cornell.edu/bitstream/handle/1813/6714/87-874.pdf?sequence=1&isAllowed=y)* (Schneider, 1987).
 
-# Formalizing Safety and Liveness
+## Formalizing Safety and Liveness
 
 An *execution* $$\sigma$$, which we can also refer to as  a *behavior*, is as an infinite sequence of states 
 
@@ -57,7 +57,7 @@ $$
 
 This definition says that a property $$P$$ is a liveness property if any partial execution $$\alpha$$ can be extended to satisfy $$P$$. That is, no matter how many finite steps we take in a behavior prefix, there's always hope that we can satisfy a liveness property in the future ("while there's life there's hope"). Note that the "good thing" required by a liveness property may or may not be discrete. A simple liveness requirement like "x is eventually 0" will be satisfied at a discrete point in a behavior, but a liveness condition like "x is 0 infinitely often" can only be determined by examining an infinite behavior. One consequence of this definition is that any liveness property must contain all finite prefixes. Defining a particular liveness property is a matter of determining which extensions of these finite prefixes to include.
 
-# The Decomposition Theorem
+## The Decomposition Theorem
 
 It turns out that any property can be written as a conjunction of a safety and liveness property. This theorem is proven in *Defining Liveness* by resorting to a topological characterization of safety and liveness properties, defining a topology where safety properties are the closed sets and liveness properties are the dense sets. In that paper, they decompose an arbitrary property $$P$$ as
 
@@ -100,7 +100,7 @@ Here is another way to think about the proof of the safety-liveness decompositio
 
 Note that I got some inspiration for the above explanations from [this short lecture](https://www.youtube.com/watch?v=wPvF2Ki1ikk) on safety and liveness.
 
-#### Liveness-Liveness Decomposition
+### Liveness-Liveness Decomposition
 
 At a high level, the safety liveness decomposition feels somewhat natural, since it reflects the way we often think about the behavior of real systems. It turns out, however, that it is also possible to express any property $$P$$ as the conjunction of two liveness properties. This is an additional theorem given in *Defining Liveness*. If $$S$$ is the set of all states, and $$\mid {S} \mid > 1$$ (i.e. there are at least 2 possible system states), then we let $$L_a$$ be the set of all executions with tails that are infinite sequences of $$a$$'s and $$L_b$$, similarly, be the set of sequences with infinite tails consisting of $$b$$'s. The intersection of $$(P \cup L_a)$$ and $$(P \cup L_b$$) (which both happen to be liveness properties) gives us $$P$$. I don't have a good intuition for why this decomposition works yet and I'm not sure if it has any notable theoretical or practical significance, but I found it to be an interesting auxiliary result.
 
