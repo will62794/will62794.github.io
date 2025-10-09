@@ -279,13 +279,13 @@
 	max-width:800px;
 }
 .post-list {
-	margin-left: 20px;
-	// list-style: square;
+	margin-left: 2px;
+	list-style: none;
 
 	> li {
 		// margin-bottom: $spacing-unit;
-		margin-bottom: 5px;
-        line-height:1.3em;
+		margin-bottom: 15px;
+        line-height:1.2em;
 	}
 }
 
@@ -296,10 +296,21 @@
 
 .post-link {
 	display: block;
-	font-size: 18px;
-	font-weight: normal;
+	font-size: 16px;
+	font-weight: bold;
+    color:#111;
 }
 
+
+
+.post-link:visited {
+    color:#111;
+}
+
+
+.post-link:hover {
+    color:#555;
+}
 .exp-date{
     display: block;
     float:left;
