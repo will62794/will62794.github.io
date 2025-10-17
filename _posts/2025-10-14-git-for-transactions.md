@@ -26,7 +26,9 @@ The proposed TARDiS system consists of a transactional key-value store that trac
 2. inter-branch isolation
 3. application-specific merge
 
-In a standard transactional data store, we can imagine that the entire system consists of a single, linear history of states. As transactions commit, the effects of their write operations are applied to the latest state in this linear history, and new transactions may read from some state in this history (e.g. from either the latest state or some historical snapshot). TARDiS breaks from this model and instead includes an explicit notion of branching into their data store abstraction. That is, when clients execute transactions, they may can do so in a *single mode*, which means they are executing their transactions against a chosen branch, or in a *merge mode*, which allows them to explicitly decide how to merge together conflicting changes across branches. As in Git, branches are conceptually isolated from concurrent transactions, so can be viewed conceptually as their own linear/sequential thread of history by an application.
+In a standard transactional data store, we can imagine that the entire system consists of a single, linear history of states. As transactions commit, the effects of their write operations are applied to the latest state in this linear history, and new transactions may read from some state in this history (e.g. from either the latest state or some historical snapshot). 
+
+TARDiS breaks from this model and instead includes an explicit notion of branching into their data store abstraction. That is, when clients execute transactions, they may can do so in a *single mode*, which means they are executing their transactions against a chosen branch, or in a *merge mode*, which allows them to explicitly decide how to merge together conflicting changes across branches. As in Git, branches are conceptually isolated from concurrent transactions, so can be viewed conceptually as their own linear/sequential thread of history by an application.
 
 ### Begin and Commit
 
