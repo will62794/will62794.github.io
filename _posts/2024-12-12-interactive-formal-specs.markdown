@@ -17,7 +17,7 @@ Formal specifications [have](https://github.com/elastic/elasticsearch-formal-mod
 
 ### The JavaScript Interpreter 
 
-At the core of the tool is a native Javascript interpreter for TLA+. [TLC](https://github.com/tlaplus/tlaplus) is the primary, existing interpreter and model checker for TLA+ specifications, and it is mature and well-maintained, and has been optimized for performance over many years. It is, however, a somewhat complex and intricate codebase, written in Java, and so it was not a great candidate for integration into a browser-based tool that would allow for dynamic interaction with specifications. 
+At the core of the tool is a native Javascript interpreter for TLA+. [TLC](https://github.com/tlaplus/tlaplus) is the primary, existing interpreter and model checker for TLA+ specifications, and it is mature, well-maintained, and has been optimized for performance over many years. It is, however, a somewhat complex and intricate codebase, written in Java, and so it was not a great candidate for integration into a browser-based tool that would allow for dynamic interaction with specifications. 
 
 One could build a type of language server into TLC that allows for remote interaction, but this seemed to provide a less than ideal dynamic interaction experience, and would require an external server to be maintained whenever the tool is being used. The now defunct [Rise4Fun](https://github.com/Z3Prover/z3/discussions/5473) site from Microsoft Research illustrates the pitfalls of relying on a remote service for running these types of tools.
 <!-- , e.g. when support for running that infrastructure goes away. -->
