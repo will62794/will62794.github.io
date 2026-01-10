@@ -9,10 +9,12 @@ A defining historical feature of database systems is that of *transactions*. But
 The world and domain of transactional programming interfaces is diverse, and offers interesting possibilites for performance and correctness considerations in database systems. There also seems to be lack of convergence on best accepted interfaces here, with proliferation of different interfaces and approaches. It may be nice to see a convergence or consolidation of techniques here, but this is a starting point.
 
 - [PL/SQL transactions](https://www.geeksforgeeks.org/sql/pl-sql-transactions/)
-- [DynamoDB one-shot transactions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html)
+- [DynamoDB transactions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html)
+  - All transactions submitted as single request, using either `TransactWriteItems` or `TransactGetItems`. DynamoDB general model is basically a KV store, and you can set or update keys on a given table. A write-transaction can include, `PutItem`, `UpdateItem`, or `DeleteItem` as basic operations.
 - [Convex](https://docs.convex.dev/database/advanced/occ)
 - [Calvin](https://cs.yale.edu/homes/thomson/publications/calvin-sigmod12.pdf) style determinstic
 - [FaunaDB/FQL](https://faunadb-docs.netlify.app/fauna/current/learn/query/)
+  - Fauna Query Language (FQL) is a TypeScript-like language for reading/writing data in Fauna.
 - MongoDB transactions
 - [Transactional memory](https://en.wikipedia.org/wiki/Transactional_memory)
 - [Sinfonia](https://dl.acm.org/doi/10.1145/1294261.1294278) (minitransactions)
