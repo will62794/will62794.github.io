@@ -24,3 +24,4 @@ In particular, one of the key tradeoffs in transactional programming models is t
 - Hackwrench
 - [Spanner transactions](https://docs.cloud.google.com/spanner/docs/transactions)
   - Appears that there is actually a special "[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api)" API as well, which are designed for only writing data (?) This is apparently in contrast to [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks) (data manipulation language)
+- RethinkDB transactions
