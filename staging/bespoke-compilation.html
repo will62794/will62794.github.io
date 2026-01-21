@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bespoke Verified Compilation with Claude</title>
+  <meta name="description" content="If we’ve written a formal specification in TLA+, we can check various correctness properties using TLC, a model checker for specifications that basically jus...">
+
+  <meta name="google-site-verification" content="Dz-TxZ5ISbYJeBidgnyTZYPTVd_filxXo3ZlPdOr2Hk" />
+  <meta property="og:site_name" content="William Schultz">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/default-syntax.css">
+  <link rel="canonical" href="https://will62794.github.io/verification/llms/compilation/2026/01/18/bespoke-compilation.html">
+  <link rel="alternate" type="application/rss+xml" title="William Schultz" href="https://will62794.github.io/feed.xml" />
+  <link rel="stylesheet" href="/css/academicons-1.9.4/css/academicons.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="bba9fb49-8108-4be6-8ae1-291f7a8379f8"></script>
+
+  <script defer data-domain="will62794.github.io" src="https://plausible.io/js/script.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/main.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js"></script>
+  <!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Bespoke Verified Compilation with Claude | William Schultz</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Bespoke Verified Compilation with Claude" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="If we’ve written a formal specification in TLA+, we can check various correctness properties using TLC, a model checker for specifications that basically just exhaustively explores the reachable states of the model and check that some specified property (e.g. invariant) holds." />
+<meta property="og:description" content="If we’ve written a formal specification in TLA+, we can check various correctness properties using TLC, a model checker for specifications that basically just exhaustively explores the reachable states of the model and check that some specified property (e.g. invariant) holds." />
+<link rel="canonical" href="https://will62794.github.io/verification/llms/compilation/2026/01/18/bespoke-compilation.html" />
+<meta property="og:url" content="https://will62794.github.io/verification/llms/compilation/2026/01/18/bespoke-compilation.html" />
+<meta property="og:site_name" content="William Schultz" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-01-18T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Bespoke Verified Compilation with Claude" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"https://will62794.github.io/verification/llms/compilation/2026/01/18/bespoke-compilation.html"},"url":"https://will62794.github.io/verification/llms/compilation/2026/01/18/bespoke-compilation.html","description":"If we’ve written a formal specification in TLA+, we can check various correctness properties using TLC, a model checker for specifications that basically just exhaustively explores the reachable states of the model and check that some specified property (e.g. invariant) holds.","@type":"BlogPosting","headline":"Bespoke Verified Compilation with Claude","dateModified":"2026-01-18T00:00:00-05:00","datePublished":"2026-01-18T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <script>
+    MathJax = {
+        "jax": ["input/TeX", "output/HTML-CSS"],
+        chtml: {
+            scale: 0.9
+        },
+        options:{
+            enableMenu: false
+        }
+    };
+  </script>
+  <script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+    <!-- <div class="site-title"><a class="site-title" href="/">willy schultz</a></div> -->
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        <a class="page-link active-link" href="/">Home</a>
+        <a class="page-link active-link" href="/posts">Writing</a>
+<!--         
+              
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+                <a class="page-link" href="/posts/">Writing</a>
+              
+        
+              
+              
+        
+              
+              
+        
+              
+              
+         -->
+      </div>
+      
+    </nav>
+
+  </div>
+
+
+   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0MVL3YF9HQ"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-0MVL3YF9HQ');
+    </script>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        
+<div class="post blog">
+  <header class="post-header">
+    <h1 class="post-title">Bespoke Verified Compilation with Claude</h1>
+    <p class="post-meta">
+    	Jan 18, 2026
+      
+    	<br>
+    </p>
+  </header>
+  <article class="post-content">
+    <p>If we’ve written a formal specification in TLA+, we can check various correctness properties using <a href="https://github.com/tlaplus/tlaplus">TLC</a>, a model checker for specifications that basically just exhaustively explores the reachable states of the model and check that some specified property (e.g. invariant) holds.</p>
+
+<p>TLC was originally developed <a href="https://link.springer.com/chapter/10.1007/3-540-48153-2_6">over 20 years ago</a>, is written in Java, and has had a lot of development effort put into it. So, it’s a mature tool, and quite performant, but probably not expected to reach the theoretical limit of performance for checking finite, explicit-state system models, as it is essentially a dynamic interpreter for TLA+ that runs in Java. Overall, it seems the JVM can still be pretty fast for this, but there are likely performance gains to be had to be moving to a lower-level (compiled) language. This is basically the approach state-of-the-art model checkers within their domain like <a href="https://spinroot.com/spin/whatispin.html">SPIN</a> i.e. they generate C code that can then be compiled and actually executes the model checking logic.</p>
+
+<p>In theory, to do this kind of translation/compilation for TLA+ would be a relatively nontrivial task e.g. transpiling/compiling TLA+ constructs down into some lower level representation (e.g. in C/C++ data structures) that for compilation and execution. Building any kind of general approach here requires somewhat detailed understanding the language and itnerpreter semantics, and how to effectively translate this into a lower level representation while preserving semantics accurately.</p>
+
+<h3 id="verified-compilation">Verified Compilation</h3>
+
+<p>Instead, we can try asking Claude to do this translation for us. This is a kind of standard transpilation/compilation task, but in a “bespoke” way, since we don’t need to build any kind of generic compiler, and can take advantage of any specific details to the given problem instance (more and more software problems seem to be falling under this category with LLMs). Furthermore, since we already have the TLC as a kind of reference interpreter, we can also ask Claude to generate an automated validation harness for us i.e. one that checks (at least for a finite space of models), that the output the optimized C++ version of the model exactly matches the semantics of the original TLA+ model. This gives us a convenient kind of approximately verified compilation step for going from high level TLA+ spec to a lower level model.</p>
+
+<p>We can easily try this out for a given TLA+ spec, by condensing this whole workflow into a prompt to Claude Code. More conveniently, wrap it into a <a href="https://code.claude.com/docs/en/skills">skill</a>, which is essentially just a format for storing re-usable prompts as Markdown. The prompt itself was developed over a few rounds of trial and error and refinement, to make sure Claude knew how to generate scripts with the right arguments, compare outputs properly, etc. The overall prompt is as follows:</p>
+
+<style>
+
+pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    font-size: 14px;
+    border: 1px solid #ccc;
+}
+.language-markdown{
+    font-size: 12px;
+}
+</style>
+
+<figure class="highlight"><pre><code class="language-markdown" data-lang="markdown"><span class="gu">## Generate Optimized C++ version of TLA+ Spec</span>
+
+Take the chosen TLA+ spec (ask the user for which one) and generate a C++ program that generates its full reachable state space as the model checker would do but in a way as optimized as possible for a C++ implementation. Do this single threaded, and check with the user for how to instantiate the constant finite parameters in the compiled C++ version. Ensure that the C++ version dumps out all states in a standard JSON format, and can output this to a JSON file. Assume a general JSON dump format that contains a state array like <span class="sb">`{ "states": [ {fp: &lt;uint64_t&gt;, val: &lt;JSON&gt;, initial: &lt;boolean&gt;}, ... ]}`</span>, where 'val' is the actual JSON representation of that state, and 'fp' is some hash/fingerprint for that state. Also add an option to run this state space exploration with JSON dumping disabled.
+
+Finally generate a Makefile with a simple, barebones default target for building it.
+
+<span class="gu">## Validate Conformance between TLC and C++ version </span>
+
+Now validate to make sure that the set of states generated and dumped into JSON by the C++ version match the set of states generated and dumped by TLC in JSON. Generate a Python script that runs TLC to generate the same state space and dump it to JSON using the tla2tools-checkall.jar binary which supports a <span class="sb">`-dump json states.json`</span> argument, and then have the script validate that the states match between the TLC output and the C++ generated state space. 
+
+Generate a simple validation report in Markdown after completing this.
+
+<span class="gu">## Benchmark Throughput Difference</span>
+
+Measure the throughput (states/second) difference in the state space generation states between TLC and the C++ version. Check with the user for the finite model config parameters to use for this run, and update the generated C++ version of the spec to account for this if needed. You can do this benchmark by measuring the total runtime of TLC for an exhaustive run, and measuring its time duration and from this compute distinct states per second, and doing this similarly for the C++ version. When doing this, disable JSON dumping for both TLC and C++ to avoid the associated overhead. In order to measure the throughput of TLC, make sure to use the time duration reported by the final output of TLC.
+
+Generate a simple markdown report file on the results once the benchmark is complete.</code></pre></figure>
+
+<p>From within a directory, we can store this under <code class="language-plaintext highlighter-rouge">~/.claude/commands</code> and then open up Claude Code and run the <code class="language-plaintext highlighter-rouge">compile_tla</code> command, which will then prompt us to get started with a given TLA+ spec.</p>
+
+<h3 id="running-some-benchmarks">Running Some Benchmarks</h3>
+
+<p>We can start with a test on the <a href="https://github.com/will62794/model-compiler/blob/main/TwoPhase/TwoPhase.tla"><code class="language-plaintext highlighter-rouge">TwoPhase</code></a> specification, a standard TLA+ example and benchmark. If we run our compilation command on this spec, Claude chugs away, with a few itneraction points from the user (e.g. to confirm finite model parameters, etc.) and we can see it generate the following validation report, executed for a model with4 resource managers:</p>
+
+<figure class="highlight"><pre><code class="language-markdown" data-lang="markdown"><span class="gh"># TwoPhase Spec Validation Report</span>
+
+<span class="gu">## Configuration</span>
+<span class="p">-</span> <span class="gs">**Spec**</span>: TwoPhase.tla
+<span class="p">-</span> <span class="gs">**Resource Managers**</span>: 4 (rm1, rm2, rm3, rm4)
+<span class="p">-</span> <span class="gs">**Depth Limit**</span>: Unlimited (full state space)
+
+<span class="gu">## Results Summary</span>
+
+| Metric | TLC | C++ |
+|--------|-----|-----|
+| Total States | 1568 | 1568 |
+| Initial States | 1 | 1 |
+| Runtime | 1.90s | 0.48s |
+
+<span class="gu">## State Comparison</span>
+<span class="p">
+-</span> <span class="gs">**Common states**</span>: 1568
+<span class="p">-</span> <span class="gs">**Only in TLC**</span>: 0
+<span class="p">-</span> <span class="gs">**Only in C++**</span>: 0
+
+<span class="gu">## Validation Status: PASSED</span>
+
+The C++ implementation generates the exact same state space as TLC.</code></pre></figure>
+
+<p>As a sanity check, we can go into this spec’s directory and take a look. Claude generated a 456 line C++ file, <code class="language-plaintext highlighter-rouge">TwoPhase.cpp</code> that compiles with <code class="language-plaintext highlighter-rouge">make</code> and generates a binary that when run produces:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./twophase
+TwoPhase State Space Generator (C++)
+Configuration: NUM_RM = 4
+Depth limit: unlimited
+JSON output: disabled
+
+Exploration complete.
+States found: 1568
+Transitions: 5377
+Duration: 0.000155417 seconds
+Throughput: 10088986 states/second
+</code></pre></div></div>
+<p>If we run TLC with the same model parameters, we get the following:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Model checking completed. No error has been found.
+  Estimates of the probability that TLC did not check all reachable states
+  because two distinct states had the same fingerprint:
+  calculated (optimistic):  val = 3.2E-13
+5378 states generated, 1568 distinct states found, 0 states left on queue.
+The depth of the complete state graph search is 14.
+The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 9 and the 95th percentile is 4).
+Finished in 00s at (2026-01-20 21:42:36)
+</code></pre></div></div>
+<p>which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the validation script should also be ensuring the the generated JSON state spaces match exactly between both TLC and the C++ version.</p>
+
+<p>After running the benchmarking step, Claude also generated this report:</p>
+
+<figure class="highlight"><pre><code class="language-markdown" data-lang="markdown"><span class="gh"># TwoPhase State Space Generation Benchmark</span>
+
+<span class="gu">## Configuration</span>
+<span class="p">
+-</span> <span class="gs">**Spec**</span>: TwoPhase.tla
+<span class="p">-</span> <span class="gs">**Resource Managers**</span>: 8 (rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8)
+<span class="p">-</span> <span class="gs">**JSON Output**</span>: Disabled (pure exploration benchmark)
+<span class="p">-</span> <span class="gs">**Workers**</span>: 1 (single-threaded)
+<span class="p">-</span> <span class="gs">**Benchmark Iterations**</span>: 3
+
+<span class="gu">## Results</span>
+
+| Metric | TLC | C++ |
+|--------|-----|-----|
+| States | 1,745,408 | 1,745,408 |
+| Avg Duration | 49.9251s | 0.851219s |
+| Min Duration | 43.0652s | 0.808712s |
+| Avg Throughput | 34,961 states/s | 2,050,480 states/s |
+| Max Throughput | 40,529 states/s | 2,158,257 states/s |
+
+<span class="gu">## Speedup</span>
+<span class="p">
+-</span> <span class="gs">**Average throughput speedup**</span>: C++ is <span class="gs">**58.7x faster**</span> than TLC
+<span class="p">-</span> <span class="gs">**Peak throughput speedup**</span>: C++ is <span class="gs">**53.3x faster**</span> than TLC</code></pre></figure>
+
+<p>showing us that the C++ version can acheve over a 50x throughput speedup over TLC for larger parameter configuration (8 resource managers). This is pretty cool, and impressive that Claude is able to generate semantically correct translation of the high level spec in essentially one-shot. Also, it seems reasonable that validating these kinds of translation steps for smaller finite parameters would be sufficient to assume generalization to larger parameter configurations e.g. if it became desirable to run larger model checking runs but would be infeasible or inefficient to do full validation at those larger parameters.</p>
+
+<h3 id="abstractraft">AbstractRaft</h3>
+
+<p>We can run the above command for another spec, an abstracted variant of Raft that also includes basic dynamic reconfiguration functionality. Running the above prompt for the TwoPhase.tla spec, Claude generates a 614 line C++ file that it combines with the following paratmers, and see Claude generates the following validation report:</p>
+
+<figure class="highlight"><pre><code class="language-markdown" data-lang="markdown"><span class="gh"># AbstractDynamicRaft Validation Report</span>
+
+<span class="gu">## Summary</span>
+
+| Metric | Value |
+|--------|-------|
+| TLC States | 470098 |
+| C++ States | 470098 |
+| Common States | 470098 |
+| Only in TLC | 0 |
+| Only in C++ | 0 |
+| TLC Initial States | 7 |
+| C++ Initial States | 7 |
+
+<span class="gu">## Result</span>
+
+<span class="gs">**✓ PASSED**</span>: The state spaces match exactly.
+
+The C++ implementation correctly generates the same state space as TLC.
+<span class="gu">## Configuration</span>
+<span class="p">
+-</span> <span class="gs">**Spec**</span>: AbstractDynamicRaft.tla
+<span class="p">-</span> <span class="gs">**Server**</span>: {n1, n2, n3}
+<span class="p">-</span> <span class="gs">**MaxTerm**</span>: 2
+<span class="p">-</span> <span class="gs">**MaxLogLen**</span>: 2
+<span class="p">-</span> <span class="gs">**MaxConfigVersion**</span>: 2
+<span class="p">-</span> <span class="gs">**InitTerm**</span>: 0</code></pre></figure>
+
+<p>and followed by the benchmark report:</p>
+
+<figure class="highlight"><pre><code class="language-markdown" data-lang="markdown"><span class="gh"># AbstractDynamicRaft Benchmark Report</span>
+
+<span class="gu">## Summary</span>
+
+Comparison of state space exploration throughput between TLC (Java) and optimized C++ implementation.
+
+| Metric | TLC | C++ |
+|--------|-----|-----|
+| Distinct States | 470,098 | 470,098 |
+| Duration | 60.00s | 1.696s |
+| Throughput | 7,835 states/sec | 277,180 states/sec |
+
+<span class="gu">## Performance Analysis</span>
+<span class="p">
+-</span> <span class="gs">**C++ Speedup**</span>: <span class="gs">**35.4x**</span> faster than TLC
+<span class="p">-</span> <span class="gs">**TLC Throughput**</span>: 7,835 states/second
+<span class="p">-</span> <span class="gs">**C++ Throughput**</span>: 277,180 states/second
+
+<span class="gu">## Configuration</span>
+<span class="p">
+-</span> <span class="gs">**Spec**</span>: AbstractDynamicRaft.tla
+<span class="p">-</span> <span class="gs">**Server**</span>: {n1, n2, n3}
+<span class="p">-</span> <span class="gs">**MaxTerm**</span>: 2
+<span class="p">-</span> <span class="gs">**MaxLogLen**</span>: 2
+<span class="p">-</span> <span class="gs">**MaxConfigVersion**</span>: 2
+<span class="p">-</span> <span class="gs">**InitTerm**</span>: 0
+
+<span class="gu">## Notes</span>
+<span class="p">
+-</span> JSON state dumping was disabled for both TLC and C++ during benchmarking
+<span class="p">-</span> TLC was run with <span class="sb">`-Xmx8g`</span> heap and <span class="sb">`-XX:+UseParallelGC`</span>
+<span class="p">-</span> C++ was compiled with <span class="sb">`-O3 -march=native -flto`</span> optimizations
+<span class="p">-</span> Single-threaded execution for both
+
+<span class="gu">## Timestamp</span>
+
+Benchmark run on: 2026-01-20 22:13:38</code></pre></figure>
+
+<p>showing a roughly 35x speedup over TLC when running with the C++ version.</p>
+
+<h3 id="final-thoughts">Final Thoughts</h3>
+
+<p>Among the many capabilities of coding agents, this is another one that is quite impressive. It also seems an example not only of a impressive nontrivial task, but also one that kind of re-frames the types of programming tasks we might care about. That is, in a “classical” view of programming, really the only natural way to solve this kind of task would be to build a general purpose transpiler/compiler, but LLMs let us consider just making these one-off tasks solvable in a “bespoke” way, in a way that’s still impressive (due to the pwoer of the LLM) but also simpler in a way, since we don’t actually need to be building an entire transpiler here (even if a coding agent could in principle also solve this problem). So, in a way, it seems the smartness and generality of the LLM coding agents also in some cases actually reduces the hardness of the types of problems that need to be solved, in a nice way, when problems have this “bespoke” quality to them.</p>
+
+<p>It’s also worth pointing out a variety of caveats that still limit this approach as a fully generalizable, real-world solution. First, all of the above was limited to a single threaded execution, and real TLC is able to safely run many parallel model checking in parallel, which requires extra care around concurrency control and efficient data structure design e.g. a shared, concurrent BFS queue is required to be managed between workers, as well as the state hash (fingerprint) set, which has been a source of fairly challenging performance engineering challenges in the past. Furthermore, one of TLC’s unique features is also its ability to spill states to disk when they are too large to fit in memory. The above approach would be fundamentally memory limited, but with modern machines this is becoming less of a concern. Nevertheless, this is still quite a promising solution for simply the inner loop of any model checking or verification task which ultimately still requires fast generation and evaluation of the transition relation of a spec in order to generate reachable states.</p>
+
+<p>All the tests here were run with Claude Code v2.1.14 on Opus 4.5, on 2024 Apple M3 Macbook Pro, and the code and Claude prompts found <a href="https://github.com/will62794/model-compiler">here</a>. As with many LLM-oriented tasks, the determinism of the outputs of these type of workflows was also ahzy to understand well, and there seems to often be a better breakdown of a workflow into those steps which are truly “non-deterministic” or LLM-driven and those which can be cached as relatively deterministic scripts (e.g. the validation scripts). When starting off, though, it is easy to just write everything up a single agent prompt and re-run the workflow from scratch to test it out and experiment. Also, working with Claude in this way really makes it really nice to think about these experimentation workflows “end to end” without focusing on chaining together various Python, baash scripts, compilation steps, etc. Especially when going further and generating whole written reports or visuals from an experiment, that is something that typically is super manual and requires a lot of analysis and stitching things together.</p>
+
+  </article>
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">
+</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col  footer-col-1">
+        <ul class="contact-list">
+        </ul>
+      </div>
+      <div class="footer-col  footer-col-2">
+        <ul class="social-media-list">
+          
+          <!-- <i class="ai ai-google-scholar"></i> -->
+          <!-- <li>
+            <a href="https://scholar.google.com/citations?user=Lh8RrHIAAAAJ">
+              <span class="icon ai ai-google-scholar">
+              </span>
+            </a>
+          </li> -->
+          
+        </ul>
+      </div>
+
+    <div class="footer-col footer-col-3">
+        <a href="https://github.com/will62794" style="text-decoration: none;">
+            <i class="fa-brands fa-github fa-lg"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/william-schultz-a22714a2/" style="text-decoration: none;">
+            <i class="fa-brands fa-linkedin fa-lg"></i>
+        </a>
+        <a href="https://scholar.google.com/citations?hl=en&user=Lh8RrHIAAAAJ&view_op=list_works&sortby=pubdate" style="text-decoration: none;">
+            <i class="ai ai-google-scholar-square ai-lg"></i>
+        </a>
+        <a href="mailto:will62794@gmail.com" style="text-decoration: none;">
+            <i class="fa-solid fa-envelope fa-lg"></i>
+        </a>
+    </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
