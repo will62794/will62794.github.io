@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Bespoke Verified Compilation with Claude"
+title:  "One-off Verified Compilation with Claude"
 categories: verification llms compilation
 ---
 
@@ -10,7 +10,7 @@ TLC was originally developed [over 20 years ago](https://link.springer.com/chapt
 
 In theory, doing this kind of translation task for TLA+ would be relatively nontrivial e.g. transpiling/compiling TLA+ constructs down into some lower level representation (e.g. in C/C++ data structures) for compilation and execution. Building any kind of general approach here likely requires somewhat detailed understanding of the language and existing interpreter implementations, and how to effectively translate this into a lower level representation while preserving semantics accurately.
 
-### Verified Compilation
+## Verified Compilation
 
 Instead of building a whole compilation engine, we can try asking Claude to do these as one-off translations for us. This is a kind of standard transpilation/compilation task, but in a "bespoke" way, since we're not aiming to build any kind of generic compiler, and can also take advantage of any details specific to the given problem instance (more and more software problems seem to be falling under this type of "bespoke" category with LLMs). 
 
@@ -50,14 +50,14 @@ Generate a simple validation report in Markdown after completing this.
 
 ## Benchmark Throughput Difference
 
-Measure the throughput (states/second) difference in the state space generation states between TLC and the C++ version. Check with the user for the finite model config parameters to use for this run, and update the generated C++ version of the spec to account for this if needed. You can do this benchmark by measuring the total runtime of TLC for an exhaustive run, and measuring its time duration and from this compute distinct states per second, and doing this similarly for the C++ version. When doing this, disable JSON dumping for both TLC and C++ to avoid the associated overhead. In order to measure the throughput of TLC, make sure to use the time duration reported by the final output of TLC.
+Measure the throughput (states/second) difference in the state space generation states between TLC and the C++ version. Check with the user for the finite model config parameters to use for this run, and update the generated C++ version of the spec to account for this if needed. You can do this benchmark by measuring the total runtime of TLC for an exhaustive run, and measuring its time duration and from this compute distinct states per second, and doing this similarly for the C++ version. When doing this, disable JSON dumping for both TLC and C++ to avoid the associated overhead. In order to measure the throughput of TLC, make sure to use the time duration reported by the final output of TLC. You don't need to do multiple runs of each, a single run is fine.
 
 Generate a simple markdown report file on the results once the benchmark is complete.
 {% endhighlight %}
 
 From within a [repo](https://github.com/will62794/model-compiler), we can store this as a Markdown file under `~/.claude/commands` and then open up Claude Code and run the `compile_tla` command, which will then prompt us to get started with a given TLA+ spec.
 
-### Running Some Benchmarks
+## Running Some Benchmarks
 
 We can start with a test on the [`TwoPhase.tla`](https://github.com/will62794/model-compiler/blob/main/TwoPhase/TwoPhase.tla) specification, a standard TLA+ example and benchmark modeling two-phase commit. If we start up Claude Code and run our compilation command on this spec, Claude chugs away, with a few interaction points from the user (e.g. to confirm finite model parameters, etc.) and we can see it generate the following validation report, executed for a model with 4 resource managers:
 
@@ -85,10 +85,8 @@ We can start with a test on the [`TwoPhase.tla`](https://github.com/will62794/mo
 - **Only in C++**: 0
 
 ## Validation Status: PASSED
-
-The C++ implementation generates the exact same state space as TLC.
-
 {% endhighlight %}
+
 
 As a sanity check, we can go into this spec's directory and take a look. Claude generated a [456 line C++ file](https://github.com/will62794/model-compiler/blob/60c3c076f34d0a2984143205096b952d657c66eb/TwoPhase/saved_outputs/TwoPhase.cpp), `TwoPhase.cpp`, that compiles with `make` and generates a binary that when run produces:
 
@@ -116,7 +114,36 @@ The depth of the complete state graph search is 14.
 The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 9 and the 95th percentile is 4).
 Finished in 00s at (2026-01-20 21:42:36)
 ```
-which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the Python validation script that was generated should also ensure that the generated JSON state spaces match exactly between both TLC and the C++ version.
+which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the Python validation script that was generated should also ensure that the generated JSON state spaces match exactly between both TLC and the C++ version. As a few extra sanity "spot checks", we can also run a few queries on the JSON outputs. As an example, one of the generate JSON states looks like the following:
+```json
+{
+    "fp": 12161962213042174405,
+    "val": {
+        "rmState": {
+            "rm1": "working",
+            "rm2": "working",
+            "rm3": "working",
+            "rm4": "working"
+        },
+        "tmState": "init",
+        "tmPrepared": [],
+        "msgs": []
+    },
+    "initial": true
+}
+```
+so even counting the occurrences of a few field values can server as a good sanity hash value on the outputs e.g.
+```
+$ for val in "aborted" "working" "prepared"; do grep -o $val tlc_states.json | wc -l && grep -o $val cpp_states.json | wc -l; done
+    4144
+    4144
+    1120
+    1120
+    2272
+    2272
+```
+In general, it still feels helpful and important to have these kinds of lightweight, human verifiable "spot checks" on outputs that are are to cheat on. Even when you have a nice, verifiable task like we do here, asking the model to "verify all its outputs" as it goes still doesn't feel like a strong enough guarantee to gain trust that it actually did the right thing, at least for these tasks where you are less confident in its outputs.
+
 
 After running the benchmarking step, Claude also generated this report:
 
@@ -148,7 +175,7 @@ After running the benchmarking step, Claude also generated this report:
 
 {% endhighlight %}
 
-showing us that the C++ version can acheve over a 50x throughput speedup over TLC for larger parameter configuration (8 resource managers). This is pretty cool, and impressive that Claude is able to generate what seems to be a semantically accurate translation of the high level spec in essentially one-shot. It also seems reasonable that validating these kinds of translation steps for smaller finite parameters would be sufficient to assume generalization to larger parameter configurations e.g. if it is desirable to run larger model checking runs but would be infeasible to do full validation at those larger parameters.
+showing us that the C++ version achieved over a 50x throughput speedup over TLC for larger parameter configuration (8 resource managers). This is pretty cool, and impressive that Claude is able to generate what seems to be a semantically accurate translation of the high level spec in essentially one-shot. It also seems reasonable that validating these kinds of translation steps for smaller finite parameters would be sufficient to assume generalization to larger parameter configurations e.g. if it is desirable to run larger model checking runs but would be infeasible to do full validation at those larger parameters.
 
 ### AbstractDynamicRaft
 
@@ -223,13 +250,66 @@ Comparison of state space exploration throughput between TLC (Java) and optimize
 - C++ was compiled with `-O3 -march=native -flto` optimizations
 - Single-threaded execution for both
 
-## Timestamp
-
-Benchmark run on: 2026-01-20 22:13:38
-
 {% endhighlight %}
 showing a roughly 35x speedup over TLC when running with the C++ version.
 
+### Bakery
+
+Finally, we can try out one more benchmark, a [specification](https://github.com/will62794/model-compiler/blob/main/Bakery/Bakery.tla) of Lamport's Bakery algorithm for mutual exclusion, with the following validation results:
+
+{% highlight markdown %}
+# TLA+ / C++ State Space Validation Report
+
+## Specification
+- **TLA+ Spec**: Bakery.tla (Lamport's Bakery Algorithm)
+- **Configuration**: N=2, Nat={0,1,2,3}
+
+## Results
+
+| Metric | TLC | C++ |
+|--------|-----|-----|
+| Distinct States | 7161 | 7161 |
+
+## Validation Status
+
+**PASSED**: State spaces are identical.
+{% endhighlight %}
+
+and followed by the benchmarking report:
+
+{% highlight markdown %}
+# TLA+ / C++ State Space Exploration Benchmark Report
+
+## Specification
+- **TLA+ Spec**: Bakery.tla (Lamport's Bakery Algorithm)
+- **Configuration**: N=3, Nat={0,1,2,3}
+- **Distinct States**: 6,016,610
+
+## Benchmark Configuration
+- JSON state dumping: **disabled** for both tools (measuring pure exploration throughput)
+- TLC: Single worker thread with parallel GC
+- C++: Single-threaded BFS exploration with O3 optimization
+
+## Results
+
+| Metric | TLC | C++ |
+|--------|-----|-----|
+| Total Time | 102 sec | 5.45 sec |
+| Distinct States | 6,016,610 | 6,016,610 |
+| Throughput | ~58,986 states/sec | ~1,103,780 states/sec |
+
+## Performance Comparison
+
+| Metric | Value |
+|--------|-------|
+| **Speedup** | **18.7x** |
+| C++ / TLC Throughput Ratio | 18.71 |
+
+## Analysis
+
+The C++ implementation achieves approximately **18.7x higher throughput** than TLC for the Bakery algorithm state space exploration.
+{% endhighlight %}
+Again, along with validation success, we get almost a 19x throughput speedup.
 
 ### Final Thoughts
 
