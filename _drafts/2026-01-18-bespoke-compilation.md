@@ -114,7 +114,9 @@ The depth of the complete state graph search is 14.
 The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 9 and the 95th percentile is 4).
 Finished in 00s at (2026-01-20 21:42:36)
 ```
-which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the Python validation script that was generated should also ensure that the generated JSON state spaces match exactly between both TLC and the C++ version. As a few extra sanity "spot checks", we can also run a few queries on the JSON outputs. As an example, one of the generate JSON states looks like the following:
+which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the generated Python [validation script](https://github.com/will62794/model-compiler/blob/81be9fb8c91e87cb354c4982e0ea915c0c59ef4f/TwoPhase/saved_outputs/validate.py) should also ensure that the generated JSON state spaces match exactly between both TLC and the C++ version. 
+
+As a few extra sanity "spot checks", we can also run a few manual queries on the JSON outputs. As an example, one of the generate JSON states looks like the following:
 ```json
 {
     "fp": 12161962213042174405,
