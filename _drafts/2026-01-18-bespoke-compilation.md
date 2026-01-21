@@ -8,13 +8,15 @@ If we've written a formal specification in TLA+, we can check various correctnes
 
 TLC was originally developed [over 20 years ago](https://link.springer.com/chapter/10.1007/3-540-48153-2_6), is written in Java, and has had a lot of development effort put into it. So, it's a mature tool, and quite performant, but probably not expected to reach the theoretical limit of performance for checking finite, explicit-state system models, as it is essentially a dynamic interpreter for TLA+ that runs in Java. Overall, it seems the JVM can still be pretty fast for this, but there are likely performance gains to be had to be moving to a lower-level (compiled) language. This is basically the approach state-of-the-art model checkers within their domain like [SPIN](https://spinroot.com/spin/whatispin.html) i.e. they generate C code that can then be compiled and actually executes the model checking logic.
 
-In theory, to do this kind of translation/compilation for TLA+ would be a relatively nontrivial task e.g. transpiling/compiling TLA+ constructs down into some lower level representation (e.g. in C/C++ data structures) that for compilation and execution. Building any kind of general approach here requires somewhat detailed understanding the language and itnerpreter semantics, and how to effectively translate this into a lower level representation while preserving semantics accurately.
+In theory, doing this kind of translation task for TLA+ would be relatively nontrivial e.g. transpiling/compiling TLA+ constructs down into some lower level representation (e.g. in C/C++ data structures) for compilation and execution. Building any kind of general approach here likely requires somewhat detailed understanding of the language and existing interpreter implementations, and how to effectively translate this into a lower level representation while preserving semantics accurately.
 
 ### Verified Compilation
 
-Instead, we can try asking Claude to do this translation for us. This is a kind of standard transpilation/compilation task, but in a "bespoke" way, since we don't need to build any kind of generic compiler, and can take advantage of any specific details to the given problem instance (more and more software problems seem to be falling under this category with LLMs). Furthermore, since we already have the TLC as a kind of reference interpreter, we can also ask Claude to generate an automated validation harness for us i.e. one that checks (at least for a finite space of models), that the output the optimized C++ version of the model exactly matches the semantics of the original TLA+ model. This gives us a convenient kind of approximately verified compilation step for going from high level TLA+ spec to a lower level model.
+Instead of building a whole compilation engine, we can try asking Claude to do these as one-off translations for us. This is a kind of standard transpilation/compilation task, but in a "bespoke" way, since we're not aiming to build any kind of generic compiler, and can also take advantage of any details specific to the given problem instance (more and more software problems seem to be falling under this type of "bespoke" category with LLMs). 
 
-We can easily try this out for a given TLA+ spec, by condensing this whole workflow into a prompt to Claude Code. More conveniently, wrap it into a [skill](https://code.claude.com/docs/en/skills), which is essentially just a format for storing re-usable prompts as Markdown. The prompt itself was developed over a few rounds of trial and error and refinement, to make sure Claude knew how to generate scripts with the right arguments, compare outputs properly, etc. The overall prompt is as follows:
+Furthermore, since we already have TLC as an existing, reference interpreter, we can also ask Claude to generate an automated validation harness for us i.e. one that checks (at least for a finite space of models), that the output of the optimized C++ version of the model exactly matches that from the original TLA+ model. This gives us a convenient kind of (approximately) verified compilation step for going from high level TLA+ spec to a lower level model.
+
+We can easily try this out for a given TLA+ spec by condensing this whole workflow into a prompt to Claude Code. More conveniently, wrap it into a [skill](https://code.claude.com/docs/en/skills), which is essentially just a format for storing re-usable prompts as Markdown. The prompt itself was developed over a few rounds of trial and error and refinement, to make sure Claude knew how to generate scripts with the right arguments, compare outputs properly, etc. The overall prompt is as follows:
 
 <style>
 
@@ -53,11 +55,11 @@ Measure the throughput (states/second) difference in the state space generation 
 Generate a simple markdown report file on the results once the benchmark is complete.
 {% endhighlight %}
 
-From within a directory, we can store this under `~/.claude/commands` and then open up Claude Code and run the `compile_tla` command, which will then prompt us to get started with a given TLA+ spec.
+From within a [repo](https://github.com/will62794/model-compiler), we can store this as a Markdown file under `~/.claude/commands` and then open up Claude Code and run the `compile_tla` command, which will then prompt us to get started with a given TLA+ spec.
 
 ### Running Some Benchmarks
 
-We can start with a test on the [`TwoPhase`](https://github.com/will62794/model-compiler/blob/main/TwoPhase/TwoPhase.tla) specification, a standard TLA+ example and benchmark. If we run our compilation command on this spec, Claude chugs away, with a few itneraction points from the user (e.g. to confirm finite model parameters, etc.) and we can see it generate the following validation report, executed for a model with4 resource managers:
+We can start with a test on the [`TwoPhase.tla`](https://github.com/will62794/model-compiler/blob/main/TwoPhase/TwoPhase.tla) specification, a standard TLA+ example and benchmark modeling two-phase commit. If we start up Claude Code and run our compilation command on this spec, Claude chugs away, with a few interaction points from the user (e.g. to confirm finite model parameters, etc.) and we can see it generate the following validation report, executed for a model with 4 resource managers:
 
 
 {% highlight markdown %}
@@ -88,9 +90,10 @@ The C++ implementation generates the exact same state space as TLC.
 
 {% endhighlight %}
 
-As a sanity check, we can go into this spec's directory and take a look. Claude generated a 456 line C++ file, `TwoPhase.cpp` that compiles with `make` and generates a binary that when run produces:
-```
-./twophase
+As a sanity check, we can go into this spec's directory and take a look. Claude generated a [456 line C++ file](https://github.com/will62794/model-compiler/blob/60c3c076f34d0a2984143205096b952d657c66eb/TwoPhase/saved_outputs/TwoPhase.cpp), `TwoPhase.cpp`, that compiles with `make` and generates a binary that when run produces:
+
+```bash 
+$ ./twophase
 TwoPhase State Space Generator (C++)
 Configuration: NUM_RM = 4
 Depth limit: unlimited
@@ -113,7 +116,7 @@ The depth of the complete state graph search is 14.
 The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 9 and the 95th percentile is 4).
 Finished in 00s at (2026-01-20 21:42:36)
 ```
-which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the validation script should also be ensuring the the generated JSON state spaces match exactly between both TLC and the C++ version.
+which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the Python validation script that was generated should also ensure that the generated JSON state spaces match exactly between both TLC and the C++ version.
 
 After running the benchmarking step, Claude also generated this report:
 
@@ -145,11 +148,11 @@ After running the benchmarking step, Claude also generated this report:
 
 {% endhighlight %}
 
-showing us that the C++ version can acheve over a 50x throughput speedup over TLC for larger parameter configuration (8 resource managers). This is pretty cool, and impressive that Claude is able to generate semantically correct translation of the high level spec in essentially one-shot. Also, it seems reasonable that validating these kinds of translation steps for smaller finite parameters would be sufficient to assume generalization to larger parameter configurations e.g. if it became desirable to run larger model checking runs but would be infeasible or inefficient to do full validation at those larger parameters.
+showing us that the C++ version can acheve over a 50x throughput speedup over TLC for larger parameter configuration (8 resource managers). This is pretty cool, and impressive that Claude is able to generate what seems to be a semantically accurate translation of the high level spec in essentially one-shot. It also seems reasonable that validating these kinds of translation steps for smaller finite parameters would be sufficient to assume generalization to larger parameter configurations e.g. if it is desirable to run larger model checking runs but would be infeasible to do full validation at those larger parameters.
 
-### AbstractRaft
+### AbstractDynamicRaft
 
-We can run the above command for another spec, an abstracted variant of Raft that also includes basic dynamic reconfiguration functionality. Running the above prompt for the TwoPhase.tla spec, Claude generates a 614 line C++ file that it combines with the following paratmers, and see Claude generates the following validation report:
+We can run the above command for another spec, an [abstracted variant of Raft](https://github.com/will62794/model-compiler/blob/main/AbstractDynamicRaft/AbstractDynamicRaft.tla) that also includes basic dynamic reconfiguration functionality. Running our prior command again, Claude generates a 740 line C++ file and generates the following validation report:
 
 
 {% highlight markdown %}
