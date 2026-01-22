@@ -5,9 +5,7 @@ categories: verification llms compilation
 ---
 
 If we've written a formal specification in TLA+, we can check its correctness properties using [TLC](https://github.com/tlaplus/tlaplus), a model checker that will exhaustively explore its reachable states and check that some specified property (e.g. an invariant) holds.
-TLC was originally developed [over 20 years ago](https://link.springer.com/chapter/10.1007/3-540-48153-2_6) and has had a lot of development effort put into it. So, it's a mature tool, and quite performant, but it is written in Java and it is essentially a dynamic interpreter for TLA+ that runs in Java.  So, it is likely that it is still not able to reach a theoretical limit of performance for checking finite, explicit-state system models. 
-
-In practice, the JVM still seems pretty fast for this, but there are still [expected performance gains](https://conf.tlapl.us/2018/kuppe.pdf) to be had by moving to a lower-level representation for model checking. This is basically the approach taken by other state-of-the-art model checkers within their domain like [SPIN](https://spinroot.com/spin/whatispin.html) i.e. they generate C code for model checking that can be compiled and run natively, rather than dynamically interpreting the model code.
+TLC was originally developed [over 20 years ago](https://link.springer.com/chapter/10.1007/3-540-48153-2_6) and has had a lot of development effort put into it. It is a mature tool, and quite performant, but it is written in Java and it is essentially a dynamic interpreter for TLA+. So, it is likely unable to reach a theoretical upper limit of performance for checking finite, explicit-state system models, meaning there are still [expected performance gains](https://conf.tlapl.us/2018/kuppe.pdf) to be had by moving to a lower-level representation for model checking. This is basically the approach taken by other state-of-the-art model checkers within their domain like [SPIN](https://spinroot.com/spin/whatispin.html) i.e. they generate C code for model checking that can be compiled and run natively, rather than dynamically interpreting the model code.
 
 ## Transpiling with Claude
 
