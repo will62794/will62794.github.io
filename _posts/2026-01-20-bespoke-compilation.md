@@ -1,23 +1,23 @@
 ---
 layout: post
-title:  "One-off Verified Compilation with Claude"
+title:  "One-off Verified Transpilation with Claude"
 categories: verification llms compilation
 ---
 
-If we've written a formal specification in TLA+, we can check its correctness properties using [TLC](https://github.com/tlaplus/tlaplus), a model checker that exhaustively explores the reachable states of the model and check that some specified property (e.g. invariant) holds.
-TLC was originally developed [over 20 years ago](https://link.springer.com/chapter/10.1007/3-540-48153-2_6), is written in Java, and has had a lot of development effort put into it. So, it's a mature tool, and quite performant, but probably not expected to reach the theoretical limit of performance for checking finite, explicit-state system models, as it is essentially a dynamic interpreter for TLA+ that runs in Java. 
+If we've written a formal specification in TLA+, we can check its correctness properties using [TLC](https://github.com/tlaplus/tlaplus), a model checker that will exhaustively explore its reachable states and check that some specified property (e.g. an invariant) holds.
+TLC was originally developed [over 20 years ago](https://link.springer.com/chapter/10.1007/3-540-48153-2_6) and has had a lot of development effort put into it. So, it's a mature tool, and quite performant, but it is written in Java and it is essentially a dynamic interpreter for TLA+ that runs in Java.  So, it is likely that it is still not able to reach a theoretical limit of performance for checking finite, explicit-state system models. 
 
-Overall, the JVM can still be pretty fast for this, but it has still been expected there are performance gains to be had by moving to a lower-level, compiled language. This is basically the approach taken by other state-of-the-art model checkers within their domain like [SPIN](https://spinroot.com/spin/whatispin.html) i.e. they generate C code for model checking that can be compiled and run natively, rather than dynamically interpreting the model code.
+In practice, the JVM still seems pretty fast for this, but there are still [expected performance gains](https://conf.tlapl.us/2018/kuppe.pdf) to be had by moving to a lower-level representation for model checking. This is basically the approach taken by other state-of-the-art model checkers within their domain like [SPIN](https://spinroot.com/spin/whatispin.html) i.e. they generate C code for model checking that can be compiled and run natively, rather than dynamically interpreting the model code.
 
-## One-off Compilation
+## Transpiling with Claude
 
-In general, doing this kind of translation task for TLA+ would be relatively nontrivial e.g. transpiling/compiling TLA+ constructs down into some lower level representation (e.g. in C/C++ data structures) for compilation and execution. Building any kind of general approach here requires a somewhat detailed understanding of the language and existing interpreter implementations, and how to effectively translate this into a lower level representation while preserving semantics accurately.
+In general, doing this kind of lower-level translation task for TLA+ would be relatively nontrivial e.g. compiling TLA+ constructs down into some lower level representation (e.g. in C/C++ data structures) for compilation and native execution. Building any kind of general approach here requires a somewhat detailed understanding of the language and existing interpreter implementations, and how to effectively translate this into a lower level representation while preserving semantics accurately.
 
-Instead of building a whole compilation engine, we can try asking Claude to do these as one-off translations for us. This is a kind of standard transpilation/compilation task, but in a "bespoke" way, since we're not aiming to build any kind of generic compiler, and can also take advantage of any details specific to the given problem instance (more and more software problems seem to be falling under this type of "bespoke" category with LLMs). 
+Instead of building a whole compilation engine, we can try asking Claude to do these as one-off translations for us. This is a kind of standard transpilation/compilation task, but in a "bespoke" way, since we're not aiming to build any kind of generic compiler, and can also take advantage of any details specific to the given problem instance (more and more software problems seem to be falling under this type of "bespoke" category with LLMs). Some [other folks](https://arxiv.org/abs/2406.03003) have tried doing this recently for a variety of standard programming languages.
 
-Furthermore, since we already have TLC as an existing, reference interpreter, we can also ask Claude to generate an automated validation harness for us i.e. one that checks (at least for a finite space of models), that the output of the optimized C++ version of the model exactly matches that from the original TLA+ model. This gives us a convenient kind of (approximately) verified compilation step for going from high level TLA+ spec to a lower level model.
+Since we already have TLC as an existing, reference interpreter, we can also ask Claude to generate an automated validation harness for us i.e. one that checks (at least for a finite domains), that the output of the optimized C++ version of the model exactly matches that from the original TLA+ model. This gives us a convenient kind of (approximately) verified compilation step for going from high level TLA+ spec to a lower level model.
 
-We can easily try this out for a given TLA+ spec by condensing this whole workflow into a prompt to Claude Code. More conveniently, wrap it into a [skill](https://code.claude.com/docs/en/skills), which is essentially just a format for storing re-usable prompts as Markdown. The prompt itself was developed over a few rounds of trial and error and refinement, to make sure Claude knew how to generate scripts with the right arguments, compare outputs properly, etc. The overall prompt is as follows:
+We can easily try this out for a given TLA+ spec by condensing this whole workflow into a prompt to Claude Code (more conveniently, wrap it into a [skill](https://code.claude.com/docs/en/skills)). The prompt itself was developed over a few rounds of trial and error and refinement, to make sure Claude knew how to generate scripts with the right arguments, compare outputs properly, etc. The overall prompt is as follows:
 
 <style>
 
@@ -58,9 +58,9 @@ Generate a simple markdown report file on the results once the benchmark is comp
 
 From within a [repo](https://github.com/will62794/model-compiler), we can [store this](https://github.com/will62794/model-compiler/blob/main/.claude/commands/compile_tla.md) as a Markdown file under `~/.claude/commands` and then open up Claude Code and run the `compile_tla` command, which will then prompt us to get started with a given TLA+ spec.
 
-## Running Some Benchmarks
+## Benchmarks
 
-We can start with a test on the [`TwoPhase.tla`](https://github.com/will62794/model-compiler/blob/main/TwoPhase/TwoPhase.tla) specification, a standard TLA+ example and benchmark modeling two-phase commit. If we start up Claude Code and run our compilation command on this spec, Claude chugs away, with a few interaction points from the user (e.g. to confirm finite model parameters, etc.) and we can see it generate the following validation report, executed for a model with 4 resource managers:
+We can start with a test on the [`TwoPhase.tla`](https://github.com/will62794/model-compiler/blob/main/TwoPhase/TwoPhase.tla) specification, a standard TLA+ example and benchmark modeling two-phase commit. If we start up Claude Code and run our compilation command on this spec, Claude chugs away, with a few interaction points from the user (e.g. to confirm finite model parameters, etc.) and we can see it generate the following validation report, for a finite model with 4 transaction resource managers:
 
 
 {% highlight markdown %}
@@ -89,7 +89,7 @@ We can start with a test on the [`TwoPhase.tla`](https://github.com/will62794/mo
 {% endhighlight %}
 
 
-As a sanity check, we can go into this spec's directory and take a look. Claude generated a [456 line C++ file](https://github.com/will62794/model-compiler/blob/60c3c076f34d0a2984143205096b952d657c66eb/TwoPhase/saved_outputs/TwoPhase.cpp), `TwoPhase.cpp`, that compiles with `make` and generates a binary that when run produces:
+As a sanity check, we can go into this spec's directory and take a look. Claude generated a [456 line C++ file](https://github.com/will62794/model-compiler/blob/60c3c076f34d0a2984143205096b952d657c66eb/TwoPhase/saved_outputs/TwoPhase.cpp), `TwoPhase.cpp`, that when compiled and run produces:
 
 ```bash 
 $ ./twophase
@@ -115,7 +115,7 @@ The depth of the complete state graph search is 14.
 The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 9 and the 95th percentile is 4).
 Finished in 00s at (2026-01-20 21:42:36)
 ```
-which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of reachable states would be hard to cheat, and the generated Python [validation script](https://github.com/will62794/model-compiler/blob/81be9fb8c91e87cb354c4982e0ea915c0c59ef4f/TwoPhase/saved_outputs/validate.py) should also ensure that the generated JSON state spaces match exactly between both TLC and the C++ version. 
+which feels a strong extra sanity check that the C++ model is doing the right thing. Even generating the exactly correct number of distinct, reachable states would be hard to cheat, and the generated Python [validation script](https://github.com/will62794/model-compiler/blob/81be9fb8c91e87cb354c4982e0ea915c0c59ef4f/TwoPhase/saved_outputs/validate.py) should also ensure that the generated JSON state spaces match exactly between both TLC and the C++ version. 
 
 As a few extra sanity "spot checks", we can also run a few manual queries on the JSON outputs from TLC and the C++ version. As an example, one of the generated JSON states from TLC looks like the following:
 ```json
@@ -135,7 +135,7 @@ As a few extra sanity "spot checks", we can also run a few manual queries on the
     "initial": true
 }
 ```
-so even counting the occurrences of a few field values can serve as a good sanity hash value on the outputs e.g.
+so even counting the occurrences of a few field values serves as a reasonable validation hash on the outputs e.g.
 ```
 $ for val in "aborted" "working" "prepared"; do grep -o $val tlc_states.json | wc -l && grep -o $val cpp_states.json | wc -l; done
     4144
@@ -145,7 +145,7 @@ $ for val in "aborted" "working" "prepared"; do grep -o $val tlc_states.json | w
     2272
     2272
 ```
-In general, it feels helpful and important to have these kinds of lightweight, human verifiable "spot checks" even on outputs that are hard to cheat on. Even with a nice, verifiable task like we do here, asking the model to "verify all its outputs" still doesn't engender a strong enough degree of trust that it did the right thing, at least for these experimental tasks where you are less confident in its outputs.
+In general, it feels helpful and important to have these kinds of lightweight, human verifiable "spot checks". Even with a nice, verifiable task like we do here, asking the model to "verify all its outputs" still doesn't engender a strong enough degree of trust that it did the right thing, at least for these experimental tasks where you are less confident in its outputs.
 
 
 After running the benchmarking step, Claude also generated this report:
@@ -318,7 +318,7 @@ Again, along with validation success, we get almost a 19x throughput speedup.
 
 ### Final Thoughts
 
-This is another impressive, general capability of coding agents. It is also an example not only of a nontrivial task, but also one that kind of re-frames the types of programming tasks we might care about solving. That is, in a "classical" view of programming, the only natural way to solve this task would be to build a general purpose compiler, but LLMs let us consider just making these one-off tasks solvable in a [*bespoke* way](https://www.geoffreylitt.com/2023/03/25/llm-end-user-programming.html), in a way that's impressive, but also simpler, since we don't need to build an entire compiler here (even if a coding agent itself could also, in principle, solve this problem). So, the cleverness and generality of the LLM coding agents also in some cases reduces the hardness of the types of problems that need to be solved, when problems have this "bespoke" quality to them. The ideas here are also echoed in recent work on [verified code transpilation](https://people.eecs.berkeley.edu/~sseshia/pubdir/llmlift-neurips24.pdf) with LLMs.
+This is another impressive, general capability of coding agents, and also an example that re-frames the types of programming tasks we might traditionally care about solving. In a "classical" view of programming, the only natural way to solve this task would be to build a general purpose compiler, but LLMs let us consider just making these one-off tasks solvable in a [*bespoke* way](https://www.geoffreylitt.com/2023/03/25/llm-end-user-programming.html), that simplifies away the task of building a compiler altogether. So, both the intelligence and generality of the LLMs can reduce the hardness of the types of problems that need to be solved, for problems that have this "bespoke" quality to them.
 
 #### Caveats
 
@@ -326,7 +326,7 @@ It is worth pointing out a variety of caveats that still limit this approach as 
 
 #### On Trust, Learning, and Workflows
 
-A recurring pattern in this type of experiment is the delicate balance of trust between you and the agent. Having a verifiable feedback loop helps a lot, but even still, it still felt necessary to review the outputs at different stages and manually verify things were actually being done correctly and not cheated in odd ways. For example, checking that the generated state spaces actually contain real, nonempty sets of states, etc. 
+A recurring pattern in this type of experiment is the balance of trust between you and the agent. Having a verifiable feedback loop helps a lot, but even still, it still felt necessary to review the outputs at different stages and manually verify things were actually being done correctly and not cheated in odd ways. For example, checking that the generated state spaces actually contain real, nonempty sets of states, etc. 
 
 I think there also seemed like a slightly related, missing feature here, which is kind of similar to the [continual learning](https://arxiv.org/abs/2501.07278) idea. That is, being confident that the LLM is developing a deeper understanding of  the problem at hand to a point where you trust it further to take on things more autonomously. It felt hard to predict when and where it would or wouldn't make the same mistakes twice, or go off on small tangents that felt unexpected. I think a lot of these issues can sort of be addressed with careful trial and error and prompt refinement, but there may still be a better kind of "teaching" workflow here to get an agent up to speed on a new problem and have it record the knowledge it learned more durably. At one point it seemed like it could be promising to start off with a "teaching" session, to have Claude learn about the workflow and develop its *own*, repeatable prompt for the task itself, but I didn't go very far with this.
 
