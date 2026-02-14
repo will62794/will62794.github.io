@@ -4,7 +4,7 @@ title:  "One-off Verified Transpilation with Claude"
 categories: verification llms compilation
 ---
 
-We can automatically check correctness properties of a TLA+ specification using [TLC](https://github.com/tlaplus/tlaplus), a model checker that will exhaustively explore a spec's reachable states and check that some specified property (e.g. an invariant) holds.
+We can automatically check correctness of a TLA+ specification using [TLC](https://github.com/tlaplus/tlaplus), a model checker that will exhaustively explore a spec's reachable states to check that a specified property (i.e. an invariant) holds.
 TLC was originally developed [over 20 years ago](https://link.springer.com/chapter/10.1007/3-540-48153-2_6) and has had a lot of development effort put into it. It is a mature and performant tool, but it is written in Java and it is essentially a dynamic interpreter for TLA+. So, it is still likely unable to reach a theoretical upper limit of performance for checking finite, explicit-state system models, meaning there are [expected performance gains](https://conf.tlapl.us/2018/kuppe.pdf) to be had by moving to a lower-level representation for model checking. This is basically the approach taken by other state-of-the-art model checkers within their domain like [SPIN](https://spinroot.com/spin/whatispin.html) i.e. they generate C code for model checking that can be compiled and run natively, rather than dynamically interpreting the model code.
 
 ## Transpiling with Claude
@@ -13,9 +13,9 @@ In general, doing this kind of lower-level translation task for TLA+ would be re
 
 Instead of building a whole compilation engine, we can try asking Claude to do these as one-off translations for us. This is a kind of standard transpilation/compilation task, but in a "bespoke" way, since we're not aiming to build any kind of generic compiler, and can also take advantage of any details specific to the given problem instance (more and more software problems seem to be falling under this type of "bespoke" category with LLMs). Some [other folks](https://arxiv.org/abs/2406.03003) have tried doing this recently for a variety of standard programming languages.
 
-Since we already have TLC as an existing, reference interpreter, we can also ask Claude to generate an automated validation harness for us i.e. one that checks (at least for a finite domains), that the output of the optimized C++ version of the model exactly matches that from the original TLA+ model. This gives us a convenient kind of (approximately) verified compilation step for going from high level TLA+ spec to a lower level model.
+Since we already have TLC as an existing, reference interpreter, we can also ask Claude to generate an automated validation harness for us i.e. one that checks (at least for finite domains), that the output of the optimized C++ version of the model exactly matches that from the original TLA+ model. This gives us a convenient kind of (approximately) verified compilation step for going from high level TLA+ spec to a lower level model.
 
-We can easily try this out for a given TLA+ spec by condensing this whole workflow into a prompt to Claude Code (more conveniently, wrap it into a [skill](https://code.claude.com/docs/en/skills)). The prompt itself was developed over a few rounds of trial and error and refinement, to make sure Claude knew how to generate scripts with the right arguments, compare outputs properly, etc. The overall prompt is as follows:
+We can easily try this out for a given TLA+ spec by condensing this whole workflow into a prompt to Claude Code (i.e. wrap it into a [skill](https://code.claude.com/docs/en/skills)). The prompt itself was developed over a few rounds of trial and error and refinement, to make sure Claude knew how to generate scripts with the right arguments, compare outputs properly, etc. The overall prompt is as follows:
 
 <style>
 
