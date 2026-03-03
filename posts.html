@@ -9,16 +9,18 @@ permalink: /posts/
 
 <!-- The post list -->
 
-<ul class="post-list">
+<ul class="post-list post-list--writing">
   {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
   {%- for post in posts -%}
   <li>
-    <b>
-      <a class="post-link" href="{{ post.url | relative_url }}">
-        {{ post.title | escape }}
-      </a>
-    </b>
-    <span class="post-meta"><small>{{ post.date | date: date_format }}</small></span>
+    <div class="post-list-row">
+      <b>
+        <a class="post-link" href="{{ post.url | relative_url }}">
+          {{ post.title | escape }}
+        </a>
+      </b>
+      <span class="post-meta"><small>{{ post.date | date: date_format }}</small></span>
+    </div>
 
     {%- if site.show_excerpts -%}
       {{ post.excerpt }}

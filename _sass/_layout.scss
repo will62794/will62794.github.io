@@ -362,6 +362,23 @@
 	}
 }
 
+.post-list--writing {
+	> li {
+		margin-bottom: 12px;
+	}
+
+	.post-list-row {
+		display: flex;
+		align-items: baseline;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.post-link {
+		display: inline;
+	}
+}
+
 .post-meta {
 	font-size: $small-font-size;
 	color: $grey-color;
