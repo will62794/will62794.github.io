@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Canonicalization of Distributed Protocol Specifications"
+title:  "Canonicalized Distributed Protocol Specifications"
 categories: distributed-systems
 ---
 
