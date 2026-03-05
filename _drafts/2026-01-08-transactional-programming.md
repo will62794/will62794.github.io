@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Programming with Transactions"
+title:  "How to Program with Transactions"
 categories: databases transactions programming
 ---
 
