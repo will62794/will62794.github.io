@@ -114,11 +114,36 @@ which checks for the appropriate quorum of voters given the set of messages (sta
 
 If we do something similar for the log replication related actions, the `LeaderLearnsOfAppliedEntry` is another similar action that records log application progress from other nodes.
 
-
+<pre>
+<span style="color: green">\* Leader advances its commit index.</span>
+AdvanceCommitIndex(i, Q, newCommitIndex) ==
+    /\ state[i] = Leader
+    /\ newCommitIndex > commitIndex[i]
+    <span style="background-color: #ccffcc">/\ \A j \in Q : \E m \in msgs : 
+        /\ m.from = j 
+        /\ Len(m.log) >= newCommitIndex
+        /\ log[i][newCommitIndex] = m.log[newCommitIndex]
+        /\ m.currentTerm = currentTerm[i]</span>
+    \* /\ LET \* The maximum indexes for which a quorum agrees
+    \*     agreeIndexes == {index \in 1..Len(log[i]) : Agree(i, index) \in Quorum}
+    \*     \* New value for commitIndex'[i]
+    \*     newCommitIndex ==
+    \*         IF /\ agreeIndexes /= {}
+    \*             /\ log[i][Max(agreeIndexes)] = currentTerm[i]
+    \*         THEN Max(agreeIndexes)
+    \*         ELSE commitIndex[i]
+    \* IN 
+    \*     /\ commitIndex[i] < newCommitIndex \* only enabled if it actually advances
+    /\ commitIndex' = [commitIndex EXCEPT ![i] = newCommitIndex]
+    /\ UNCHANGED <<serverVars, candidateVars, leaderVars, log>>
+    /\ BroadcastUniversalMsg(i)
+</pre>
 
 <!-- So, for example, `RecordGrantedVote` is simply checking for some `votedFor` value, and recording this state into a local variable `votesGranted`. Similarly, `BecomeLeader` is simply reading the (current) `votesGranted` state and setting some `state` variable. -->
 
 <!-- This canonical description model also reduces the possible design space of protocols. For example, given only `state` and `currentTerm` variables, what are our possible options for implementing a protocol that ensures Election Safety? Everyone can just become leader at term when they decide to, but to ensure safety, they must check that no one else is currently leader in the term they want to go to.  -->
+
+So, after moving to history query based actions, we can think about how our protocol is actually defined now. Essentially, we have a set of state variables for each node, and a set of actions where each action is a (1) history query precondition and (2) a postcondition that tells the node how to update its local state.
 
 ### Query Incrementalization
 
