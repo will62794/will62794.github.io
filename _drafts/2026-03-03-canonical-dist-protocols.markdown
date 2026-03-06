@@ -15,15 +15,13 @@ It would be nice if there was a better canonical format for describing/modeling 
 Raft, for example, chooses two specific message types, *RequestVote* and *AppendEntries*, to implement its protocol behavior. It also contains a host of other specific state variables for tracking state, etc. It makes a bunch of implementation choices that are reflected in its descriptions.
 
 
-What does a version of Raft look like if we abstract it to eliminate concrete message types i.e. specific in a so-called universal message passing canonical form? If we just focus on the [election related actions](https://github.com/will62794/dist-protocol-canonicalization/blob/a64c3697e7afb8b1b2f6296a185da1fbd8aff25a/code/RaftAsyncUniversal/RaftAsyncUniversal.tla#L105-L173), it contains the following:
-
-
-Conceptually, we are expressing protocols in a model where all actions follow a common template:
+What does a version of Raft look like if we abstract it to eliminate concrete message types i.e. specific in a so-called universal message passing canonical form? We can explore how far we can take this. Conceptually, we will express protocols in a model where all actions follow a simple, common template:
 
 
 1. Reading its local state and/or a message from the network. 
 2. Updating its local state based on this read.
 3. Broadcasting its entire updated state into the network as a new message. 
+
 
 If we start with the election related actions of Raft, we can end up with the following state variables:
 
@@ -90,7 +88,7 @@ This type of abstraction first gets rid of message passing and communication pat
 
 ### History Queries
 
-We can push this abstraction further, simplifying some actions to express their reads entirely in terms of *history queries*, rather than incrementally updating and reading an auxiiliary variable. For example, for the `BecomeLeader` action, it is really just waiting until the `votesGranted` variable has accumulated the right internal state so that it can safely transition to a leader state. If we ignore this variable entirely, we can express the action precondition with one big precondition query like this:
+We can push this abstraction further, simplifying some actions to express their reads entirely in terms of *history queries*, rather than incrementally updating and reading an auxiliary variable. For example, for the `BecomeLeader` action, it is really just waiting until the `votesGranted` variable has accumulated the right internal state so that it can safely transition to a leader state. If we ignore this variable entirely, we can express the action precondition with one big precondition query like this:
 
 <pre>
 <span style="color: green">\* Candidate i becomes a leader.</span>
@@ -114,30 +112,29 @@ which checks for the appropriate quorum of voters given the set of messages (sta
 - `UpdateTerm`
 
 
+If we do something similar for the log replication related actions, the `LeaderLearnsOfAppliedEntry` is another similar action that records log application progress from other nodes.
 
 
 
-and the following state variables:
+<!-- So, for example, `RecordGrantedVote` is simply checking for some `votedFor` value, and recording this state into a local variable `votesGranted`. Similarly, `BecomeLeader` is simply reading the (current) `votesGranted` state and setting some `state` variable. -->
 
-
-Protocol actions can then all be viewed as direct reads of past states of other nodes.
-
-So, for example, `RecordGrantedVote` is simply checking for some `votedFor` value, and recording this state into a local variable `votesGranted`. Similarly, `BecomeLeader` is simply reading the (current) `votesGranted` state and setting some `state` variable.
-
-This canonical description model also reduces the possible design space of protocols. For example, given only `state` and `currentTerm` variables, what are our possible options for implementing a protocol that ensures Election Safety? Everyone can just become leader at term when they decide to, but to ensure safety, they must check that no one else is currently leader in the term they want to go to. 
+<!-- This canonical description model also reduces the possible design space of protocols. For example, given only `state` and `currentTerm` variables, what are our possible options for implementing a protocol that ensures Election Safety? Everyone can just become leader at term when they decide to, but to ensure safety, they must check that no one else is currently leader in the term they want to go to.  -->
 
 ### Query Incrementalization
 
-Specifying a protocol in terms if history queries is conceptually satisfying and a nice way to abstract away more of the lower level protocol details. It moves the protocol further away from a practical implementation, though, since it's not realistic for a node to have the ability to continuously read and query over the entire history of all states of other nodes. We can bridge this over to practical implementations, though, by viewing this as an incremental view maintenance problem. That is, in a real system, we essentially want to maintain the correct output of this precondition query based on the current state of the network. An alternate way to do this is to view this as an online maintenance problem i.e. instead of computing the query output over a giant batch of all historical messages, we update the output of the query incrementally as each new message arrives.
+Specifying a protocol in terms of history queries is conceptually satisfying and a nice way to abstract away more of the lower level protocol details. It moves the protocol further away from a practical implementation, though, since it's not realistic for a node to have the ability to continuously read and query over the entire history of all states of other nodes. We can bridge this over to practical implementations, though, by viewing this as an incremental view maintenance problem. 
+
+That is, in a real system, we essentially want to maintain the correct output of this precondition query based on the current state of the network. An alternate way to do this is to view this as an online maintenance problem i.e. instead of computing the query output over a giant batch of all historical messages, we update the output of the query incrementally as each new message arrives.
 
 This is a formal way to map between the abstract, query-oriented protocol specification and a more practical, operational algorithmic implementation. It also, in theory, is perfectly general i.e. as long as know that the query we write down can be computed incrementally, any protocol we specify in this manner could in theory always be automatically "incrementalized" into a practical, operational version.
 
 
-From an efficiency and optimization perspective, we can also deal with the warranted objection that passing around every node's full state for any real protocol is infeasible e.g. you can't be passing around an entire Raft log in every message, even though it's easy to do in an abstract spec. So, we can also define transformation functions that operate on the full state of a node for sake of a practical efficiency. For example, if we send a message that contains a node's full state $$s$$, we can send $$m = f(s)$$ into the network, and assume the receiver can easily compute $$s = f^{-1}(m)$$ to get the full state back, so that we could still express our protocol logic in terms of the full state.
+From an efficiency and optimization perspective, we can also deal with the reasonable objection that passing around every node's full state for any real protocol is infeasible e.g. you can't be passing around an entire Raft log in every message, even though it's easy to do in an abstract spec. So, we can also define transformation functions that operate on the full state of a node for sake of a practical efficiency. For example, if we send a message that contains a node's full state $$s$$, we can send $$m = f(s)$$ into the network, and assume the receiver can easily compute $$s = f^{-1}(m)$$ to get the full state back, so that we could still express our protocol logic in terms of the full state.
 
+For example, in Raft as classically defined, an AppendEntries message may only send one new log entry (or a chunk of them) from a primary to a follower. This is based on a local computation, though, based on its knowledge of its own log and the log application progress (`matchIndex`) of the follower node. So, we can think of this as applying some transformation function $$f$$ on these local state variables to produce a message format that is efficient to send across the network.
 
 ### Related Work
 
-This approach is similar to past about "broadcast" oriented algorithms, and also similar to *semi-symmetric* message passing specification aprpoach taken in some [PaxosStore specifications](https://dl.acm.org/doi/10.14778/3137765.3137778) from WeChat. The notion of specifying protocols as queries over histories also has quite a long...history. This includes the [DistAlgo work](https://dl.acm.org/doi/10.1145/2994595), and also the work done on [Dedalus](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2009/EECS-2009-173.pdf) and [Bloom](https://bloom-lang.net/).
+This approach is similar to past work on "broadcast" oriented algorithms, and also similar to *semi-symmetric* message passing specification aprpoach taken in some [PaxosStore specifications](https://dl.acm.org/doi/10.14778/3137765.3137778) from WeChat. The notion of specifying protocols as queries over histories also has quite a long...history. This includes the [DistAlgo work](https://dl.acm.org/doi/10.1145/2994595), and also the work done on [Dedalus](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2009/EECS-2009-173.pdf) and [Bloom](https://bloom-lang.net/).
 
 History-oriented approach has appeared in a kind of folk way in more abstract specs like [original specs](https://github.com/tlaplus/Examples/blob/9ac1cdc8d54ce619105ffed96a7c9b52041733ae/specifications/Paxos/Paxos.tla#L108-L141) of Paxos.
