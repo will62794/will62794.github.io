@@ -25,7 +25,7 @@ Formal descriptions of message passing distributed protocols are complex and het
 I've found the way these protocols are described also often leads to confusion around the separation between (1) the messaging-specific details and communication patterns of a protocol and (2) the essential behavior required for ensuring correctness.
 It would be nice to have a better *canonical* format for describing/modeling distributed protocols that makes their similarities & differences clearer, and potentially also facilitates mechanical derivation of protocol optimizations, modifications etc. without muddying things up with too many implementation details.
 
-Raft, for example, chooses two specific message types, *RequestVote* and *AppendEntries*, to implement its protocol behavior. It also contains a host of other specific state variables for tracking state, etc. It makes a bunch of implementation choices that are reflected in its descriptions.
+Raft, for example, chooses two specific message types, *RequestVote* and *AppendEntries*, to implement its protocol behavior. It also contains a host of other specific state variables for tracking state, etc.
 What would a version of Raft look like if we try to abstract it to eliminate concrete message types i.e. specify it in what we can call a so-called "canonicalized" message passing form? We can take a very simple approach and see how far it takes us. 
 
 Conceptually, we will express protocols in a model where all actions on a given node follow a simple, common template:
@@ -76,7 +76,7 @@ So, for example, if we apply this approach to the [original Raft TLA+ spec](http
     /\ UNCHANGED <<currentTerm, votedFor, candidateVars, logVars, msgs>>
     /\ BroadcastUniversalMsg(i)
 </pre>
-where each action is parameterized on a message `m` whose fields exactly match the state variables on a local node.
+where each action is parameterized on a message `m` whose fields exactly match the state variables on a local node, and the [`BroadcastUniversalMsg`](https://github.com/will62794/dist-protocol-canonicalization/blob/b80954af376903f503002b3608d1fefcf119573e/code/RaftAsyncUniversal/RaftAsyncUniversal.tla#L111-L122) operator simply pushes a node's full, updated state into the network as a new message.
 
 We can do this similarly for the core log replication related actions:
 
@@ -167,8 +167,6 @@ We can do something similar for the log replication related actions, the `Leader
 
 <!-- This canonical description model also reduces the possible design space of protocols. For example, given only `state` and `currentTerm` variables, what are our possible options for implementing a protocol that ensures Election Safety? Everyone can just become leader at term when they decide to, but to ensure safety, they must check that no one else is currently leader in the term they want to go to.  -->
 
-After moving to history query based actions, we can think about how our protocol is defined now. Essentially, we have a set of state variables for each node, and a set of actions where each action is a (1) history query precondition and (2) a postcondition that tells the node how to update its local state.
-
 Applying this history query specification approach, we end up with a [simplified set of actions](https://github.com/will62794/dist-protocol-canonicalization/blob/16b93ab4d26d7abdcd5e4fbb6306db5c1cd6d898/code/RaftAsyncUniversal/RaftAsyncUniversal.tla#L280-L295) for the protocol:
 
 - `BecomeCandidate`
@@ -183,15 +181,17 @@ Applying this history query specification approach, we end up with a [simplified
 
 where the previously required `RecordGrantedVote` and `LeaderLearnsOfAppliedEntry` actions have been subsumed into the `BecomeLeader` and `AdvanceCommitIndex` actions respectively, as well as their associated state variables `votesGranted` and `matchIndex`. 
 
-Simplifying the action structure by utilizing history queries can also have a non-trivial impact on model checking performance, as we are able to cut out a number of intermediate steps from the protocol. Cutting out interleavings like this can have a nice impact on state space exploration efficiency. For example, in one experiment, even for a relatively tiny model (3 servers, `MaxTerm = 2`, `MaxLogLen=1`), running the original spec with `RecordGrantedVote` and
-`LeaderLearnsOfAppliedEntry` actions enabled generates 2,060,946 distinct states.  With these actions disabled and the history query based spec in place, only 27,062 distinct states were generated, a potential 75x reduction. 
+Simplifying the action structure by utilizing history queries can also have a non-trivial impact on model checking performance, as we are able to cut out a number of intermediate steps from the protocol. For example, in one experiment, even for a relatively small model (3 servers, `MaxTerm = 2`, `MaxLogLen=1`), running the original spec with `RecordGrantedVote` and
+`LeaderLearnsOfAppliedEntry` actions enabled generates 2,060,946 distinct states.  With these actions disabled and using the history query based spec, only 27,062 distinct states were generated, a potential 75x reduction. 
 
 ### Query Incrementalization
 
 Specifying a protocol in terms of history queries is conceptually satisfying and a nice way to abstract away more of the lower level protocol details. It moves the protocol further away from a practical implementation, though, since it's not realistic for a node to have the ability to continuously read and query over the entire history of all states of other nodes. We can bridge this over to practical implementations, though, by viewing this as an [incremental view maintenance](https://materialize.com/blog/ivm-database-replica/) problem. 
 
-That is, in a real system, we essentially want to maintain the correct output of this precondition query based on the current state of the network. We can view this as an online maintenance problem i.e. instead of computing the query output over a giant batch of all historical messages, we update the output of the query incrementally as each new message arrives.
-This is a formal way to map between the abstract, query-oriented protocol specification and a more practical, operational algorithmic implementation. It also, in theory, is sufficiently general i.e. as long as know that the queries we write down can be computed incrementally, any protocol we specify in this manner could in theory always be automatically "incrementalized" into a practical, operational version. A lot of previous work has explored the [foundations](https://ecommons.cornell.edu/server/api/core/bitstreams/ef203133-30b8-45e8-a504-53b3b5443632/content) of evaluating these types of (first order logic) queries incrementally, particularly in the [context of Datalog](https://corescholar.libraries.wright.edu/knoesis/352/).
+That is, in a real system, we essentially want to maintain the correct output of these precondition queries based on the current state of the network. We can view this as an online maintenance problem i.e. instead of computing the query output over a giant batch of historical messages, we update the output of the query incrementally as each new message arrives.
+This is a formal way to map between the abstract, query-oriented protocol specification and a more practical, operational algorithmic implementation. It also, in theory, is sufficiently general i.e. as long as know that the queries we write down can be computed incrementally, any protocol we specify in this manner could in theory always be automatically "incrementalized" into a practical, operational version. 
+
+A lot of previous work has explored the [foundations](https://ecommons.cornell.edu/server/api/core/bitstreams/ef203133-30b8-45e8-a504-53b3b5443632/content) of evaluating these types of (first order logic) queries incrementally, particularly in the [context of Datalog](https://corescholar.libraries.wright.edu/knoesis/352/). I'm not as clear, though, what work has been done on automatically "incrementalizing" these types of queries into practical, operational versions for realistic protocols like Raft. [Hydroflow](https://speakerdeck.com/jhellerstein/hydroflow-a-compiler-target-for-fast-correct-distributed-programs) might be the closest project tackling similar ideas.
 
 
 
