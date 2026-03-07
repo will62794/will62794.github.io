@@ -26,7 +26,9 @@ I've found the way these protocols are described also often leads to confusion a
 It would be nice to have a better *canonical* format for describing/modeling distributed protocols that makes their similarities & differences clearer, and potentially also facilitates mechanical derivation of protocol optimizations, modifications etc. without muddying things up with too many implementation details.
 
 Raft, for example, chooses two specific message types, *RequestVote* and *AppendEntries*, to implement its protocol behavior. It also contains a host of other specific state variables for tracking state, etc. It makes a bunch of implementation choices that are reflected in its descriptions.
-What would a version of Raft look like if we try to abstract it to eliminate concrete message types i.e. specifie it in what we can call a so-called "canonicalized" message passing form? We can take a very simple approach to this and see how far it takes us. Conceptually, we will express protocols in a model where all actions on a given node operating the protocol follow a simple, common template:
+What would a version of Raft look like if we try to abstract it to eliminate concrete message types i.e. specify it in what we can call a so-called "canonicalized" message passing form? We can take a very simple approach and see how far it takes us. 
+
+Conceptually, we will express protocols in a model where all actions on a given node follow a simple, common template:
 
 
 1. **Read** its local state and optionally a message from the network. 
@@ -34,7 +36,9 @@ What would a version of Raft look like if we try to abstract it to eliminate con
 3. **Broadcast** its entire updated state into the network as a new message. 
 
 
-We don't impose any message type details on communication between nodes, so we can think of every action as based on reading some message from the network and updating its state appropriately in response. More simply, since all messages are simply a full recording of a node's local state at sending time, we can consider every action as based on reading the remote (past) state of some other node and acting in response. So, for example, if we apply this to the [base Raft TLA+ spec](https://github.com/ongardie/raft.tla/blob/master/raft.tla), we can have election related actions `GrantVote`, `RecordGrantedVote`, and `BecomeLeader` actions as follows:
+We don't impose any message type details on communication between nodes, so we can think of every action as based on reading some message from the network and updating its state appropriately in response. More simply, since all messages are simply a full recording of a node's local state at sending time, we can view every action as based on reading the remote (past) state of some other node and acting in response. 
+
+So, for example, if we apply this approach to the [original Raft TLA+ spec](https://github.com/ongardie/raft.tla/blob/master/raft.tla), we can have election related actions `GrantVote`, `RecordGrantedVote`, and `BecomeLeader` actions as follows:
 <pre>
 <span style="color: green">\* Server i grants its vote to a candidate server.</span>
 <b>GrantVote</b>(i, m) ==
@@ -72,7 +76,7 @@ We don't impose any message type details on communication between nodes, so we c
     /\ UNCHANGED <<currentTerm, votedFor, candidateVars, logVars, msgs>>
     /\ BroadcastUniversalMsg(i)
 </pre>
-where the action is parameterized on a message `m` whose fields exactly match the state variables on a local node.
+where each action is parameterized on a message `m` whose fields exactly match the state variables on a local node.
 
 We can do this similarly for the core log replication related actions:
 
@@ -165,7 +169,7 @@ We can do something similar for the log replication related actions, the `Leader
 
 So, after moving to history query based actions, we can think about how our protocol is actually defined now. Essentially, we have a set of state variables for each node, and a set of actions where each action is a (1) history query precondition and (2) a postcondition that tells the node how to update its local state.
 
-Taking this history query specification approach all the way, we end up with a simplified set of actions for the protocol:
+Taking this history query specification approach all the way, we end up with a [simplified set of actions](https://github.com/will62794/dist-protocol-canonicalization/blob/16b93ab4d26d7abdcd5e4fbb6306db5c1cd6d898/code/RaftAsyncUniversal/RaftAsyncUniversal.tla#L280-L295) for the protocol:
 
 - `BecomeCandidate`
 - `GrantVote`
@@ -183,9 +187,8 @@ where the previously required `RecordGrantedVote` and `LeaderLearnsOfAppliedEntr
 
 Specifying a protocol in terms of history queries is conceptually satisfying and a nice way to abstract away more of the lower level protocol details. It moves the protocol further away from a practical implementation, though, since it's not realistic for a node to have the ability to continuously read and query over the entire history of all states of other nodes. We can bridge this over to practical implementations, though, by viewing this as an [incremental view maintenance](https://materialize.com/blog/ivm-database-replica/) problem. 
 
-That is, in a real system, we essentially want to maintain the correct output of this precondition query based on the current state of the network. An alternate way to do this is to view this as an online maintenance problem i.e. instead of computing the query output over a giant batch of all historical messages, we update the output of the query incrementally as each new message arrives.
-
-This is a formal way to map between the abstract, query-oriented protocol specification and a more practical, operational algorithmic implementation. It also, in theory, is perfectly general i.e. as long as know that the query we write down can be computed incrementally, any protocol we specify in this manner could in theory always be automatically "incrementalized" into a practical, operational version. A lot of previous work has explored the [foundations](https://ecommons.cornell.edu/server/api/core/bitstreams/ef203133-30b8-45e8-a504-53b3b5443632/content) of evaluating these types of (first order logic) queries incrementally, particularly in the [context of Datalog](https://corescholar.libraries.wright.edu/knoesis/352/).
+That is, in a real system, we essentially want to maintain the correct output of this precondition query based on the current state of the network. We can view this as an online maintenance problem i.e. instead of computing the query output over a giant batch of all historical messages, we update the output of the query incrementally as each new message arrives.
+This is a formal way to map between the abstract, query-oriented protocol specification and a more practical, operational algorithmic implementation. It also, in theory, is sufficiently general i.e. as long as know that the queries we write down can be computed incrementally, any protocol we specify in this manner could in theory always be automatically "incrementalized" into a practical, operational version. A lot of previous work has explored the [foundations](https://ecommons.cornell.edu/server/api/core/bitstreams/ef203133-30b8-45e8-a504-53b3b5443632/content) of evaluating these types of (first order logic) queries incrementally, particularly in the [context of Datalog](https://corescholar.libraries.wright.edu/knoesis/352/).
 
 
 
