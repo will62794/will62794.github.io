@@ -14,12 +14,12 @@ permalink: /posts/
   {%- for post in posts -%}
   <li>
     <div class="post-list-row">
+      <span class="post-meta"><small>{{ post.date | date: date_format }}</small></span>
       <b>
         <a class="post-link" href="{{ post.url | relative_url }}">
           {{ post.title | escape }}
         </a>
       </b>
-      <span class="post-meta"><small>{{ post.date | date: date_format }}</small></span>
     </div>
 
     {%- if site.show_excerpts -%}

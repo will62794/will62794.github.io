@@ -377,6 +377,13 @@
 	.post-link {
 		display: inline;
 	}
+
+	.post-meta {
+		flex: 0 0 78px;
+		min-width: 78px;
+		text-align: left;
+		white-space: nowrap;
+	}
 }
 
 .post-meta {
