@@ -27,14 +27,61 @@ The development of a Javascript interpreter for TLA+ was enabled by earlier work
 
 A benefit of this interpreter implementation is its ability to dynamically evaluate TLA+ specifications and expressions in the browser. For example, the demo below shows the dynamic evaluation of initial states for a single variable declaration (e.g `VARIABLE x`):
 
-<div style="display: flex; justify-content: space-between; padding: 20px; font-size: 16px; width: 90%; margin: 0 auto;">
-    <div style="flex: 1; margin-right: 10px;">
-        <textarea id="tla-repl-input" placeholder="Enter initial state expression (e.g. x \in {1,2,3})" style="font-size: 16px; padding: 10px; width: 92%; height: 140px; font-family: monospace; border-radius: 10px;"></textarea>
-    </div>
-    <div style="flex: 1;">
-        <div style="margin-left: 10px;margin-bottom: 10px;text-align: center;">Generated states:</div>
-        <div id="tla-init-states" style="font-size: 14px; font-family: monospace; border: solid 1px gray; padding: 20px; border-radius: 10px; min-height: 70px;"></div>
-    </div>
+<div style="
+    display: flex; 
+    flex-direction: row; 
+    width: 98%; 
+    margin: 0 auto 24px auto; 
+    gap: 0; 
+    min-height: 180px;
+    border-radius: 12px;
+    box-shadow: 0 1px 7px rgba(0,0,0,0.04);
+    background: #f5f6fa;">
+  <!-- Left: Input -->
+  <div style="
+      flex: 1 1 0; 
+      border-right: 1px solid #e0e0e0; 
+      padding: 26px 20px 26px 20px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-start;">
+    <div style="font-size: 0.96em; font-weight: 500; margin-bottom: 8px; color: #444;">Initial state expression</div>
+    <textarea 
+      id="tla-repl-input" 
+      placeholder="Enter state expression (e.g. x \in {1,2,3})" 
+      style="
+        font-size: 14px; 
+        padding: 12px; 
+        width: 100%; 
+        resize: vertical;
+        min-height: 90px; 
+        max-height: 250px;
+        font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace; 
+        border-radius: 8px;
+        border: 1px solid #cacaca;
+        background: #fff;
+        box-sizing: border-box;"
+    ></textarea>
+  </div>
+  <!-- Right: Output -->
+  <div style="
+      flex: 1 1 0; 
+      padding: 26px 20px 26px 20px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-start;">
+    <div style="font-size: 0.96em; font-weight: 500; margin-bottom: 8px; color: #444;">Initial states generated</div>
+    <div 
+      id="tla-init-states" 
+      style="
+        font-size: 14px; 
+        font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace; 
+        border: solid 1px #ccc; 
+        padding: 15px 14px; 
+        border-radius: 8px; 
+        min-height: 70px;
+        background: #fff;"></div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
