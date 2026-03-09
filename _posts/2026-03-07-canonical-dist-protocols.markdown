@@ -6,15 +6,23 @@ categories: distributed-systems
 
 <style>
 pre {
-  font-size: 0.72em;
-  line-height: 1.28;
-  margin: 1em 0;
-  padding: 0.6em 0.9em;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  font-size: 0.75em;
+  line-height: 1.5;
+  margin: 1.2em 0;
+  padding: 1.1em 1.4em;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(98deg, #f9fafc 0%, #eef1f5 100%);
+  box-shadow: 0 3px 18px 0 rgba(80,100,138,0.07);
+  color: #222;
+  font-family: 'Fira Mono', 'Consolas', 'SFMono-Regular', Menlo, Monaco, monospace;
+  overflow-x: auto;
+  transition: background 0.25s;
+}
+pre:hover {
+  background: linear-gradient(98deg, #f1f5fb 0%, #e5eaf3 100%);
 }
 </style>
-
 
 Formal descriptions of message passing distributed protocols are complex and heterogeneous.  In theory, writing a formal spec of a distributed protocol is a good way to formalize and communicate its precise behavior. In practice, though, many of these specs become quite [large](https://github.com/ongardie/raft.tla/blob/master/raft.tla) and [challenging to digest](https://github.com/Vanlightly/vsr-tlaplus/blob/main/vsr-revisited/paper/VSR.tla) clearly. They use different messaging formats and patterns for how information is communicated between nodes, making protocol comprehension and modification tedious and [error-prone](https://jira.mongodb.org/browse/SERVER-34728). There are [long discussions](https://groups.google.com/g/raft-dev/c/cBNLTZT2q8o) around the various message types used and comparions between Raft and Viewstamped Replication.
 
