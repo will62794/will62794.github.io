@@ -76,7 +76,7 @@ As an example, we can apply this to a version of the originally published [Raft 
     /\ UNCHANGED <<currentTerm, votedFor, candidateVars, logVars, msgs>>
     /\ BroadcastUniversalMsg(i)
 </pre>
-where each action is parameterized on a message `m` whose fields exactly match the state variables on a local node, and the [`BroadcastUniversalMsg`](https://github.com/will62794/dist-protocol-canonicalization/blob/b80954af376903f503002b3608d1fefcf119573e/code/RaftAsyncUniversal/RaftAsyncUniversal.tla#L111-L122) operator simply pushes a node's full, updated state into the network as a new message.
+where each action is parameterized on a message `m` whose fields exactly match the state variables on a local node, and the [`BroadcastUniversalMsg`](https://github.com/will62794/dist-protocol-canonicalization/blob/b80954af376903f503002b3608d1fefcf119573e/code/RaftAsyncUniversal/RaftAsyncUniversal.tla#L111-L122) operator simply pushes a node's full, updated state into the network as a new message, stored in a global `msgs` state variable.
 
 
 <pre>
