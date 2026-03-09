@@ -16,17 +16,17 @@ pre {
 </style>
 
 
-Formal descriptions of message passing distributed protocols are complex and heterogeneous.  In theory, writing a formal spec of a protocol is a great way to formalize and communicate its precise behavior. In practice, though, many of these specs become quite [large](https://github.com/ongardie/raft.tla/blob/master/raft.tla) and [challenging to digest](https://github.com/Vanlightly/vsr-tlaplus/blob/main/vsr-revisited/paper/VSR.tla) clearly. They use different messaging formats and patterns for how information is communicated between nodes, making protocol comprehension and modification tedious and error-prone. There are [whole discussions](https://groups.google.com/g/raft-dev/c/cBNLTZT2q8o) around the various message types used and comparions between Raft and Viewstamped Replication.
+Formal descriptions of message passing distributed protocols are complex and heterogeneous.  In theory, writing a formal spec of a distributed protocol is a good way to formalize and communicate its precise behavior. In practice, though, many of these specs become quite [large](https://github.com/ongardie/raft.tla/blob/master/raft.tla) and [challenging to digest](https://github.com/Vanlightly/vsr-tlaplus/blob/main/vsr-revisited/paper/VSR.tla) clearly. They use different messaging formats and patterns for how information is communicated between nodes, making protocol comprehension and modification tedious and [error-prone](https://jira.mongodb.org/browse/SERVER-34728). There are [long discussions](https://groups.google.com/g/raft-dev/c/cBNLTZT2q8o) around the various message types used and comparions between Raft and Viewstamped Replication.
 
 <!-- , an EPaxos [spec](https://github.com/efficient/epaxos/blob/791b115669fca472d3136f6a2eda46c00b3f8251/tla%2B/EgalitarianPaxos.tla#L61-L90) has 9 different message types, and in general [these specs](https://github.com/ongardie/raft.tla/blob/master/raft.tla) just become pretty large and challenging to digest succinctly. -->
 
 <!-- These specs become complex and difficult to understand when specified at sufficient level of detail to fully capture fine-grained, asynchronous message passing details [1,2,3].  -->
 
 I've found the way these protocols are described also often leads to confusion around the separation between (1) the messaging-specific details and communication patterns of a protocol and (2) the essential behavior required for ensuring correctness.
-It would be nice to have a better *canonical* format for describing/modeling distributed protocols that makes their similarities & differences clearer, and potentially also facilitates mechanical derivation of protocol optimizations, modifications etc. without muddying things up with too many implementation details.
+It would be nice to have a better *canonical* format for describing/modeling distributed protocols that makes their similarities & differences clearer, and potentially also facilitates mechanical derivation of protocol optimizations, modifications etc. without obscuring things with too many implementation specific choices.
 
 Raft, for example, chooses two specific message types, *RequestVote* and *AppendEntries*, to implement its protocol behavior. It also contains a host of other specific state variables for tracking state, etc.
-What would a version of Raft look like if we try to abstract it to eliminate concrete message types i.e. specify it in what we can call a so-called "canonicalized" message passing form? We can take a very simple approach and see how far it takes us. 
+What does a version of Raft look like if we try to abstract away concrete message types and communication patterns i.e. specify it in what we can call a so-called "canonicalized" message passing form? We can take a very simple approach and see how far it takes us. 
 
 Conceptually, we will express protocols in a model where all actions on a given node follow a simple, common template:
 
@@ -36,9 +36,9 @@ Conceptually, we will express protocols in a model where all actions on a given 
 3. **Broadcast** its entire updated state into the network as a new message. 
 
 
-We don't impose any message type details on communication between nodes, so we can think of every action as based on reading some message from the network and updating its state appropriately in response. More simply, since all messages are simply a full recording of a node's local state at sending time, we can view every action as based on reading the remote (past) state of some other node and acting in response. 
+We don't impose any message type details on communication between nodes, so we can think of the behavior of every action as reading some message from the network and updating its state appropriately in response. More simply, since all messages are simply a full recording of a node's local state at sending time, we can view every action as based on reading the remote (past) state of some other node and acting in response. 
 
-So, for example, if we apply this approach to the [original Raft TLA+ spec](https://github.com/ongardie/raft.tla/blob/master/raft.tla), we can have election related actions `GrantVote`, `RecordGrantedVote`, and `BecomeLeader` actions as follows:
+As an example, we can apply this to a version of the originally published [Raft TLA+ spec](https://github.com/ongardie/raft.tla/blob/master/raft.tla), which contains roughly 9 distinct, core protocol actions. If we write a version of this spec in a "canonical" form, we end up with the following, election related actions `GrantVote`, `RecordGrantedVote`, and `BecomeLeader` actions:
 <pre>
 <span style="color: green">\* Server i grants its vote to a candidate server.</span>
 <b>GrantVote</b>(i, m) ==
@@ -78,6 +78,19 @@ So, for example, if we apply this approach to the [original Raft TLA+ spec](http
 </pre>
 where each action is parameterized on a message `m` whose fields exactly match the state variables on a local node, and the [`BroadcastUniversalMsg`](https://github.com/will62794/dist-protocol-canonicalization/blob/b80954af376903f503002b3608d1fefcf119573e/code/RaftAsyncUniversal/RaftAsyncUniversal.tla#L111-L122) operator simply pushes a node's full, updated state into the network as a new message.
 
+
+<pre>
+<b>BroadcastUniversalMsg</b>(s) == 
+    msgs' = msgs \cup {[
+        from |-> s,
+        currentTerm |-> currentTerm'[s],
+        state |-> state'[s],
+        votedFor |-> votedFor'[s],
+        log |-> log'[s],
+        commitIndex |-> commitIndex'[s]
+    ]}
+</pre>
+
 We can do this similarly for the core log replication related actions:
 
 <pre>
@@ -108,7 +121,7 @@ We can do this similarly for the core log replication related actions:
     /\ matchIndex' = [matchIndex EXCEPT ![i][m.from] = Len(m.log)]
     /\ UNCHANGED <<serverVars, candidateVars, logVars, nextIndex, msgs>>
 
-<span style="color: green">\* Leader advances its commit index.</span>
+<span style="color: green">\* Leader advances its commit index with quorum Q.</span>
 <b>AdvanceCommitIndex</b>(i, Q, newCommitIndex) ==
     /\ state[i] = Leader
     /\ newCommitIndex > commitIndex[i]
@@ -127,11 +140,11 @@ We can do this similarly for the core log replication related actions:
     /\ BroadcastUniversalMsg(i)
 </pre>
 
-This type of abstraction first gets rid of message passing and communication pattern specific details from the protocol. All we do is define actions that are able to read some past state of another node and make updates based on it.  
+This type of specification approach gets rid of message type and communication pattern specific details from the protocol. All we do is define actions that are able to read some past state of another node and make updates based on it. In this model, we can view a protocol as specified simply in terms of (1) its state variables and (2) its actions, each of which are simply a read of some (current or past) node state.
 
 ### History Queries
 
-We can push this type of abstraction further, simplifying some actions to express their reads entirely in terms of *history queries*, rather than incrementally updating and reading an auxiliary variable. For example, for the `BecomeLeader` action, it is really just waiting until the `votesGranted` variable has accumulated the right internal state so that it can safely transition to a leader state. If we ignore this variable entirely, we can express the action precondition with one big precondition query like this:
+We can push this specification approach further, simplifying some actions to express their reads entirely in terms of *history queries*, rather than incrementally updating and reading an auxiliary variable. For example, for the `BecomeLeader` action, it is really just waiting until the `votesGranted` variable has accumulated the right internal state so that it can safely transition to a leader state. If we ignore this variable entirely, we can express the action precondition with one big precondition query like this:
 
 <pre>
 <span style="color: green">\* Candidate i becomes a leader.</span>
