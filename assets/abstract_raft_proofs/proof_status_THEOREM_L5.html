@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof Status: THEOREM L_5 (H_QuorumsSafeAtTerms)</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 20px; background: #fff; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
+  .summary { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 16px; margin: 16px 0; }
+  .summary strong { color: #166534; }
+  .tree { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85em; line-height: 1.6; }
+  .node { margin-left: 0; }
+  .children { margin-left: 24px; border-left: 1px solid #e5e7eb; padding-left: 8px; }
+  .toggle { cursor: pointer; user-select: none; }
+  .toggle::before { content: '\25BC '; font-size: 0.7em; color: #6b7280; }
+  .toggle.collapsed::before { content: '\25B6 '; }
+  .proved { color: #166534; }
+  .badge { display: inline-block; font-size: 0.75em; padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
+  .badge-smt { background: #dbeafe; color: #1e40af; }
+  .badge-proved { background: #dcfce7; color: #166534; }
+  .badge-cached { background: #f3f4f6; color: #6b7280; }
+  .line-ref { color: #9ca3af; font-size: 0.8em; }
+  code { background: #f3f4f6; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+  h2 { font-size: 1.1em; margin-top: 28px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
+</style>
+</head>
+<body>
+<h1>THEOREM L_5 &mdash; H_QuorumsSafeAtTerms</h1>
+<div class="summary">
+  <strong>Status: ALL 132 OBLIGATIONS PROVED</strong> &nbsp;|&nbsp; 46 unique proof steps &nbsp;|&nbsp; Prover: SMT (all) &nbsp;|&nbsp; Timing: cached
+</div>
+<p><code>TypeOK /\ H_QuorumsSafeAtTerms /\ Next =&gt; H_QuorumsSafeAtTerms'</code></p>
+
+<div class="tree">
+
+<div class="node">
+  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+    <span class="proved">THEOREM L_5</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L367</span>
+  </div>
+  <div class="children">
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;. USE A0..A7</span> <span class="line-ref">L368</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;1. ClientRequestAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L370</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;2. GetEntriesAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L372</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;3. RollbackEntriesAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L374</span>
+    </div>
+
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved">&lt;1&gt;4. BecomeLeaderAction</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L376</span>
+      </div>
+      <div class="children">
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. SUFFICES ASSUME TypeOK, H_QuorumsSafeAtTerms, BecomeLeaderAction PROVE H_QuorumsSafeAtTerms'</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L377&ndash;L379</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;1. PICK leader &isin; Server, Q &isin; Quorums(Server) : BecomeLeader(leader, Q)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L380</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;2. currentTerm' = [s_1 &isin; Server &rarr; IF s_1 &isin; Q THEN currentTerm[leader]+1 ELSE currentTerm[s_1]]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L382</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;3. state' = [s_1 &isin; Server &rarr; IF s_1 = leader THEN Primary ELSE IF s_1 &isin; Q THEN Secondary ELSE state[s_1]]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L384</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;4. leader &isin; Q</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L386</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;5. &forall; v &isin; Q : currentTerm[v] &lt; currentTerm[leader]+1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L388</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;6. &forall; n &isin; Q : currentTerm'[n] = currentTerm[leader]+1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L390</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;7. Q &sube; Server</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L392</span>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;8. &forall; Q1, Q2 &isin; Quorums(Server) : Q1 &cap; Q2 &ne; {} &nbsp;<em>(quorum intersection)</em></span> <span class="badge badge-proved">proved</span> <span class="line-ref">L395</span>
+          </div>
+          <div class="children">
+            <div class="node">
+              <span class="proved">&lt;3&gt;1. IsFiniteSet(Server)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L396</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;2. SUFFICES ASSUME NEW Q1, Q2 &isin; Quorums(Server) PROVE Q1 &cap; Q2 &ne; {}</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L397</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;3. Q1 &sube; Server &and; Q2 &sube; Server</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L398</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;4. IsFiniteSet(Q1) &and; IsFiniteSet(Q2)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L399</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;5. Cardinality(Q1)*2 &gt; |Server| &and; Cardinality(Q2)*2 &gt; |Server|</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L400</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;6. Cardinality(Server) &isin; Nat</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L401</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;7. Cardinality(Q1) &isin; Nat &and; Cardinality(Q2) &isin; Nat</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L402</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;8. Cardinality(Q1) + Cardinality(Q2) &gt; |Server|</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L403</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;. QED by FS_MajoritiesIntersect</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L404</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;9. &forall; s &isin; Server : state[s] = Primary &rArr; currentTerm[leader]+1 &ge; currentTerm[s]</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L406</span>
+          </div>
+          <div class="children">
+            <div class="node">
+              <span class="proved">&lt;3&gt;. SUFFICES ASSUME NEW s &isin; Server, state[s] = Primary PROVE currentTerm[leader]+1 &ge; currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L407</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;1. PICK Qs &isin; Quorums(Server) : &forall; n &isin; Qs : currentTerm[n] &ge; currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L408</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;2. Q &cap; Qs &ne; {}</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L410</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;3. PICK w &isin; Q &cap; Qs</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L411</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;4. currentTerm[w] &ge; currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L412</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;5. currentTerm[w] &lt; currentTerm[leader]+1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L413</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;6. w &isin; Server</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L414</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L415</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;10. &forall; s &isin; Server : state'[s] = Primary &rArr; &forall; n &isin; Q : currentTerm'[n] &ge; currentTerm'[s]</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L417</span>
+          </div>
+          <div class="children">
+            <div class="node">
+              <span class="proved">&lt;3&gt;. SUFFICES ASSUME NEW s &isin; Server, state'[s] = Primary PROVE &forall; n &isin; Q : currentTerm'[n] &ge; currentTerm'[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L419</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;1. CASE s = leader &rarr; Q witnesses for leader</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L420</span>
+            </div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;2. CASE s &ne; leader</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L422</span>
+              </div>
+              <div class="children">
+                <div class="node">
+                  <span class="proved">&lt;4&gt;1. s &notin; Q &and; state[s] = Primary</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L423</span>
+                </div>
+                <div class="node">
+                  <span class="proved">&lt;4&gt;2. currentTerm'[s] = currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L424</span>
+                </div>
+                <div class="node">
+                  <span class="proved">&lt;4&gt;3. currentTerm[leader]+1 &ge; currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L425</span>
+                </div>
+                <div class="node">
+                  <span class="proved">&lt;4&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L426</span>
+                </div>
+              </div>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L427</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. QED by &lt;2&gt;10 DEF H_QuorumsSafeAtTerms</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L428</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;5. CommitEntryAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L430</span>
+    </div>
+
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved">&lt;1&gt;6. UpdateTermsAction</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L432</span>
+      </div>
+      <div class="children">
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. SUFFICES ASSUME TypeOK, H_QuorumsSafeAtTerms, UpdateTerms(i,j), state'[s] = Primary PROVE &exist; Qw : &forall; n &isin; Qw : currentTerm'[n] &ge; currentTerm'[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L433</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;1. currentTerm' = [currentTerm EXCEPT ![j] = currentTerm[i]]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L438</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;2. state' = [state EXCEPT ![j] = Secondary]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L440</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;3. s &ne; j &and; state[s] = Primary</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L442</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;4. currentTerm'[s] = currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L444</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;5. PICK Qs &isin; Quorums(Server) : &forall; n &isin; Qs : currentTerm[n] &ge; currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L446</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;6. Qs &sube; Server</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L448</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;7. currentTerm[i] &ge; currentTerm[j]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L450</span>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;8. ASSUME NEW n &isin; Qs PROVE currentTerm'[n] &ge; currentTerm'[s]</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L452</span>
+          </div>
+          <div class="children">
+            <div class="node">
+              <span class="proved">&lt;3&gt;1. n &isin; Server</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L453</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;2. CASE n = j &rarr; currentTerm'[n] = currentTerm[i] &ge; currentTerm[j] &ge; ...</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L454</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;3. CASE n &ne; j &rarr; currentTerm'[n] = currentTerm[n] &ge; currentTerm[s]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L456</span>
+            </div>
+            <div class="node">
+              <span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L458</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. QED by &lt;2&gt;8</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L459</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;7. QED BY &lt;1&gt;1..&lt;1&gt;6 DEF Next</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L460</span>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<h2>Proof Strategy</h2>
+<p>The invariant <code>H_QuorumsSafeAtTerms</code> states that every Primary server <em>s</em> has a witnessing quorum Qs such that every member of Qs has a term at least as large as <code>currentTerm[s]</code>.
+The proof proceeds action by action:</p>
+<ol>
+  <li><strong>ClientRequest, GetEntries, RollbackEntries, CommitEntry</strong>: These actions do not modify <code>currentTerm</code> or <code>state</code> in ways that change the Primary set or the term ordering; SMT closes all four directly from the definitions.</li>
+  <li><strong>BecomeLeader</strong>: This is the most involved case. A leader is elected with a quorum Q of voters. The new leader bumps everyone in Q to <code>currentTerm[leader]+1</code>.
+    <ul>
+      <li>Quorum intersection (<code>&lt;2&gt;8</code>) is proved manually using <code>FS_MajoritiesIntersect</code>, establishing that any two quorums share a member.</li>
+      <li>By induction (<code>H_QuorumsSafeAtTerms</code>), every old Primary had a quorum witnessing it; quorum intersection with Q gives a shared node whose old term bounds the old Primary's term, so <code>currentTerm[leader]+1</code> dominates all old Primaries (<code>&lt;2&gt;9</code>).</li>
+      <li>Q then witnesses the invariant for the new post-state: the new leader (in Q) satisfies it trivially; any surviving old Primary (not in Q) is bounded by <code>&lt;2&gt;9</code> and Q's uniform term (<code>&lt;2&gt;10</code>).</li>
+    </ul>
+  </li>
+  <li><strong>UpdateTerms</strong>: <code>UpdateTerms(i, j)</code> only increases <code>currentTerm[j]</code> and demotes <code>j</code> to Secondary. Any surviving Primary <em>s</em> is different from <em>j</em>, so its term is unchanged. The old witness quorum Qs still works: for <em>n = j</em> the updated term is <code>currentTerm[i] &ge; currentTerm[j]</code> which is at least as large; for <em>n &ne; j</em> the term is unchanged.</li>
+</ol>
+<p>All 132 proof obligations were discharged by SMT (Z3 via TLAPM), with the quorum intersection sub-proof requiring explicit Cardinality arithmetic to guide the solver.</p>
+
+<script>
+  // Initialize all toggles as expanded (children visible)
+  document.querySelectorAll('.toggle').forEach(function(t) {
+    var children = t.nextElementSibling;
+    if (children) children.style.display = 'block';
+  });
+</script>
+</body>
+</html>

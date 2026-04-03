@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof Status: THEOREM L_12 (H_StateMachineSafety)</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 20px; background: #fff; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
+  .summary { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 16px; margin: 16px 0; }
+  .summary strong { color: #166534; }
+  .tree { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85em; line-height: 1.6; }
+  .node { margin-left: 0; }
+  .children { margin-left: 24px; border-left: 1px solid #e5e7eb; padding-left: 8px; }
+  .toggle { cursor: pointer; user-select: none; }
+  .toggle::before { content: '\25BC '; font-size: 0.7em; color: #6b7280; }
+  .toggle.collapsed::before { content: '\25B6 '; }
+  .proved { color: #166534; }
+  .badge { display: inline-block; font-size: 0.75em; padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
+  .badge-smt { background: #dbeafe; color: #1e40af; }
+  .badge-proved { background: #dcfce7; color: #166534; }
+  .line-ref { color: #9ca3af; font-size: 0.8em; }
+  code { background: #f3f4f6; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<h1>THEOREM L_12 &mdash; H_StateMachineSafety</h1>
+<div class="summary">
+  <strong>Status: ALL 138 OBLIGATIONS PROVED</strong> &nbsp;|&nbsp; 54 unique proof steps &nbsp;|&nbsp; Prover: SMT (all)
+</div>
+<p><code>TypeOK /\ H_CommittedEntryIsOnQuorum /\ H_StateMachineSafety /\ Next =&gt; H_StateMachineSafety'</code></p>
+
+<div class="tree">
+
+<div class="node">
+  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+    <span class="proved">THEOREM L_12</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1599</span>
+  </div>
+  <div class="children">
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;. USE A0..A6</span> <span class="line-ref">L1600</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;1. ClientRequestAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1602</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;2. GetEntriesAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1604</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;3. RollbackEntriesAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1606</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;4. BecomeLeaderAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1608</span>
+    </div>
+
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved">&lt;1&gt;5. CommitEntryAction</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1610</span>
+      </div>
+      <div class="children">
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. SUFFICES ASSUME ... PROVE c1 = c2</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1611</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;1. immediatelyCommitted' = ... &cup; {&laquo;Len(log[i]), currentTerm[i]&raquo;}</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1619</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;2. UNCHANGED &laquo;currentTerm, state, log&raquo;</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1621</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;3. CASE both old &rarr; by H_StateMachineSafety</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1623</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;4. CASE both new &rarr; trivially equal</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1626</span>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;5. CASE c1 old, c2 new &rarr; quorum intersection</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1629</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;1. &exist; Q: &forall; n &isin; Q: InLog(c1, n)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1631</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;2. PICK Q1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1633</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;3. &forall; n &isin; commitQuorum: InLog(new, n)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1636</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;4. IsFiniteSet(Server)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1639</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;5. Q1, commitQuorum &sube; Server</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1640</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;6. IsFiniteSet(Q1) &and; IsFiniteSet(commitQuorum)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1642</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;7. Cardinality types &isin; Nat</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1644</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;8. Quorum cardinality &gt; |Server|/2</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1646</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;9. |Q1| + |commitQuorum| &gt; |Server|</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1648</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;10. Q1 &cap; commitQuorum &ne; {}</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1650</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;11. PICK n &isin; Q1 &cap; commitQuorum</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1653</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;12-16. InLog facts + index equality</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1655-L1660</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;17. c1[2] = currentTerm[i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1661</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;18-19. Tuple reconstruction from TypeOK</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1662-L1663</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;20. c1 = c2</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1664</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1665</span></div>
+          </div>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;6. CASE c2 old, c1 new &rarr; symmetric quorum intersection</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1667</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;1-20. (symmetric to &lt;2&gt;5)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1669-L1698</span></div>
+          </div>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;7. QED (exhaustive case split)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1700</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;6. UpdateTermsAction</span> <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1702</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;7. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L1703</span>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<h2>Proof Strategy</h2>
+<p>The key challenge is the <strong>CommitEntry</strong> action, which adds a new entry to <code>immediatelyCommitted</code>.
+The proof decomposes into four cases based on whether c1 and c2 are old (pre-existing) or new (just committed):</p>
+<ol>
+  <li><strong>Both old</strong>: Direct from induction hypothesis (H_StateMachineSafety).</li>
+  <li><strong>Both new</strong>: Trivially equal (same entry added).</li>
+  <li><strong>One old, one new</strong>: Quorum intersection argument. H_CommittedEntryIsOnQuorum provides a quorum for the old entry; the commit quorum witnesses the new entry. FS_MajoritiesIntersect gives a node in both quorums, where InLog forces the terms at the shared index to match, making the entries equal.</li>
+</ol>
+<p>The tuple reconstruction step (<code>c \in LogIndices &times; Terms &rArr; c = &laquo;c[1], c[2]&raquo;</code>) is needed because TLAPM cannot automatically reconstruct tuple equality from component equality.</p>
+
+</body>
+</html>

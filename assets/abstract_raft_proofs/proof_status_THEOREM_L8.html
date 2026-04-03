@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof Status: THEOREM L_8 (H_LogEntryImpliesSafeAtTerm)</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 20px; background: #fff; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
+  h2 { font-size: 1.1em; margin-top: 28px; }
+  .summary { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 16px; margin: 16px 0; }
+  .summary strong { color: #166534; }
+  .tree { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85em; line-height: 1.6; }
+  .node { margin-left: 0; }
+  .children { margin-left: 24px; border-left: 1px solid #e5e7eb; padding-left: 8px; }
+  .toggle { cursor: pointer; user-select: none; }
+  .toggle::before { content: '\25BC '; font-size: 0.7em; color: #6b7280; }
+  .toggle.collapsed::before { content: '\25B6 '; }
+  .proved { color: #166534; }
+  .badge { display: inline-block; font-size: 0.75em; padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
+  .badge-smt { background: #dbeafe; color: #1e40af; }
+  .badge-tlapm { background: #fef9c3; color: #854d0e; }
+  .badge-proved { background: #dcfce7; color: #166534; }
+  .badge-trivial { background: #f3f4f6; color: #6b7280; }
+  .badge-cached { background: #ede9fe; color: #5b21b6; }
+  .line-ref { color: #9ca3af; font-size: 0.8em; }
+  code { background: #f3f4f6; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+  .meta-table { border-collapse: collapse; font-size: 0.85em; margin-top: 8px; }
+  .meta-table th, .meta-table td { padding: 4px 10px; border: 1px solid #e5e7eb; }
+  .meta-table th { background: #f9fafb; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>THEOREM L_8 &mdash; H_LogEntryImpliesSafeAtTerm</h1>
+<div class="summary">
+  <strong>Status: ALL 20 OBLIGATIONS PROVED</strong> &nbsp;|&nbsp; 7 proof steps (6 action cases + QED) &nbsp;|&nbsp; Provers: SMT + TLAPM (trivial)
+</div>
+<p><code>TypeOK /\ H_QuorumsSafeAtTerms /\ H_LogEntryImpliesSafeAtTerm /\ Next =&gt; H_LogEntryImpliesSafeAtTerm'</code></p>
+
+<div class="tree">
+
+<div class="node">
+  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+    <span class="proved">THEOREM L_8</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L998</span>
+  </div>
+  <div class="children">
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;. USE A0,A1,A2,A3,A4,A5,A6</span> <span class="badge badge-tlapm">tlapm</span> <span class="badge badge-trivial">trivial &times;7</span> <span class="line-ref">L999</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;1. TypeOK /\ H_QuorumsSafeAtTerms /\ H_LogEntryImpliesSafeAtTerm /\ ClientRequestAction =&gt; H_LogEntryImpliesSafeAtTerm'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="badge badge-cached">cached</span> <span class="line-ref">L1001</span>
+      <div style="margin-left:16px; font-size:0.8em; color:#6b7280;">
+        BY DEF TypeOK, H_QuorumsSafeAtTerms, ClientRequestAction, ClientRequest, H_LogEntryImpliesSafeAtTerm
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;2. TypeOK /\ H_LogEntryImpliesSafeAtTerm /\ GetEntriesAction =&gt; H_LogEntryImpliesSafeAtTerm'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="badge badge-cached">cached</span> <span class="line-ref">L1003</span>
+      <div style="margin-left:16px; font-size:0.8em; color:#6b7280;">
+        BY DEF TypeOK, GetEntriesAction, GetEntries, H_LogEntryImpliesSafeAtTerm
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;3. TypeOK /\ H_LogEntryImpliesSafeAtTerm /\ RollbackEntriesAction =&gt; H_LogEntryImpliesSafeAtTerm'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="badge badge-cached">cached</span> <span class="line-ref">L1005</span>
+      <div style="margin-left:16px; font-size:0.8em; color:#6b7280;">
+        BY DEF TypeOK, RollbackEntriesAction, RollbackEntries, H_LogEntryImpliesSafeAtTerm
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;4. TypeOK /\ H_LogEntryImpliesSafeAtTerm /\ BecomeLeaderAction =&gt; H_LogEntryImpliesSafeAtTerm'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="badge badge-cached">cached (0.2s)</span> <span class="line-ref">L1007</span>
+      <div style="margin-left:16px; font-size:0.8em; color:#6b7280;">
+        BY DEF TypeOK, BecomeLeaderAction, BecomeLeader, H_LogEntryImpliesSafeAtTerm, CanVoteForOplog, Terms
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;5. TypeOK /\ H_LogEntryImpliesSafeAtTerm /\ CommitEntryAction =&gt; H_LogEntryImpliesSafeAtTerm'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="badge badge-cached">cached</span> <span class="line-ref">L1009</span>
+      <div style="margin-left:16px; font-size:0.8em; color:#6b7280;">
+        BY DEF TypeOK, CommitEntryAction, CommitEntry, H_LogEntryImpliesSafeAtTerm
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;6. TypeOK /\ H_LogEntryImpliesSafeAtTerm /\ UpdateTermsAction =&gt; H_LogEntryImpliesSafeAtTerm'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="badge badge-cached">cached (0.1s)</span> <span class="line-ref">L1011</span>
+      <div style="margin-left:16px; font-size:0.8em; color:#6b7280;">
+        BY DEF TypeOK, UpdateTermsAction, UpdateTerms, UpdateTermsExpr, H_LogEntryImpliesSafeAtTerm, Terms
+      </div>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;7. QED</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L1012</span>
+      <div style="margin-left:16px; font-size:0.8em; color:#6b7280;">
+        BY &lt;1&gt;1, &lt;1&gt;2, &lt;1&gt;3, &lt;1&gt;4, &lt;1&gt;5, &lt;1&gt;6 DEF Next
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<h2>Obligation Breakdown</h2>
+<table class="meta-table">
+  <tr>
+    <th>Step</th>
+    <th>Action</th>
+    <th>Prover</th>
+    <th>Status</th>
+    <th>Timing</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;. USE</td>
+    <td>A0&ndash;A6 axiom assumptions</td>
+    <td>tlapm</td>
+    <td>trivial (&times;7)</td>
+    <td>cached</td>
+    <td>IDs 8&ndash;14</td>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;1</td>
+    <td>ClientRequestAction</td>
+    <td>smt</td>
+    <td>proved</td>
+    <td>cached</td>
+    <td>ID 15; needs H_QuorumsSafeAtTerms</td>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;2</td>
+    <td>GetEntriesAction</td>
+    <td>smt</td>
+    <td>proved</td>
+    <td>cached</td>
+    <td>ID 16; log copy preserves invariant</td>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;3</td>
+    <td>RollbackEntriesAction</td>
+    <td>smt</td>
+    <td>proved</td>
+    <td>cached</td>
+    <td>ID 17; log truncation preserves invariant</td>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;4</td>
+    <td>BecomeLeaderAction</td>
+    <td>smt</td>
+    <td>proved</td>
+    <td>0.2s (3%)</td>
+    <td>ID 18; needs CanVoteForOplog, Terms defs</td>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;5</td>
+    <td>CommitEntryAction</td>
+    <td>smt</td>
+    <td>proved</td>
+    <td>cached</td>
+    <td>ID 19; commit does not change log</td>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;6</td>
+    <td>UpdateTermsAction</td>
+    <td>smt</td>
+    <td>proved</td>
+    <td>0.1s (1%)</td>
+    <td>ID 20; needs UpdateTermsExpr, Terms defs</td>
+  </tr>
+  <tr>
+    <td>&lt;1&gt;7. QED</td>
+    <td>Exhaustive action case split</td>
+    <td>smt</td>
+    <td>proved</td>
+    <td>cached</td>
+    <td>IDs 1&ndash;7</td>
+  </tr>
+</table>
+
+<h2>Proof Strategy</h2>
+<p><strong>H_LogEntryImpliesSafeAtTerm</strong> asserts that every log entry at index <em>i</em> with term <em>t</em> implies that a quorum of servers was safe at term <em>t</em> at the time of appending. The inductive step proves this is preserved by all six Next-state actions.</p>
+<p>The proof is a straightforward flat case split over each action in <code>Next</code>:</p>
+<ol>
+  <li><strong>ClientRequest</strong>: A new entry is appended by a primary. Requires <code>H_QuorumsSafeAtTerms</code> to establish that the leader's current quorum was safe at the entry's term &mdash; this is the only action that needs an extra inductive hypothesis beyond TypeOK.</li>
+  <li><strong>GetEntries</strong>: Log entries are copied from another server. The invariant is preserved because the copied entries already satisfy it (from <code>H_LogEntryImpliesSafeAtTerm</code> on the source).</li>
+  <li><strong>RollbackEntries</strong>: Log entries are removed. Since the set of log entries only shrinks, the invariant trivially holds for the remaining entries.</li>
+  <li><strong>BecomeLeader</strong>: No log entries are added or removed; only <code>state</code> and <code>currentTerm</code> change. The <code>CanVoteForOplog</code> and <code>Terms</code> definitions are unfolded to confirm the log is unchanged.</li>
+  <li><strong>CommitEntry</strong>: Only the <code>immediatelyCommitted</code> set changes; the log itself is unchanged.</li>
+  <li><strong>UpdateTerms</strong>: Only <code>currentTerm</code> and <code>state</code> change; the log and safety witnesses are unchanged. Requires unfolding <code>UpdateTermsExpr</code> and <code>Terms</code>.</li>
+</ol>
+<p>All six cases are discharged automatically by SMT after unfolding the relevant definitions. The only non-trivial step is <code>BecomeLeaderAction</code> (0.2s) and <code>UpdateTermsAction</code> (0.1s); all others were satisfied from the fingerprint cache.</p>
+<p>Total TLAPM-reported obligations: <strong>20</strong> (7 QED sub-obligations from the case-split, 7 trivial axiom-use obligations, and 6 BY obligations for each action case). All proved.</p>
+
+</body>
+</html>

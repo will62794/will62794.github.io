@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof Status: THEOREM L_3</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    padding: 24px;
+    line-height: 1.5;
+  }
+  .header {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .header h1 {
+    font-size: 1.5em;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+  }
+  .header .subtitle {
+    color: #6c757d;
+    font-size: 0.95em;
+  }
+  .stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 14px 20px;
+    min-width: 140px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .stat-card .label { color: #6c757d; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 1.5em; font-weight: 700; color: #1a1a2e; }
+  .stat-card.success .value { color: #198754; }
+  .stat-card.info .value { color: #0d6efd; }
+  .stat-card.time .value { color: #6f42c1; }
+
+  .tree-container {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .tree-container h2 {
+    font-size: 1.15em;
+    color: #1a1a2e;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .tree-node {
+    margin-left: 0px;
+    margin-bottom: 2px;
+  }
+  .tree-node .children {
+    margin-left: 24px;
+    border-left: 2px solid #e9ecef;
+    padding-left: 12px;
+  }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .step-header:hover { background: #f1f3f5; }
+  .step-header .toggle {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #868e96;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .step-header .toggle.expanded { transform: rotate(90deg); }
+  .step-header .toggle.leaf { visibility: hidden; }
+  .step-label {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #495057;
+    white-space: nowrap;
+  }
+  .step-code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.82em;
+    color: #868e96;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-proved { background: #d1e7dd; color: #0f5132; }
+  .badge-trivial { background: #e2e3e5; color: #41464b; }
+  .badge-failed { background: #f8d7da; color: #842029; }
+  .badge-smt { background: #cfe2ff; color: #084298; }
+  .badge-zenon { background: #fff3cd; color: #664d03; }
+  .badge-tlapm { background: #e2e3e5; color: #41464b; }
+
+  .obl-list {
+    margin: 4px 0 8px 42px;
+    display: none;
+  }
+  .obl-list.show { display: block; }
+  .obl-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px;
+    font-size: 0.82em;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    border-radius: 4px;
+  }
+  .obl-item:hover { background: #f8f9fa; }
+  .obl-item .obl-id { color: #868e96; min-width: 30px; }
+  .obl-item .obl-loc { color: #495057; min-width: 100px; }
+  .obl-item .obl-time { color: #6f42c1; min-width: 80px; }
+
+  .step-summary {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .step-count {
+    font-size: 0.75em;
+    color: #868e96;
+    white-space: nowrap;
+  }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>THEOREM L_3 (H_LogMatching)</h1>
+  <div class="subtitle">Lines 261&#8211;275 &middot; AbstractRaft_IndProofs_test.tla</div>
+  <div class="stats">
+    <div class="stat-card success">
+      <div class="label">Obligations Proved</div>
+      <div class="value">21/21</div>
+    </div>
+    <div class="stat-card info">
+      <div class="label">SMT / Zenon / TLAPM</div>
+      <div class="value">7 / 0 / 14</div>
+    </div>
+    <div class="stat-card time">
+      <div class="label">Prover Time</div>
+      <div class="value">1.3s</div>
+    </div>
+    <div class="stat-card time">
+      <div class="label">Claude Code Time</div>
+      <div class="value">~4 min</div>
+    </div>
+  </div>
+</div>
+
+<div class="tree-container">
+  <h2>Proof Tree</h2>
+  <div id="proof-tree">
+
+  </div>
+</div>
+
+<script>
+function toggleNode(nodeId) {
+  const children = document.getElementById('children-' + nodeId);
+  const obls = document.getElementById('obls-' + nodeId);
+  const toggle = document.getElementById('toggle-' + nodeId);
+
+  if (children) {
+    const isHidden = children.style.display === 'none';
+    children.style.display = isHidden ? 'block' : 'none';
+    if (toggle) {
+      toggle.classList.toggle('expanded', isHidden);
+    }
+  }
+  if (obls) {
+    const isHidden = obls.style.display === 'none' || !obls.classList.contains('show');
+    obls.classList.toggle('show', isHidden);
+    obls.style.display = isHidden ? 'block' : 'none';
+  }
+}
+
+// Start with all children visible
+document.querySelectorAll('[id^="children-"]').forEach(el => {
+  el.style.display = 'block';
+});
+</script>
+</body>
+</html>

@@ -18,220 +18,294 @@ In some [prior research](https://will62794.github.io/assets/papers/nfm26-interac
 In recent experiments re-checking these proofs, the latest Claude models (Opus 4.6) appear to do an excellent job of automatically writing these proofs. In the past, and from direct experience working on this during past research projects, this was typically at least a months long effort for a highly capable master's or PhD student. It is also incredibly tedious, meticulous, and mentally taxing work for humans to carry out. In other words, it can just be a huge time sink, for questionable value.
 
 We can take the candidate inductive invariant as a starting point, and give Claude a [few basic instructions](https://github.com/will62794/autoproofs/blob/main/AGENTS.md) about how to run TLAPS to check proof obligations. The ultimate goal is to check this induction step for each separate lemma and action of the protocol. We then let it go, asking it prove each theorem one by one. We can also ask for a nice HTML report of the proofs generated after each one is done, where we can also drill into the proof of each individual theorem.
+<div class="proof-status-scope">
+  <style>
+    .proof-status-scope, .proof-status-scope * { box-sizing: border-box; margin: 0; padding: 0; }
+    .proof-status-scope {
+      /* override conflicting body background for local container */
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .proof-status-scope .header {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .proof-status-scope .header h1 {
+      font-size: 1.5em;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+    .proof-status-scope .header .subtitle {
+      color: #6c757d;
+      font-size: 0.95em;
+    }
+    .proof-status-scope .stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .proof-status-scope .stat-card {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 8px 10px;
+      min-width: 140px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .proof-status-scope .stat-card .label { color: #6c757d; font-size: 0.6em; text-transform: uppercase; letter-spacing: 0.5px; }
+    .proof-status-scope .stat-card .value { font-size: 1.0em; font-weight: 700; color: #1a1a2e; }
+    .proof-status-scope .stat-card.success .value { color: #198754; }
+    .proof-status-scope .stat-card.time .value { color: #6f42c1; }
 
-
-<!-- INSERT SUMMARY TABLE. -->
-<div class="raft-proof-summary">
-
-<style>
-  .raft-proof-summary * { box-sizing: border-box; margin: 0; padding: 0; }
-  .raft-proof-summary {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f8f9fa; color: #333; padding: 2rem;
-    max-width: 1000px; margin: 0 auto; line-height: 1.5;
-  }
-  .raft-proof-summary h1 { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.25rem; }
-  .raft-proof-summary .subtitle { font-size: 0.85rem; color: #868e96; margin-bottom: 1.5rem; }
-  .raft-proof-summary .totals {
-    display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
-  }
-  .raft-proof-summary .totals .card {
-    background: #fff; border: 1px solid #dee2e6; border-radius: 8px;
-    padding: 0.75rem 1.25rem; text-align: center; min-width: 120px; flex: 1;
-  }
-  .raft-proof-summary .totals .card .val { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
-  .raft-proof-summary .totals .card .lbl { font-size: 0.7rem; color: #868e96; text-transform: uppercase; letter-spacing: 0.5px; }
-  .raft-proof-summary .green { color: #2b8a3e; }
-  .raft-proof-summary .blue { color: #1864ab; }
-  .raft-proof-summary .gray { color: #868e96; }
-
-  .raft-proof-summary table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #dee2e6; }
-  .raft-proof-summary thead { background: #f1f3f5; }
-  .raft-proof-summary th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #495057; font-weight: 600; padding: 0.6rem 0.75rem; text-align: left; border-bottom: 2px solid #dee2e6; }
-  .raft-proof-summary td { padding: 0.55rem 0.75rem; border-bottom: 1px solid #f1f3f5; font-size: 0.85rem; }
-  .raft-proof-summary tr:last-child td { border-bottom: none; }
-  .raft-proof-summary tr:hover td { background: #f8f9fa; }
-
-  .raft-proof-summary .badge {
-    display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px;
-    font-size: 0.72rem; font-weight: 600;
-  }
-  .raft-proof-summary .badge-proved { background: #d3f9d8; color: #2b8a3e; }
-  .raft-proof-summary .badge-pending { background: #fff3bf; color: #e67700; }
-
-  .raft-proof-summary .mono { font-family: 'SF Mono', Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; }
-  .raft-proof-summary .prover-breakdown { font-size: 0.78rem; color: #495057; }
-  .raft-proof-summary .prover-breakdown span { white-space: nowrap; }
-  .raft-proof-summary .smt { color: #1864ab; }
-  .raft-proof-summary .zenon { color: #5f3dc4; }
-  .raft-proof-summary .tlapm { color: #868e96; }
-  .raft-proof-summary .time { font-variant-numeric: tabular-nums; }
-
-  .raft-proof-summary a { color: #1864ab; text-decoration: none; }
-  .raft-proof-summary a:hover { text-decoration: underline; }
-
-  .raft-proof-summary .footer { margin-top: 1rem; font-size: 0.75rem; color: #adb5bd; }
-</style>
-
-  <h1>AbstractRaft Inductive Invariant &mdash; Proof Summary</h1>
-  <div class="subtitle">AbstractRaft_IndProofs_test.tla &middot; 13 theorems (L_0 &ndash; L_12)</div>
-
-  <div class="totals">
-    <div class="card">
-      <div class="val green">4</div>
-      <div class="lbl">Theorems Proved</div>
-    </div>
-    <div class="card">
-      <div class="val gray">9</div>
-      <div class="lbl">Remaining</div>
-    </div>
-    <div class="card">
-      <div class="val blue">577</div>
-      <div class="lbl">Total Obligations</div>
-    </div>
-    <div class="card">
-      <div class="val time">19.2s</div>
-      <div class="lbl">Total Prover Time</div>
+    .proof-status-scope .table-container {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      overflow-x: auto;
+    }
+    .proof-status-scope .table-container h2 {
+      font-size: 1.15em;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .proof-status-scope table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+    }
+    .proof-status-scope th {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 2px solid #dee2e6;
+      color: #495057;
+      font-weight: 600;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .proof-status-scope td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .proof-status-scope tr.success td:first-child { border-left: 3px solid #198754; }
+    .proof-status-scope tr.warning td:first-child { border-left: 3px solid #ffc107; }
+    .proof-status-scope tr:hover { background: #f8f9fa; }
+    .proof-status-scope a { color: #0d6efd; text-decoration: none; font-weight: 600; }
+    .proof-status-scope a:hover { text-decoration: underline; }
+    .proof-status-scope .footer {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      color: #6c757d;
+      font-size: 0.85em;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+  </style>
+  <div class="header">
+    <h1>AbstractRaft Inductive Invariant Proofs</h1>
+    <div class="subtitle">TLAPS proof status summary &middot; AbstractRaft_IndProofs_test.tla</div>
+    <div class="stats">
+      <div class="stat-card success">
+        <div class="label">Total Obligations</div>
+        <div class="value">2559/2559</div>
+      </div>
+      <div class="stat-card success">
+        <div class="label">Theorems Proved</div>
+        <div class="value">12/12</div>
+      </div>
+      <div class="stat-card time">
+        <div class="label">Total Prover Time</div>
+        <div class="value">21.4s+</div>
+      </div>
+      <div class="stat-card time">
+        <div class="label">Total Claude Code Time</div>
+        <div class="value">~37 min+</div>
+      </div>
     </div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Theorem</th>
-        <th>Property</th>
-        <th>Status</th>
-        <th>Obligations</th>
-        <th>Provers (SMT / Zenon / TLAPM)</th>
-        <th>Prover Time</th>
-        <th>Report</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="mono">L_0</td>
-        <td>TypeOK</td>
-        <td><span class="badge badge-pending">pending</span></td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-      </tr>
-      <tr>
-        <td class="mono">L_1</td>
+  <div class="table-container">
+    <h2>Theorem Summary</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Theorem</th>
+          <th>Invariant</th>
+          <th>Obligations</th>
+          <th>SMT</th>
+          <th>Zenon</th>
+          <th>TLAPM</th>
+          <th>Prover Time</th>
+          <th>Claude Time</th>
+          <th>Attempts</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L1.html">L_1</a></td>
         <td>H_OnePrimaryPerTerm</td>
-        <td><span class="badge badge-proved">proved</span></td>
-        <td class="time">139 / 139</td>
-        <td class="prover-breakdown"><span class="smt">47 SMT</span> &middot; <span class="zenon">2 Zenon</span> &middot; <span class="tlapm">90 TLAPM</span></td>
-        <td class="time">11.9s</td>
-        <td><a href="proof_status_THEOREM_L1.html">view</a></td>
+        <td>139/139</td>
+        <td>47</td>
+        <td>2</td>
+        <td>90</td>
+        <td>11.9s</td>
+        <td>~8 min</td>
+        <td>8</td>
       </tr>
-      <tr>
-        <td class="mono">L_2</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L2.html">L_2</a></td>
         <td>H_PrimaryHasOwnEntries</td>
-        <td><span class="badge badge-proved">proved</span></td>
-        <td class="time">182 / 182</td>
-        <td class="prover-breakdown"><span class="smt">63 SMT</span> &middot; <span class="tlapm">119 TLAPM</span></td>
-        <td class="time">2.4s</td>
-        <td><a href="proof_status_THEOREM_L2.html">view</a></td>
+        <td>182/182</td>
+        <td>63</td>
+        <td>0</td>
+        <td>119</td>
+        <td>2.4s</td>
+        <td>~10 min</td>
+        <td>4</td>
       </tr>
-      <tr>
-        <td class="mono">L_3</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L3.html">L_3</a></td>
         <td>H_LogMatching</td>
-        <td><span class="badge badge-proved">proved</span></td>
-        <td class="time">21 / 21</td>
-        <td class="prover-breakdown"><span class="smt">7 SMT</span> &middot; <span class="tlapm">14 TLAPM</span></td>
-        <td class="time">1.3s</td>
-        <td><a href="proof_status_THEOREM_L3.html">view</a></td>
+        <td>21/21</td>
+        <td>7</td>
+        <td>0</td>
+        <td>14</td>
+        <td>1.3s</td>
+        <td>~4 min</td>
+        <td>2</td>
       </tr>
-      <tr>
-        <td class="mono">L_4</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L4.html">L_4</a></td>
         <td>H_PrimaryTermGTELogTerm</td>
-        <td><span class="badge badge-pending">pending</span></td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>95/95</td>
+        <td>37</td>
+        <td>0</td>
+        <td>58</td>
+        <td>1.7s</td>
+        <td>~15 min</td>
+        <td>9</td>
       </tr>
-      <tr>
-        <td class="mono">L_5</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L5.html">L_5</a></td>
         <td>H_QuorumsSafeAtTerms</td>
-        <td><span class="badge badge-pending">pending</span></td>
+        <td>132/132</td>
+        <td>132</td>
+        <td>0</td>
+        <td>0</td>
+        <td>cached</td>
         <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>6</td>
       </tr>
-      <tr>
-        <td class="mono">L_6</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L6.html">L_6</a></td>
         <td>H_UniformLogEntries</td>
-        <td><span class="badge badge-pending">pending</span></td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>640/640</td>
+        <td>640</td>
+        <td>0</td>
+        <td>0</td>
+        <td>cached</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
       </tr>
-      <tr>
-        <td class="mono">L_7</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L7.html">L_7</a></td>
         <td>H_TermsMonotonic</td>
-        <td><span class="badge badge-proved">proved</span></td>
-        <td class="time">235 / 235</td>
-        <td class="prover-breakdown"><span class="smt">75 SMT</span> &middot; <span class="tlapm">160 TLAPM</span></td>
-        <td class="time">3.6s</td>
-        <td><a href="../proof_status_THEOREM_L7.html">view</a></td>
+        <td>227/227</td>
+        <td>227</td>
+        <td>0</td>
+        <td>0</td>
+        <td>cached</td>
+        <td>~8 min</td>
+        <td>6</td>
       </tr>
-      <tr>
-        <td class="mono">L_8</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L8.html">L_8</a></td>
         <td>H_LogEntryImpliesSafeAtTerm</td>
-        <td><span class="badge badge-pending">pending</span></td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>20/20</td>
+        <td>20</td>
+        <td>0</td>
+        <td>0</td>
+        <td>cached</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
       </tr>
-      <tr>
-        <td class="mono">L_9</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L9.html">L_9</a></td>
         <td>H_LeaderCompleteness</td>
-        <td><span class="badge badge-pending">pending</span></td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>418/418</td>
+        <td>159</td>
+        <td>0</td>
+        <td>257</td>
+        <td>4.1s</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
       </tr>
-      <tr>
-        <td class="mono">L_10</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L10.html">L_10</a></td>
         <td>H_LaterLogsHaveEarlierCommitted</td>
-        <td><span class="badge badge-pending">pending</span></td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>422/422</td>
+        <td>131</td>
+        <td>0</td>
+        <td>291</td>
+        <td>cached</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
       </tr>
-      <tr>
-        <td class="mono">L_11</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L11.html">L_11</a></td>
         <td>H_CommittedEntryIsOnQuorum</td>
-        <td><span class="badge badge-pending">pending</span></td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>125/125</td>
+        <td>125</td>
+        <td>0</td>
+        <td>0</td>
+        <td>cached</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
       </tr>
-      <tr>
-        <td class="mono">L_12</td>
+      <tr class="success">
+        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L12.html">L_12</a></td>
         <td>H_StateMachineSafety</td>
-        <td><span class="badge badge-pending">pending</span></td>
+        <td>138/138</td>
+        <td>54</td>
+        <td>0</td>
+        <td>84</td>
+        <td>cached</td>
+        <td>~5 min</td>
+        <td>3</td>
+      </tr>
+      <tr class="success">
+        <td>&mdash;</td>
+        <td>Init =&gt; IndGlobal</td>
+        <td>N/A</td>
+        <td>&mdash;</td>
+        <td>&mdash;</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
         <td>&mdash;</td>
       </tr>
-    </tbody>
-  </table>
 
-  <div class="footer">Generated 2026-04-03 &middot; TLAPS 1.5.0</div>
+      </tbody>
+    </table>
+  </div>
 </div>
 
-Overall, each theorem required roughly no more than 30-40 minutes of agent thinking time, and with little to no human intervention. The arguments and steps generated by Claude automatically were all very impressive miraculous to me, and something I was not expecting it do so well at. The final version of the generated proof can be found [here](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made my Claude as it proved each theorem.
+Overall, each theorem required roughly no more than 30-40 minutes of agent thinking time, and with little to no human intervention. The arguments and steps generated by Claude automatically were all impressive, and something I was not expecting it do so well at. The final version of the generated proof can be found [here](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made my Claude as it proved each theorem. The full file with complete proofs is around 1720 lines, up from a baseline of 296 lines in the starting [unproven file](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla).
 
 There are definitely a few caveats here, but the results are still incredibly impressive, and something completely out of realm of possibility a few years ago. Importantly, there is a lot of information about the Raft protocol on the web, and it is probably one of the most well-studied and widely implemented consensus protocols to date. Similarly, there has been some amount of work done on formally verified Raft proofs. Not in TLA+, necessarily, but there is prior work in this area. Having said that, I still think this is a wild achievement. Even for an experience engineer/researcher, going off and reading documentation on existing Raft proofs and synthesizing that into a correct TLAPS proof is an extremely nontrivial task.
 

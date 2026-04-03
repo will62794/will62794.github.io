@@ -1,0 +1,4866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof Status: THEOREM L_10</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    padding: 24px;
+    line-height: 1.5;
+  }
+  .header {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .header h1 {
+    font-size: 1.5em;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+  }
+  .header .subtitle {
+    color: #6c757d;
+    font-size: 0.95em;
+  }
+  .stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 14px 20px;
+    min-width: 140px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .stat-card .label { color: #6c757d; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 1.5em; font-weight: 700; color: #1a1a2e; }
+  .stat-card.success .value { color: #198754; }
+  .stat-card.info .value { color: #0d6efd; }
+  .stat-card.time .value { color: #6f42c1; }
+
+  .description {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .description h2 {
+    font-size: 1.1em;
+    color: #1a1a2e;
+    margin-bottom: 10px;
+  }
+  .description ul {
+    margin-left: 20px;
+    color: #495057;
+    font-size: 0.92em;
+  }
+  .description li { margin-bottom: 4px; }
+
+  .tree-container {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .tree-container h2 {
+    font-size: 1.15em;
+    color: #1a1a2e;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .tree-node {
+    margin-left: 0px;
+    margin-bottom: 2px;
+  }
+  .tree-node .children {
+    margin-left: 24px;
+    border-left: 2px solid #e9ecef;
+    padding-left: 12px;
+  }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .step-header:hover { background: #f1f3f5; }
+  .step-header .toggle {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #868e96;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .step-header .toggle.expanded { transform: rotate(90deg); }
+  .step-header .toggle.leaf { visibility: hidden; }
+  .step-label {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #495057;
+    white-space: nowrap;
+  }
+  .step-comment {
+    font-size: 0.8em;
+    color: #6c757d;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  .step-code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.82em;
+    color: #868e96;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-proved { background: #d1e7dd; color: #0f5132; }
+  .badge-trivial { background: #e2e3e5; color: #41464b; }
+  .badge-failed { background: #f8d7da; color: #842029; }
+  .badge-smt { background: #cfe2ff; color: #084298; }
+  .badge-zenon { background: #fff3cd; color: #664d03; }
+  .badge-isabelle { background: #f3e5f5; color: #6a1b9a; }
+  .badge-tlapm { background: #e2e3e5; color: #41464b; }
+
+  .obl-list {
+    margin: 4px 0 8px 42px;
+    display: none;
+  }
+  .obl-list.show { display: block; }
+  .obl-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px;
+    font-size: 0.82em;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    border-radius: 4px;
+  }
+  .obl-item:hover { background: #f8f9fa; }
+  .obl-item .obl-id { color: #868e96; min-width: 40px; }
+  .obl-item .obl-loc { color: #495057; min-width: 120px; }
+  .obl-item .obl-time { color: #6f42c1; min-width: 80px; }
+
+  .step-summary {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .step-count {
+    font-size: 0.75em;
+    color: #868e96;
+    white-space: nowrap;
+  }
+
+  .hidden { display: none; }
+
+  .controls {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .controls button {
+    padding: 6px 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: #fff;
+    color: #495057;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .controls button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>THEOREM L_10 (H_LaterLogsHaveEarlierCommitted)</h1>
+  <div class="subtitle">Lines 1300&#8211;1507 &middot; AbstractRaft_IndProofs_test.tla</div>
+  <div class="stats">
+    <div class="stat-card success">
+      <div class="label">Obligations Proved</div>
+      <div class="value">422/422</div>
+    </div>
+    <div class="stat-card info">
+      <div class="label">SMT / Trivial (TLAPM)</div>
+      <div class="value">131 / 291</div>
+    </div>
+    <div class="stat-card time">
+      <div class="label">All Cached</div>
+      <div class="value">Yes</div>
+    </div>
+  </div>
+</div>
+
+<div class="description">
+  <h2>Proof Notes</h2>
+  <ul>
+    <li>6 action cases: ClientRequest, GetEntries, RollbackEntries, BecomeLeader, CommitEntry, UpdateTerms</li>
+    <li>GetEntries was the deepest case, requiring 5 levels of decomposition with H_LogMatching and SubSeq reasoning</li>
+    <li>CommitEntry uses quorum intersection (FS_MajoritiesIntersect) and H_LogEntryImpliesSafeAtTerm to derive contradiction</li>
+    <li>RollbackEntries uses H_TermsMonotonic to show c[1] is preserved in the truncated log</li>
+    <li>BecomeLeader and UpdateTerms proved directly by definition expansion</li>
+  </ul>
+</div>
+
+<div class="tree-container">
+  <h2>Proof Tree</h2>
+  <div class="controls">
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+    <button onclick="expandLevel(1)">Level 1 Only</button>
+    <button onclick="expandLevel(2)">Level 1+2</button>
+  </div>
+  <div id="proof-tree">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-1')">
+    <span class="toggle leaf" id="toggle-node-1">&#9654;</span>
+    <span class="step-label">&lt;1&gt;.</span>
+    <span class="step-code">USE A0,A1,A2,A3,A4,A5,A6</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">7/7</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-1">
+    <div class="obl-item">
+      <span class="obl-id">#8</span>
+      <span class="obl-loc">L1301:12:1301:14</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#9</span>
+      <span class="obl-loc">L1301:15:1301:17</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#10</span>
+      <span class="obl-loc">L1301:18:1301:20</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#11</span>
+      <span class="obl-loc">L1301:21:1301:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#12</span>
+      <span class="obl-loc">L1301:24:1301:26</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#13</span>
+      <span class="obl-loc">L1301:27:1301:29</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#14</span>
+      <span class="obl-loc">L1301:30:1301:32</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-2')">
+    <span class="toggle expanded" id="toggle-node-2">&#9654;</span>
+    <span class="step-label">&lt;1&gt;1</span>
+    <span class="step-comment">(H_LaterLogsHaveEarlierCommitted,ClientRequestAction)</span>
+    <span class="step-code">TypeOK /\ H_LeaderCompleteness /\ H_LaterLogsHaveEarlierCommitted /\ ClientRequestAction =&gt; H_LaterLogsHaveEarlierCommit...</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">102/102</span>
+    </span>
+  </div>
+  <div class="children " id="children-node-2">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-3')">
+    <span class="toggle leaf" id="toggle-node-3">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">SUFFICES ASSUME TypeOK, H_LeaderCompleteness, H_LaterLogsHaveEarlierCommitted, ClientRequestAction,</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-3">
+    <div class="obl-item">
+      <span class="obl-id">#18</span>
+      <span class="obl-loc">L1309:10:1309:12</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-4')">
+    <span class="toggle leaf" id="toggle-node-4">&#9654;</span>
+    <span class="step-label">&lt;2&gt;1</span>
+    <span class="step-code">PICK i \in Server : ClientRequest(i) BY DEF ClientRequestAction</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-4">
+    <div class="obl-item">
+      <span class="obl-id">#19</span>
+      <span class="obl-loc">L1310:48:1310:50</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-5')">
+    <span class="toggle leaf" id="toggle-node-5">&#9654;</span>
+    <span class="step-label">&lt;2&gt;2</span>
+    <span class="step-code">immediatelyCommitted&#x27; = immediatelyCommitted /\ c \in immediatelyCommitted BY &lt;2&gt;1 DEF ClientRequest</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-5">
+    <div class="obl-item">
+      <span class="obl-id">#20</span>
+      <span class="obl-loc">L1311:86:1311:88</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#21</span>
+      <span class="obl-loc">L1311:89:1311:93</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-6')">
+    <span class="toggle leaf" id="toggle-node-6">&#9654;</span>
+    <span class="step-label">&lt;2&gt;3</span>
+    <span class="step-code">c[1] &gt;= 1 /\ c[1] \in Nat BY &lt;2&gt;2 DEF TypeOK, LogIndices</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-6">
+    <div class="obl-item">
+      <span class="obl-id">#22</span>
+      <span class="obl-loc">L1312:37:1312:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#23</span>
+      <span class="obl-loc">L1312:40:1312:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-7')">
+    <span class="toggle leaf" id="toggle-node-7">&#9654;</span>
+    <span class="step-label">&lt;2&gt;4</span>
+    <span class="step-code">log[i] \in Seq(Terms) BY DEF TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-7">
+    <div class="obl-item">
+      <span class="obl-id">#24</span>
+      <span class="obl-loc">L1313:33:1313:35</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-8')">
+    <span class="toggle leaf" id="toggle-node-8">&#9654;</span>
+    <span class="step-label">&lt;2&gt;5</span>
+    <span class="step-code">CASE s # i</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-8">
+    <div class="obl-item">
+      <span class="obl-id">#25</span>
+      <span class="obl-loc">L1315:7:1315:9</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#26</span>
+      <span class="obl-loc">L1315:10:1315:14</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#27</span>
+      <span class="obl-loc">L1315:16:1315:20</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#28</span>
+      <span class="obl-loc">L1315:22:1315:26</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-9')">
+    <span class="toggle " id="toggle-node-9">&#9654;</span>
+    <span class="step-label">&lt;2&gt;6</span>
+    <span class="step-code">CASE s = i</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">88/88</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-9">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-10')">
+    <span class="toggle leaf" id="toggle-node-10">&#9654;</span>
+    <span class="step-label">&lt;3&gt;1</span>
+    <span class="step-code">log&#x27;[i] = Append(log[i], currentTerm[i]) BY &lt;2&gt;1, &lt;2&gt;4 DEF ClientRequest, TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-10">
+    <div class="obl-item">
+      <span class="obl-id">#33</span>
+      <span class="obl-loc">L1317:54:1317:56</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#34</span>
+      <span class="obl-loc">L1317:57:1317:61</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#35</span>
+      <span class="obl-loc">L1317:63:1317:67</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-11')">
+    <span class="toggle leaf" id="toggle-node-11">&#9654;</span>
+    <span class="step-label">&lt;3&gt;2</span>
+    <span class="step-code">state[i] = Primary BY &lt;2&gt;1 DEF ClientRequest</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-11">
+    <div class="obl-item">
+      <span class="obl-id">#36</span>
+      <span class="obl-loc">L1318:32:1318:34</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#37</span>
+      <span class="obl-loc">L1318:35:1318:39</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-12')">
+    <span class="toggle " id="toggle-node-12">&#9654;</span>
+    <span class="step-label">&lt;3&gt;3</span>
+    <span class="step-code">CASE idx \in DOMAIN log[i]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">37/37</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-12">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-13')">
+    <span class="toggle leaf" id="toggle-node-13">&#9654;</span>
+    <span class="step-label">&lt;4&gt;1</span>
+    <span class="step-code">log[i][idx] &gt; c[2] BY &lt;2&gt;6, &lt;3&gt;1, &lt;3&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-13">
+    <div class="obl-item">
+      <span class="obl-id">#41</span>
+      <span class="obl-loc">L1320:34:1320:36</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#42</span>
+      <span class="obl-loc">L1320:37:1320:41</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#43</span>
+      <span class="obl-loc">L1320:43:1320:47</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#44</span>
+      <span class="obl-loc">L1320:49:1320:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#45</span>
+      <span class="obl-loc">L1320:55:1320:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-14')">
+    <span class="toggle leaf" id="toggle-node-14">&#9654;</span>
+    <span class="step-label">&lt;4&gt;2</span>
+    <span class="step-code">Len(log[i]) &gt;= c[1] /\ log[i][c[1]] = c[2]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-14">
+    <div class="obl-item">
+      <span class="obl-id">#46</span>
+      <span class="obl-loc">L1322:11:1322:13</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#47</span>
+      <span class="obl-loc">L1322:14:1322:18</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#48</span>
+      <span class="obl-loc">L1322:20:1322:24</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#49</span>
+      <span class="obl-loc">L1322:26:1322:30</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-15')">
+    <span class="toggle leaf" id="toggle-node-15">&#9654;</span>
+    <span class="step-label">&lt;4&gt;3</span>
+    <span class="step-code">c[1] \in DOMAIN log[i] BY &lt;2&gt;3, &lt;4&gt;2, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-15">
+    <div class="obl-item">
+      <span class="obl-id">#50</span>
+      <span class="obl-loc">L1323:38:1323:40</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#51</span>
+      <span class="obl-loc">L1323:41:1323:45</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#52</span>
+      <span class="obl-loc">L1323:47:1323:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#53</span>
+      <span class="obl-loc">L1323:53:1323:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-16')">
+    <span class="toggle leaf" id="toggle-node-16">&#9654;</span>
+    <span class="step-label">&lt;4&gt;4</span>
+    <span class="step-code">Len(log&#x27;[i]) = Len(log[i]) + 1 BY &lt;3&gt;1, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-16">
+    <div class="obl-item">
+      <span class="obl-id">#54</span>
+      <span class="obl-loc">L1324:46:1324:48</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#55</span>
+      <span class="obl-loc">L1324:49:1324:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#56</span>
+      <span class="obl-loc">L1324:55:1324:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-17')">
+    <span class="toggle leaf" id="toggle-node-17">&#9654;</span>
+    <span class="step-label">&lt;4&gt;5</span>
+    <span class="step-code">Len(log[i]) \in Nat BY &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-17">
+    <div class="obl-item">
+      <span class="obl-id">#57</span>
+      <span class="obl-loc">L1325:35:1325:37</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#58</span>
+      <span class="obl-loc">L1325:38:1325:42</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-18')">
+    <span class="toggle leaf" id="toggle-node-18">&#9654;</span>
+    <span class="step-label">&lt;4&gt;6</span>
+    <span class="step-code">Len(log&#x27;[i]) &gt;= c[1] BY &lt;4&gt;4, &lt;4&gt;2, &lt;4&gt;5, &lt;2&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-18">
+    <div class="obl-item">
+      <span class="obl-id">#59</span>
+      <span class="obl-loc">L1326:36:1326:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#60</span>
+      <span class="obl-loc">L1326:39:1326:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#61</span>
+      <span class="obl-loc">L1326:45:1326:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#62</span>
+      <span class="obl-loc">L1326:51:1326:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#63</span>
+      <span class="obl-loc">L1326:57:1326:61</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-19')">
+    <span class="toggle leaf" id="toggle-node-19">&#9654;</span>
+    <span class="step-label">&lt;4&gt;7</span>
+    <span class="step-code">log&#x27;[i][c[1]] = log[i][c[1]] BY &lt;3&gt;1, &lt;4&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-19">
+    <div class="obl-item">
+      <span class="obl-id">#64</span>
+      <span class="obl-loc">L1327:44:1327:46</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#65</span>
+      <span class="obl-loc">L1327:47:1327:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#66</span>
+      <span class="obl-loc">L1327:53:1327:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#67</span>
+      <span class="obl-loc">L1327:59:1327:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-20')">
+    <span class="toggle leaf" id="toggle-node-20">&#9654;</span>
+    <span class="step-label">&lt;4&gt;8</span>
+    <span class="step-code">Len(log&#x27;[s]) &gt;= c[1] BY &lt;2&gt;6, &lt;4&gt;6</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-20">
+    <div class="obl-item">
+      <span class="obl-id">#68</span>
+      <span class="obl-loc">L1328:36:1328:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#69</span>
+      <span class="obl-loc">L1328:39:1328:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#70</span>
+      <span class="obl-loc">L1328:45:1328:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-21')">
+    <span class="toggle leaf" id="toggle-node-21">&#9654;</span>
+    <span class="step-label">&lt;4&gt;9</span>
+    <span class="step-code">log&#x27;[s][c[1]] = c[2] BY &lt;2&gt;6, &lt;4&gt;7, &lt;4&gt;2</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-21">
+    <div class="obl-item">
+      <span class="obl-id">#71</span>
+      <span class="obl-loc">L1329:36:1329:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#72</span>
+      <span class="obl-loc">L1329:39:1329:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#73</span>
+      <span class="obl-loc">L1329:45:1329:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#74</span>
+      <span class="obl-loc">L1329:51:1329:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-22')">
+    <span class="toggle leaf" id="toggle-node-22">&#9654;</span>
+    <span class="step-label">&lt;4&gt;.</span>
+    <span class="step-code">QED BY &lt;4&gt;8, &lt;4&gt;9</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-22">
+    <div class="obl-item">
+      <span class="obl-id">#38</span>
+      <span class="obl-loc">L1330:18:1330:20</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#39</span>
+      <span class="obl-loc">L1330:21:1330:25</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#40</span>
+      <span class="obl-loc">L1330:27:1330:31</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-23')">
+    <span class="toggle " id="toggle-node-23">&#9654;</span>
+    <span class="step-label">&lt;3&gt;4</span>
+    <span class="step-code">CASE idx = Len(log[i]) + 1</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">38/38</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-23">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-24')">
+    <span class="toggle leaf" id="toggle-node-24">&#9654;</span>
+    <span class="step-label">&lt;4&gt;1</span>
+    <span class="step-code">currentTerm[i] &gt; c[2] BY &lt;2&gt;6, &lt;3&gt;1, &lt;3&gt;4, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-24">
+    <div class="obl-item">
+      <span class="obl-id">#78</span>
+      <span class="obl-loc">L1332:37:1332:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#79</span>
+      <span class="obl-loc">L1332:40:1332:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#80</span>
+      <span class="obl-loc">L1332:46:1332:50</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#81</span>
+      <span class="obl-loc">L1332:52:1332:56</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#82</span>
+      <span class="obl-loc">L1332:58:1332:62</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-25')">
+    <span class="toggle leaf" id="toggle-node-25">&#9654;</span>
+    <span class="step-label">&lt;4&gt;2</span>
+    <span class="step-code">InLog(&lt;&lt;c[1], c[2]&gt;&gt;, i) BY &lt;3&gt;2, &lt;4&gt;1, &lt;2&gt;2 DEF H_LeaderCompleteness</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-25">
+    <div class="obl-item">
+      <span class="obl-id">#83</span>
+      <span class="obl-loc">L1333:40:1333:42</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#84</span>
+      <span class="obl-loc">L1333:43:1333:47</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#85</span>
+      <span class="obl-loc">L1333:49:1333:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#86</span>
+      <span class="obl-loc">L1333:55:1333:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-26')">
+    <span class="toggle leaf" id="toggle-node-26">&#9654;</span>
+    <span class="step-label">&lt;4&gt;3</span>
+    <span class="step-code">c[1] \in DOMAIN log[i] /\ log[i][c[1]] = c[2] BY &lt;4&gt;2 DEF InLog</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-26">
+    <div class="obl-item">
+      <span class="obl-id">#87</span>
+      <span class="obl-loc">L1334:61:1334:63</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#88</span>
+      <span class="obl-loc">L1334:64:1334:68</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-27')">
+    <span class="toggle leaf" id="toggle-node-27">&#9654;</span>
+    <span class="step-label">&lt;4&gt;4</span>
+    <span class="step-code">Len(log[i]) &gt;= c[1] BY &lt;4&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-27">
+    <div class="obl-item">
+      <span class="obl-id">#89</span>
+      <span class="obl-loc">L1335:35:1335:37</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#90</span>
+      <span class="obl-loc">L1335:38:1335:42</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#91</span>
+      <span class="obl-loc">L1335:44:1335:48</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-28')">
+    <span class="toggle leaf" id="toggle-node-28">&#9654;</span>
+    <span class="step-label">&lt;4&gt;5</span>
+    <span class="step-code">Len(log&#x27;[i]) = Len(log[i]) + 1 BY &lt;3&gt;1, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-28">
+    <div class="obl-item">
+      <span class="obl-id">#92</span>
+      <span class="obl-loc">L1336:46:1336:48</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#93</span>
+      <span class="obl-loc">L1336:49:1336:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#94</span>
+      <span class="obl-loc">L1336:55:1336:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-29')">
+    <span class="toggle leaf" id="toggle-node-29">&#9654;</span>
+    <span class="step-label">&lt;4&gt;5a</span>
+    <span class="step-code">Len(log[i]) \in Nat BY &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-29">
+    <div class="obl-item">
+      <span class="obl-id">#95</span>
+      <span class="obl-loc">L1337:36:1337:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#96</span>
+      <span class="obl-loc">L1337:39:1337:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-30')">
+    <span class="toggle leaf" id="toggle-node-30">&#9654;</span>
+    <span class="step-label">&lt;4&gt;6</span>
+    <span class="step-code">Len(log&#x27;[i]) &gt;= c[1] BY &lt;4&gt;5, &lt;4&gt;4, &lt;4&gt;5a, &lt;2&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-30">
+    <div class="obl-item">
+      <span class="obl-id">#97</span>
+      <span class="obl-loc">L1338:36:1338:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#98</span>
+      <span class="obl-loc">L1338:39:1338:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#99</span>
+      <span class="obl-loc">L1338:45:1338:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#100</span>
+      <span class="obl-loc">L1338:51:1338:56</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#101</span>
+      <span class="obl-loc">L1338:58:1338:62</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-31')">
+    <span class="toggle leaf" id="toggle-node-31">&#9654;</span>
+    <span class="step-label">&lt;4&gt;7</span>
+    <span class="step-code">log&#x27;[i][c[1]] = log[i][c[1]] BY &lt;3&gt;1, &lt;4&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-31">
+    <div class="obl-item">
+      <span class="obl-id">#102</span>
+      <span class="obl-loc">L1339:44:1339:46</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#103</span>
+      <span class="obl-loc">L1339:47:1339:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#104</span>
+      <span class="obl-loc">L1339:53:1339:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#105</span>
+      <span class="obl-loc">L1339:59:1339:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-32')">
+    <span class="toggle leaf" id="toggle-node-32">&#9654;</span>
+    <span class="step-label">&lt;4&gt;8</span>
+    <span class="step-code">Len(log&#x27;[s]) &gt;= c[1] BY &lt;2&gt;6, &lt;4&gt;6</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-32">
+    <div class="obl-item">
+      <span class="obl-id">#106</span>
+      <span class="obl-loc">L1340:36:1340:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#107</span>
+      <span class="obl-loc">L1340:39:1340:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#108</span>
+      <span class="obl-loc">L1340:45:1340:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-33')">
+    <span class="toggle leaf" id="toggle-node-33">&#9654;</span>
+    <span class="step-label">&lt;4&gt;9</span>
+    <span class="step-code">log&#x27;[s][c[1]] = c[2] BY &lt;2&gt;6, &lt;4&gt;7, &lt;4&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-33">
+    <div class="obl-item">
+      <span class="obl-id">#109</span>
+      <span class="obl-loc">L1341:36:1341:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#110</span>
+      <span class="obl-loc">L1341:39:1341:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#111</span>
+      <span class="obl-loc">L1341:45:1341:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#112</span>
+      <span class="obl-loc">L1341:51:1341:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-34')">
+    <span class="toggle leaf" id="toggle-node-34">&#9654;</span>
+    <span class="step-label">&lt;4&gt;.</span>
+    <span class="step-code">QED BY &lt;4&gt;8, &lt;4&gt;9</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-34">
+    <div class="obl-item">
+      <span class="obl-id">#75</span>
+      <span class="obl-loc">L1342:18:1342:20</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#76</span>
+      <span class="obl-loc">L1342:21:1342:25</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#77</span>
+      <span class="obl-loc">L1342:27:1342:31</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-35')">
+    <span class="toggle leaf" id="toggle-node-35">&#9654;</span>
+    <span class="step-label">&lt;3&gt;5</span>
+    <span class="step-code">idx \in DOMAIN log[i] \/ idx = Len(log[i]) + 1</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-35">
+    <div class="obl-item">
+      <span class="obl-id">#113</span>
+      <span class="obl-loc">L1344:9:1344:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#114</span>
+      <span class="obl-loc">L1344:12:1344:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#115</span>
+      <span class="obl-loc">L1344:18:1344:22</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#116</span>
+      <span class="obl-loc">L1344:24:1344:28</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-36')">
+    <span class="toggle leaf" id="toggle-node-36">&#9654;</span>
+    <span class="step-label">&lt;3&gt;.</span>
+    <span class="step-code">QED BY &lt;3&gt;3, &lt;3&gt;4, &lt;3&gt;5</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-36">
+    <div class="obl-item">
+      <span class="obl-id">#29</span>
+      <span class="obl-loc">L1345:16:1345:18</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#30</span>
+      <span class="obl-loc">L1345:19:1345:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#31</span>
+      <span class="obl-loc">L1345:25:1345:29</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#32</span>
+      <span class="obl-loc">L1345:31:1345:35</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-37')">
+    <span class="toggle leaf" id="toggle-node-37">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">QED BY &lt;2&gt;5, &lt;2&gt;6</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-37">
+    <div class="obl-item">
+      <span class="obl-id">#15</span>
+      <span class="obl-loc">L1346:14:1346:16</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#16</span>
+      <span class="obl-loc">L1346:17:1346:21</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#17</span>
+      <span class="obl-loc">L1346:23:1346:27</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-38')">
+    <span class="toggle expanded" id="toggle-node-38">&#9654;</span>
+    <span class="step-label">&lt;1&gt;2</span>
+    <span class="step-comment">(H_LaterLogsHaveEarlierCommitted,GetEntriesAction)</span>
+    <span class="step-code">TypeOK /\ H_TermsMonotonic /\ H_UniformLogEntries /\ H_LogMatching /\ H_LaterLogsHaveEarlierCommitted /\ GetEntriesActio...</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">161/161</span>
+    </span>
+  </div>
+  <div class="children " id="children-node-38">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-39')">
+    <span class="toggle leaf" id="toggle-node-39">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">SUFFICES ASSUME TypeOK, H_TermsMonotonic, H_UniformLogEntries, H_LogMatching, H_LaterLogsHaveEarlierCommitted, GetEntrie...</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-39">
+    <div class="obl-item">
+      <span class="obl-id">#120</span>
+      <span class="obl-loc">L1354:10:1354:12</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-40')">
+    <span class="toggle leaf" id="toggle-node-40">&#9654;</span>
+    <span class="step-label">&lt;2&gt;1</span>
+    <span class="step-code">PICK i \in Server, j \in Server : GetEntries(i, j) BY DEF GetEntriesAction</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-40">
+    <div class="obl-item">
+      <span class="obl-id">#121</span>
+      <span class="obl-loc">L1355:62:1355:64</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-41')">
+    <span class="toggle leaf" id="toggle-node-41">&#9654;</span>
+    <span class="step-label">&lt;2&gt;2</span>
+    <span class="step-code">immediatelyCommitted&#x27; = immediatelyCommitted /\ c \in immediatelyCommitted BY &lt;2&gt;1 DEF GetEntries</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-41">
+    <div class="obl-item">
+      <span class="obl-id">#122</span>
+      <span class="obl-loc">L1356:86:1356:88</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#123</span>
+      <span class="obl-loc">L1356:89:1356:93</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-42')">
+    <span class="toggle leaf" id="toggle-node-42">&#9654;</span>
+    <span class="step-label">&lt;2&gt;3</span>
+    <span class="step-code">c[1] &gt;= 1 /\ c[1] \in Nat BY &lt;2&gt;2 DEF TypeOK, LogIndices</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-42">
+    <div class="obl-item">
+      <span class="obl-id">#124</span>
+      <span class="obl-loc">L1357:37:1357:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#125</span>
+      <span class="obl-loc">L1357:40:1357:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-43')">
+    <span class="toggle leaf" id="toggle-node-43">&#9654;</span>
+    <span class="step-label">&lt;2&gt;4</span>
+    <span class="step-code">log[i] \in Seq(Terms) /\ log[j] \in Seq(Terms) BY DEF TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-43">
+    <div class="obl-item">
+      <span class="obl-id">#126</span>
+      <span class="obl-loc">L1358:58:1358:60</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-44')">
+    <span class="toggle leaf" id="toggle-node-44">&#9654;</span>
+    <span class="step-label">&lt;2&gt;5</span>
+    <span class="step-code">CASE s # i</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-44">
+    <div class="obl-item">
+      <span class="obl-id">#127</span>
+      <span class="obl-loc">L1360:7:1360:9</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#128</span>
+      <span class="obl-loc">L1360:10:1360:14</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#129</span>
+      <span class="obl-loc">L1360:16:1360:20</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#130</span>
+      <span class="obl-loc">L1360:22:1360:26</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-45')">
+    <span class="toggle " id="toggle-node-45">&#9654;</span>
+    <span class="step-label">&lt;2&gt;6</span>
+    <span class="step-code">CASE s = i</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">147/147</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-45">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-46')">
+    <span class="toggle leaf" id="toggle-node-46">&#9654;</span>
+    <span class="step-label">&lt;3&gt;.</span>
+    <span class="step-code">DEFINE newEntryIndex == IF Empty(log[i]) THEN 1 ELSE Len(log[i]) + 1</span>
+    <span class="step-summary">
+    </span>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-47')">
+    <span class="toggle leaf" id="toggle-node-47">&#9654;</span>
+    <span class="step-label">&lt;3&gt;0</span>
+    <span class="step-code">log&#x27;[i] = Append(log[i], log[j][newEntryIndex]) BY &lt;2&gt;1, &lt;2&gt;4 DEF GetEntries, Empty, TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-47">
+    <div class="obl-item">
+      <span class="obl-id">#135</span>
+      <span class="obl-loc">L1363:61:1363:63</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#136</span>
+      <span class="obl-loc">L1363:64:1363:68</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#137</span>
+      <span class="obl-loc">L1363:70:1363:74</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-48')">
+    <span class="toggle leaf" id="toggle-node-48">&#9654;</span>
+    <span class="step-label">&lt;3&gt;0a</span>
+    <span class="step-code">Len(log[j]) &gt; Len(log[i]) BY &lt;2&gt;1 DEF GetEntries</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-48">
+    <div class="obl-item">
+      <span class="obl-id">#138</span>
+      <span class="obl-loc">L1364:40:1364:42</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#139</span>
+      <span class="obl-loc">L1364:43:1364:47</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-49')">
+    <span class="toggle " id="toggle-node-49">&#9654;</span>
+    <span class="step-label">&lt;3&gt;1</span>
+    <span class="step-code">CASE idx \in DOMAIN log[i]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">37/37</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-49">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-50')">
+    <span class="toggle leaf" id="toggle-node-50">&#9654;</span>
+    <span class="step-label">&lt;4&gt;1</span>
+    <span class="step-code">log[i][idx] &gt; c[2] BY &lt;2&gt;6, &lt;3&gt;0, &lt;3&gt;1, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-50">
+    <div class="obl-item">
+      <span class="obl-id">#143</span>
+      <span class="obl-loc">L1366:34:1366:36</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#144</span>
+      <span class="obl-loc">L1366:37:1366:41</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#145</span>
+      <span class="obl-loc">L1366:43:1366:47</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#146</span>
+      <span class="obl-loc">L1366:49:1366:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#147</span>
+      <span class="obl-loc">L1366:55:1366:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-51')">
+    <span class="toggle leaf" id="toggle-node-51">&#9654;</span>
+    <span class="step-label">&lt;4&gt;2</span>
+    <span class="step-code">Len(log[i]) &gt;= c[1] /\ log[i][c[1]] = c[2]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-51">
+    <div class="obl-item">
+      <span class="obl-id">#148</span>
+      <span class="obl-loc">L1368:11:1368:13</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#149</span>
+      <span class="obl-loc">L1368:14:1368:18</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#150</span>
+      <span class="obl-loc">L1368:20:1368:24</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#151</span>
+      <span class="obl-loc">L1368:26:1368:30</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-52')">
+    <span class="toggle leaf" id="toggle-node-52">&#9654;</span>
+    <span class="step-label">&lt;4&gt;3</span>
+    <span class="step-code">c[1] \in DOMAIN log[i] BY &lt;2&gt;3, &lt;4&gt;2, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-52">
+    <div class="obl-item">
+      <span class="obl-id">#152</span>
+      <span class="obl-loc">L1369:38:1369:40</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#153</span>
+      <span class="obl-loc">L1369:41:1369:45</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#154</span>
+      <span class="obl-loc">L1369:47:1369:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#155</span>
+      <span class="obl-loc">L1369:53:1369:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-53')">
+    <span class="toggle leaf" id="toggle-node-53">&#9654;</span>
+    <span class="step-label">&lt;4&gt;4</span>
+    <span class="step-code">Len(log&#x27;[i]) = Len(log[i]) + 1 BY &lt;3&gt;0, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-53">
+    <div class="obl-item">
+      <span class="obl-id">#156</span>
+      <span class="obl-loc">L1370:46:1370:48</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#157</span>
+      <span class="obl-loc">L1370:49:1370:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#158</span>
+      <span class="obl-loc">L1370:55:1370:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-54')">
+    <span class="toggle leaf" id="toggle-node-54">&#9654;</span>
+    <span class="step-label">&lt;4&gt;5</span>
+    <span class="step-code">Len(log[i]) \in Nat BY &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-54">
+    <div class="obl-item">
+      <span class="obl-id">#159</span>
+      <span class="obl-loc">L1371:35:1371:37</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#160</span>
+      <span class="obl-loc">L1371:38:1371:42</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-55')">
+    <span class="toggle leaf" id="toggle-node-55">&#9654;</span>
+    <span class="step-label">&lt;4&gt;6</span>
+    <span class="step-code">Len(log&#x27;[i]) &gt;= c[1] BY &lt;4&gt;4, &lt;4&gt;2, &lt;4&gt;5, &lt;2&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-55">
+    <div class="obl-item">
+      <span class="obl-id">#161</span>
+      <span class="obl-loc">L1372:36:1372:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#162</span>
+      <span class="obl-loc">L1372:39:1372:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#163</span>
+      <span class="obl-loc">L1372:45:1372:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#164</span>
+      <span class="obl-loc">L1372:51:1372:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#165</span>
+      <span class="obl-loc">L1372:57:1372:61</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-56')">
+    <span class="toggle leaf" id="toggle-node-56">&#9654;</span>
+    <span class="step-label">&lt;4&gt;7</span>
+    <span class="step-code">log&#x27;[i][c[1]] = log[i][c[1]] BY &lt;3&gt;0, &lt;4&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-56">
+    <div class="obl-item">
+      <span class="obl-id">#166</span>
+      <span class="obl-loc">L1373:44:1373:46</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#167</span>
+      <span class="obl-loc">L1373:47:1373:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#168</span>
+      <span class="obl-loc">L1373:53:1373:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#169</span>
+      <span class="obl-loc">L1373:59:1373:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-57')">
+    <span class="toggle leaf" id="toggle-node-57">&#9654;</span>
+    <span class="step-label">&lt;4&gt;8</span>
+    <span class="step-code">Len(log&#x27;[s]) &gt;= c[1] BY &lt;2&gt;6, &lt;4&gt;6</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-57">
+    <div class="obl-item">
+      <span class="obl-id">#170</span>
+      <span class="obl-loc">L1374:36:1374:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#171</span>
+      <span class="obl-loc">L1374:39:1374:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#172</span>
+      <span class="obl-loc">L1374:45:1374:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-58')">
+    <span class="toggle leaf" id="toggle-node-58">&#9654;</span>
+    <span class="step-label">&lt;4&gt;9</span>
+    <span class="step-code">log&#x27;[s][c[1]] = c[2] BY &lt;2&gt;6, &lt;4&gt;7, &lt;4&gt;2</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-58">
+    <div class="obl-item">
+      <span class="obl-id">#173</span>
+      <span class="obl-loc">L1375:36:1375:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#174</span>
+      <span class="obl-loc">L1375:39:1375:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#175</span>
+      <span class="obl-loc">L1375:45:1375:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#176</span>
+      <span class="obl-loc">L1375:51:1375:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-59')">
+    <span class="toggle leaf" id="toggle-node-59">&#9654;</span>
+    <span class="step-label">&lt;4&gt;.</span>
+    <span class="step-code">QED BY &lt;4&gt;8, &lt;4&gt;9</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-59">
+    <div class="obl-item">
+      <span class="obl-id">#140</span>
+      <span class="obl-loc">L1376:18:1376:20</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#141</span>
+      <span class="obl-loc">L1376:21:1376:25</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#142</span>
+      <span class="obl-loc">L1376:27:1376:31</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-60')">
+    <span class="toggle " id="toggle-node-60">&#9654;</span>
+    <span class="step-label">&lt;3&gt;2</span>
+    <span class="step-code">CASE idx \notin DOMAIN log[i]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">100/100</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-60">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-61')">
+    <span class="toggle leaf" id="toggle-node-61">&#9654;</span>
+    <span class="step-label">&lt;4&gt;1</span>
+    <span class="step-code">log[j][newEntryIndex] &gt; c[2] BY &lt;2&gt;6, &lt;3&gt;0, &lt;3&gt;2, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-61">
+    <div class="obl-item">
+      <span class="obl-id">#180</span>
+      <span class="obl-loc">L1378:44:1378:46</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#181</span>
+      <span class="obl-loc">L1378:47:1378:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#182</span>
+      <span class="obl-loc">L1378:53:1378:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#183</span>
+      <span class="obl-loc">L1378:59:1378:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#184</span>
+      <span class="obl-loc">L1378:65:1378:69</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-62')">
+    <span class="toggle leaf" id="toggle-node-62">&#9654;</span>
+    <span class="step-label">&lt;4&gt;2</span>
+    <span class="step-code">newEntryIndex \in DOMAIN log[j] BY &lt;3&gt;0a, &lt;2&gt;4 DEF Empty</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-62">
+    <div class="obl-item">
+      <span class="obl-id">#185</span>
+      <span class="obl-loc">L1379:47:1379:49</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#186</span>
+      <span class="obl-loc">L1379:50:1379:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#187</span>
+      <span class="obl-loc">L1379:57:1379:61</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-63')">
+    <span class="toggle leaf" id="toggle-node-63">&#9654;</span>
+    <span class="step-label">&lt;4&gt;3</span>
+    <span class="step-code">Len(log[j]) &gt;= c[1] /\ log[j][c[1]] = c[2]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-63">
+    <div class="obl-item">
+      <span class="obl-id">#188</span>
+      <span class="obl-loc">L1381:11:1381:13</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#189</span>
+      <span class="obl-loc">L1381:14:1381:18</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#190</span>
+      <span class="obl-loc">L1381:20:1381:24</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#191</span>
+      <span class="obl-loc">L1381:26:1381:30</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-64')">
+    <span class="toggle leaf" id="toggle-node-64">&#9654;</span>
+    <span class="step-label">&lt;4&gt;4</span>
+    <span class="step-code">c[1] \in DOMAIN log[j] BY &lt;2&gt;3, &lt;4&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-64">
+    <div class="obl-item">
+      <span class="obl-id">#192</span>
+      <span class="obl-loc">L1382:38:1382:40</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#193</span>
+      <span class="obl-loc">L1382:41:1382:45</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#194</span>
+      <span class="obl-loc">L1382:47:1382:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#195</span>
+      <span class="obl-loc">L1382:53:1382:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-65')">
+    <span class="toggle leaf" id="toggle-node-65">&#9654;</span>
+    <span class="step-label">&lt;4&gt;5</span>
+    <span class="step-code">newEntryIndex \in DOMAIN log[j] BY &lt;4&gt;2</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-65">
+    <div class="obl-item">
+      <span class="obl-id">#196</span>
+      <span class="obl-loc">L1383:47:1383:49</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#197</span>
+      <span class="obl-loc">L1383:50:1383:54</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-66')">
+    <span class="toggle leaf" id="toggle-node-66">&#9654;</span>
+    <span class="step-label">&lt;4&gt;6</span>
+    <span class="step-comment">By H_TermsMonotonic on j: c[1] &lt; newEntryIndex.</span>
+    <span class="step-code">log[j] \in Seq(Terms) BY &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-66">
+    <div class="obl-item">
+      <span class="obl-id">#198</span>
+      <span class="obl-loc">L1385:37:1385:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#199</span>
+      <span class="obl-loc">L1385:40:1385:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-67')">
+    <span class="toggle leaf" id="toggle-node-67">&#9654;</span>
+    <span class="step-label">&lt;4&gt;7</span>
+    <span class="step-code">c[1] &lt; newEntryIndex</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">6/6</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-67">
+    <div class="obl-item">
+      <span class="obl-id">#200</span>
+      <span class="obl-loc">L1387:11:1387:13</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#201</span>
+      <span class="obl-loc">L1387:14:1387:18</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#202</span>
+      <span class="obl-loc">L1387:20:1387:24</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#203</span>
+      <span class="obl-loc">L1387:26:1387:30</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#204</span>
+      <span class="obl-loc">L1387:32:1387:36</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#205</span>
+      <span class="obl-loc">L1387:38:1387:42</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-68')">
+    <span class="toggle " id="toggle-node-68">&#9654;</span>
+    <span class="step-label">&lt;4&gt;8</span>
+    <span class="step-code">CASE ~Empty(log[i])</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">67/67</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-68">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-69')">
+    <span class="toggle leaf" id="toggle-node-69">&#9654;</span>
+    <span class="step-label">&lt;5&gt;0</span>
+    <span class="step-code">Len(log[i]) \in Nat BY &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-69">
+    <div class="obl-item">
+      <span class="obl-id">#209</span>
+      <span class="obl-loc">L1389:37:1389:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#210</span>
+      <span class="obl-loc">L1389:40:1389:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-70')">
+    <span class="toggle leaf" id="toggle-node-70">&#9654;</span>
+    <span class="step-label">&lt;5&gt;1</span>
+    <span class="step-code">c[1] &lt;= Len(log[i]) BY &lt;4&gt;7, &lt;4&gt;8, &lt;5&gt;0, &lt;2&gt;3 DEF Empty</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-70">
+    <div class="obl-item">
+      <span class="obl-id">#211</span>
+      <span class="obl-loc">L1390:37:1390:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#212</span>
+      <span class="obl-loc">L1390:40:1390:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#213</span>
+      <span class="obl-loc">L1390:46:1390:50</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#214</span>
+      <span class="obl-loc">L1390:52:1390:56</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#215</span>
+      <span class="obl-loc">L1390:58:1390:62</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-71')">
+    <span class="toggle leaf" id="toggle-node-71">&#9654;</span>
+    <span class="step-label">&lt;5&gt;2</span>
+    <span class="step-code">c[1] \in DOMAIN log[i] BY &lt;2&gt;3, &lt;5&gt;1, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-71">
+    <div class="obl-item">
+      <span class="obl-id">#216</span>
+      <span class="obl-loc">L1391:40:1391:42</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#217</span>
+      <span class="obl-loc">L1391:43:1391:47</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#218</span>
+      <span class="obl-loc">L1391:49:1391:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#219</span>
+      <span class="obl-loc">L1391:55:1391:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-72')">
+    <span class="toggle leaf" id="toggle-node-72">&#9654;</span>
+    <span class="step-label">&lt;5&gt;3</span>
+    <span class="step-comment">Log consistency check + H_LogMatching give prefix agreement.</span>
+    <span class="step-code">Len(log[i]) \in DOMAIN log[i] BY &lt;4&gt;8, &lt;2&gt;4 DEF Empty</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-72">
+    <div class="obl-item">
+      <span class="obl-id">#220</span>
+      <span class="obl-loc">L1393:47:1393:49</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#221</span>
+      <span class="obl-loc">L1393:50:1393:54</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#222</span>
+      <span class="obl-loc">L1393:56:1393:60</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-73')">
+    <span class="toggle leaf" id="toggle-node-73">&#9654;</span>
+    <span class="step-label">&lt;5&gt;4</span>
+    <span class="step-code">Len(log[i]) &gt;= 1 BY &lt;4&gt;8, &lt;2&gt;4 DEF Empty</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-73">
+    <div class="obl-item">
+      <span class="obl-id">#223</span>
+      <span class="obl-loc">L1394:34:1394:36</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#224</span>
+      <span class="obl-loc">L1394:37:1394:41</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#225</span>
+      <span class="obl-loc">L1394:43:1394:47</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-74')">
+    <span class="toggle leaf" id="toggle-node-74">&#9654;</span>
+    <span class="step-label">&lt;5&gt;4a</span>
+    <span class="step-code">Len(log[j]) \in Nat BY &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-74">
+    <div class="obl-item">
+      <span class="obl-id">#226</span>
+      <span class="obl-loc">L1395:38:1395:40</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#227</span>
+      <span class="obl-loc">L1395:41:1395:45</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-75')">
+    <span class="toggle leaf" id="toggle-node-75">&#9654;</span>
+    <span class="step-label">&lt;5&gt;4b</span>
+    <span class="step-code">Len(log[i]) \in DOMAIN log[j] BY &lt;3&gt;0a, &lt;5&gt;0, &lt;5&gt;4, &lt;5&gt;4a, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">6/6</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-75">
+    <div class="obl-item">
+      <span class="obl-id">#228</span>
+      <span class="obl-loc">L1396:48:1396:50</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#229</span>
+      <span class="obl-loc">L1396:51:1396:56</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#230</span>
+      <span class="obl-loc">L1396:58:1396:62</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#231</span>
+      <span class="obl-loc">L1396:64:1396:68</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#232</span>
+      <span class="obl-loc">L1396:70:1396:75</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#233</span>
+      <span class="obl-loc">L1396:77:1396:81</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-76')">
+    <span class="toggle leaf" id="toggle-node-76">&#9654;</span>
+    <span class="step-label">&lt;5&gt;5</span>
+    <span class="step-code">log[j][Len(log[i])] = log[i][Len(log[i])] BY &lt;2&gt;1, &lt;4&gt;8 DEF GetEntries, Empty</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-76">
+    <div class="obl-item">
+      <span class="obl-id">#234</span>
+      <span class="obl-loc">L1397:59:1397:61</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#235</span>
+      <span class="obl-loc">L1397:62:1397:66</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#236</span>
+      <span class="obl-loc">L1397:68:1397:72</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-77')">
+    <span class="toggle leaf" id="toggle-node-77">&#9654;</span>
+    <span class="step-label">&lt;5&gt;6</span>
+    <span class="step-code">Len(log[i]) \in DOMAIN log[j] BY &lt;5&gt;4b</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-77">
+    <div class="obl-item">
+      <span class="obl-id">#237</span>
+      <span class="obl-loc">L1398:47:1398:49</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#238</span>
+      <span class="obl-loc">L1398:50:1398:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-78')">
+    <span class="toggle leaf" id="toggle-node-78">&#9654;</span>
+    <span class="step-label">&lt;5&gt;6a</span>
+    <span class="step-comment">Instantiate H_LogMatching: matching index Len(log[i]) in log[i] and log[j].</span>
+    <span class="step-code">log[i][Len(log[i])] = log[j][Len(log[i])] BY &lt;5&gt;5</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-78">
+    <div class="obl-item">
+      <span class="obl-id">#239</span>
+      <span class="obl-loc">L1400:60:1400:62</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#240</span>
+      <span class="obl-loc">L1400:63:1400:67</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-79')">
+    <span class="toggle leaf" id="toggle-node-79">&#9654;</span>
+    <span class="step-label">&lt;5&gt;6b</span>
+    <span class="step-code">\E k \in DOMAIN log[j] : k = Len(log[i]) /\ log[i][Len(log[i])] = log[j][k]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-79">
+    <div class="obl-item">
+      <span class="obl-id">#241</span>
+      <span class="obl-loc">L1402:13:1402:15</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#242</span>
+      <span class="obl-loc">L1402:16:1402:20</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#243</span>
+      <span class="obl-loc">L1402:22:1402:27</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-80')">
+    <span class="toggle leaf" id="toggle-node-80">&#9654;</span>
+    <span class="step-label">&lt;5&gt;6c</span>
+    <span class="step-code">SubSeq(log[i], 1, Len(log[i])) = SubSeq(log[j], 1, Len(log[i]))</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-80">
+    <div class="obl-item">
+      <span class="obl-id">#244</span>
+      <span class="obl-loc">L1404:13:1404:15</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#245</span>
+      <span class="obl-loc">L1404:16:1404:20</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#246</span>
+      <span class="obl-loc">L1404:22:1404:27</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-81')">
+    <span class="toggle leaf" id="toggle-node-81">&#9654;</span>
+    <span class="step-label">&lt;5&gt;7</span>
+    <span class="step-code">log[i][c[1]] = log[j][c[1]] BY &lt;5&gt;1, &lt;5&gt;6c, &lt;5&gt;2, &lt;2&gt;4, &lt;2&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">6/6</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-81">
+    <div class="obl-item">
+      <span class="obl-id">#247</span>
+      <span class="obl-loc">L1405:45:1405:47</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#248</span>
+      <span class="obl-loc">L1405:48:1405:52</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#249</span>
+      <span class="obl-loc">L1405:54:1405:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#250</span>
+      <span class="obl-loc">L1405:61:1405:65</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#251</span>
+      <span class="obl-loc">L1405:67:1405:71</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#252</span>
+      <span class="obl-loc">L1405:73:1405:77</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-82')">
+    <span class="toggle leaf" id="toggle-node-82">&#9654;</span>
+    <span class="step-label">&lt;5&gt;8</span>
+    <span class="step-code">log&#x27;[i][c[1]] = log[i][c[1]] BY &lt;3&gt;0, &lt;5&gt;2, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-82">
+    <div class="obl-item">
+      <span class="obl-id">#253</span>
+      <span class="obl-loc">L1406:46:1406:48</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#254</span>
+      <span class="obl-loc">L1406:49:1406:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#255</span>
+      <span class="obl-loc">L1406:55:1406:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#256</span>
+      <span class="obl-loc">L1406:61:1406:65</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-83')">
+    <span class="toggle leaf" id="toggle-node-83">&#9654;</span>
+    <span class="step-label">&lt;5&gt;9</span>
+    <span class="step-code">Len(log&#x27;[i]) = Len(log[i]) + 1 BY &lt;3&gt;0, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-83">
+    <div class="obl-item">
+      <span class="obl-id">#257</span>
+      <span class="obl-loc">L1407:48:1407:50</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#258</span>
+      <span class="obl-loc">L1407:51:1407:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#259</span>
+      <span class="obl-loc">L1407:57:1407:61</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-84')">
+    <span class="toggle leaf" id="toggle-node-84">&#9654;</span>
+    <span class="step-label">&lt;5&gt;10</span>
+    <span class="step-code">Len(log&#x27;[i]) &gt;= c[1] BY &lt;5&gt;9, &lt;5&gt;1, &lt;5&gt;0, &lt;2&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-84">
+    <div class="obl-item">
+      <span class="obl-id">#260</span>
+      <span class="obl-loc">L1408:39:1408:41</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#261</span>
+      <span class="obl-loc">L1408:42:1408:46</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#262</span>
+      <span class="obl-loc">L1408:48:1408:52</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#263</span>
+      <span class="obl-loc">L1408:54:1408:58</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#264</span>
+      <span class="obl-loc">L1408:60:1408:64</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-85')">
+    <span class="toggle leaf" id="toggle-node-85">&#9654;</span>
+    <span class="step-label">&lt;5&gt;11</span>
+    <span class="step-code">Len(log&#x27;[s]) &gt;= c[1] BY &lt;2&gt;6, &lt;5&gt;10</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-85">
+    <div class="obl-item">
+      <span class="obl-id">#265</span>
+      <span class="obl-loc">L1409:39:1409:41</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#266</span>
+      <span class="obl-loc">L1409:42:1409:46</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#267</span>
+      <span class="obl-loc">L1409:48:1409:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-86')">
+    <span class="toggle leaf" id="toggle-node-86">&#9654;</span>
+    <span class="step-label">&lt;5&gt;12</span>
+    <span class="step-code">log&#x27;[s][c[1]] = c[2] BY &lt;2&gt;6, &lt;5&gt;8, &lt;5&gt;7, &lt;4&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-86">
+    <div class="obl-item">
+      <span class="obl-id">#268</span>
+      <span class="obl-loc">L1410:39:1410:41</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#269</span>
+      <span class="obl-loc">L1410:42:1410:46</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#270</span>
+      <span class="obl-loc">L1410:48:1410:52</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#271</span>
+      <span class="obl-loc">L1410:54:1410:58</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#272</span>
+      <span class="obl-loc">L1410:60:1410:64</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-87')">
+    <span class="toggle leaf" id="toggle-node-87">&#9654;</span>
+    <span class="step-label">&lt;5&gt;.</span>
+    <span class="step-code">QED BY &lt;5&gt;11, &lt;5&gt;12</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-87">
+    <div class="obl-item">
+      <span class="obl-id">#206</span>
+      <span class="obl-loc">L1411:20:1411:22</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#207</span>
+      <span class="obl-loc">L1411:23:1411:28</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#208</span>
+      <span class="obl-loc">L1411:30:1411:35</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-88')">
+    <span class="toggle leaf" id="toggle-node-88">&#9654;</span>
+    <span class="step-label">&lt;4&gt;9</span>
+    <span class="step-code">CASE Empty(log[i])</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-88">
+    <div class="obl-item">
+      <span class="obl-id">#273</span>
+      <span class="obl-loc">L1413:11:1413:13</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#274</span>
+      <span class="obl-loc">L1413:14:1413:18</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#275</span>
+      <span class="obl-loc">L1413:20:1413:24</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#276</span>
+      <span class="obl-loc">L1413:26:1413:30</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-89')">
+    <span class="toggle leaf" id="toggle-node-89">&#9654;</span>
+    <span class="step-label">&lt;4&gt;.</span>
+    <span class="step-code">QED BY &lt;4&gt;8, &lt;4&gt;9 DEF Empty</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-89">
+    <div class="obl-item">
+      <span class="obl-id">#177</span>
+      <span class="obl-loc">L1414:18:1414:20</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#178</span>
+      <span class="obl-loc">L1414:21:1414:25</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#179</span>
+      <span class="obl-loc">L1414:27:1414:31</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-90')">
+    <span class="toggle leaf" id="toggle-node-90">&#9654;</span>
+    <span class="step-label">&lt;3&gt;3</span>
+    <span class="step-code">idx \in DOMAIN log[i] \/ idx \notin DOMAIN log[i] OBVIOUS</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-90">
+    <div class="obl-item">
+      <span class="obl-id">#277</span>
+      <span class="obl-loc">L1415:63:1415:70</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-91')">
+    <span class="toggle leaf" id="toggle-node-91">&#9654;</span>
+    <span class="step-label">&lt;3&gt;.</span>
+    <span class="step-code">QED BY &lt;3&gt;1, &lt;3&gt;2, &lt;3&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-91">
+    <div class="obl-item">
+      <span class="obl-id">#131</span>
+      <span class="obl-loc">L1416:16:1416:18</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#132</span>
+      <span class="obl-loc">L1416:19:1416:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#133</span>
+      <span class="obl-loc">L1416:25:1416:29</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#134</span>
+      <span class="obl-loc">L1416:31:1416:35</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-92')">
+    <span class="toggle leaf" id="toggle-node-92">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">QED BY &lt;2&gt;5, &lt;2&gt;6</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-92">
+    <div class="obl-item">
+      <span class="obl-id">#117</span>
+      <span class="obl-loc">L1417:14:1417:16</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#118</span>
+      <span class="obl-loc">L1417:17:1417:21</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#119</span>
+      <span class="obl-loc">L1417:23:1417:27</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-93')">
+    <span class="toggle expanded" id="toggle-node-93">&#9654;</span>
+    <span class="step-label">&lt;1&gt;3</span>
+    <span class="step-comment">(H_LaterLogsHaveEarlierCommitted,RollbackEntriesAction)</span>
+    <span class="step-code">TypeOK /\ H_TermsMonotonic /\ H_LaterLogsHaveEarlierCommitted /\ RollbackEntriesAction =&gt; H_LaterLogsHaveEarlierCommitte...</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">84/84</span>
+    </span>
+  </div>
+  <div class="children " id="children-node-93">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-94')">
+    <span class="toggle leaf" id="toggle-node-94">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">SUFFICES ASSUME TypeOK, H_TermsMonotonic, H_LaterLogsHaveEarlierCommitted, RollbackEntriesAction,</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-94">
+    <div class="obl-item">
+      <span class="obl-id">#281</span>
+      <span class="obl-loc">L1425:10:1425:12</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-95')">
+    <span class="toggle leaf" id="toggle-node-95">&#9654;</span>
+    <span class="step-label">&lt;2&gt;1</span>
+    <span class="step-code">PICK i \in Server, j \in Server : RollbackEntries(i, j)</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-95">
+    <div class="obl-item">
+      <span class="obl-id">#282</span>
+      <span class="obl-loc">L1427:10:1427:12</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-96')">
+    <span class="toggle leaf" id="toggle-node-96">&#9654;</span>
+    <span class="step-label">&lt;2&gt;2</span>
+    <span class="step-code">immediatelyCommitted&#x27; = immediatelyCommitted BY &lt;2&gt;1 DEF RollbackEntries</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-96">
+    <div class="obl-item">
+      <span class="obl-id">#283</span>
+      <span class="obl-loc">L1428:56:1428:58</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#284</span>
+      <span class="obl-loc">L1428:59:1428:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-97')">
+    <span class="toggle leaf" id="toggle-node-97">&#9654;</span>
+    <span class="step-label">&lt;2&gt;3</span>
+    <span class="step-code">c[1] &gt;= 1 /\ c[1] \in Nat BY &lt;2&gt;2 DEF TypeOK, LogIndices</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-97">
+    <div class="obl-item">
+      <span class="obl-id">#285</span>
+      <span class="obl-loc">L1429:37:1429:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#286</span>
+      <span class="obl-loc">L1429:40:1429:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-98')">
+    <span class="toggle leaf" id="toggle-node-98">&#9654;</span>
+    <span class="step-label">&lt;2&gt;4</span>
+    <span class="step-code">log[i] \in Seq(Terms) BY DEF TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-98">
+    <div class="obl-item">
+      <span class="obl-id">#287</span>
+      <span class="obl-loc">L1430:33:1430:35</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-99')">
+    <span class="toggle leaf" id="toggle-node-99">&#9654;</span>
+    <span class="step-label">&lt;2&gt;5</span>
+    <span class="step-code">CASE s # i</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-99">
+    <div class="obl-item">
+      <span class="obl-id">#288</span>
+      <span class="obl-loc">L1432:7:1432:9</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#289</span>
+      <span class="obl-loc">L1432:10:1432:14</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#290</span>
+      <span class="obl-loc">L1432:16:1432:20</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#291</span>
+      <span class="obl-loc">L1432:22:1432:26</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-100')">
+    <span class="toggle " id="toggle-node-100">&#9654;</span>
+    <span class="step-label">&lt;2&gt;6</span>
+    <span class="step-code">CASE s = i</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">70/70</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-100">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-101')">
+    <span class="toggle leaf" id="toggle-node-101">&#9654;</span>
+    <span class="step-label">&lt;3&gt;1</span>
+    <span class="step-code">log&#x27;[i] = SubSeq(log[i], 1, Len(log[i])-1) BY &lt;2&gt;1, &lt;2&gt;4 DEF RollbackEntries, TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-101">
+    <div class="obl-item">
+      <span class="obl-id">#295</span>
+      <span class="obl-loc">L1434:56:1434:58</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#296</span>
+      <span class="obl-loc">L1434:59:1434:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#297</span>
+      <span class="obl-loc">L1434:65:1434:69</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-102')">
+    <span class="toggle leaf" id="toggle-node-102">&#9654;</span>
+    <span class="step-label">&lt;3&gt;2</span>
+    <span class="step-code">c \in immediatelyCommitted BY &lt;2&gt;2</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-102">
+    <div class="obl-item">
+      <span class="obl-id">#298</span>
+      <span class="obl-loc">L1435:40:1435:42</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#299</span>
+      <span class="obl-loc">L1435:43:1435:47</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-103')">
+    <span class="toggle leaf" id="toggle-node-103">&#9654;</span>
+    <span class="step-label">&lt;3&gt;3</span>
+    <span class="step-code">Len(log[i]) &gt; 0 BY &lt;2&gt;1 DEF RollbackEntries, CanRollback</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-103">
+    <div class="obl-item">
+      <span class="obl-id">#300</span>
+      <span class="obl-loc">L1436:29:1436:31</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#301</span>
+      <span class="obl-loc">L1436:32:1436:36</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-104')">
+    <span class="toggle leaf" id="toggle-node-104">&#9654;</span>
+    <span class="step-label">&lt;3&gt;4</span>
+    <span class="step-comment">idx is in DOMAIN SubSeq = 1..Len(log[i])-1, so idx \in DOMAIN log[i] too.</span>
+    <span class="step-code">idx \in DOMAIN log[i] /\ log[i][idx] &gt; c[2]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-104">
+    <div class="obl-item">
+      <span class="obl-id">#302</span>
+      <span class="obl-loc">L1439:9:1439:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#303</span>
+      <span class="obl-loc">L1439:12:1439:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#304</span>
+      <span class="obl-loc">L1439:18:1439:22</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#305</span>
+      <span class="obl-loc">L1439:24:1439:28</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#306</span>
+      <span class="obl-loc">L1439:30:1439:34</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-105')">
+    <span class="toggle leaf" id="toggle-node-105">&#9654;</span>
+    <span class="step-label">&lt;3&gt;5</span>
+    <span class="step-code">Len(log[i]) &gt;= c[1] /\ log[i][c[1]] = c[2]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-105">
+    <div class="obl-item">
+      <span class="obl-id">#307</span>
+      <span class="obl-loc">L1441:9:1441:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#308</span>
+      <span class="obl-loc">L1441:12:1441:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#309</span>
+      <span class="obl-loc">L1441:18:1441:22</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-106')">
+    <span class="toggle leaf" id="toggle-node-106">&#9654;</span>
+    <span class="step-label">&lt;3&gt;6</span>
+    <span class="step-comment">By H_TermsMonotonic, idx &gt; c[1].</span>
+    <span class="step-code">c[1] \in DOMAIN log[i] BY &lt;2&gt;3, &lt;3&gt;5, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-106">
+    <div class="obl-item">
+      <span class="obl-id">#310</span>
+      <span class="obl-loc">L1443:36:1443:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#311</span>
+      <span class="obl-loc">L1443:39:1443:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#312</span>
+      <span class="obl-loc">L1443:45:1443:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#313</span>
+      <span class="obl-loc">L1443:51:1443:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-107')">
+    <span class="toggle leaf" id="toggle-node-107">&#9654;</span>
+    <span class="step-label">&lt;3&gt;6a</span>
+    <span class="step-code">Len(log[i]) \in Nat BY &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-107">
+    <div class="obl-item">
+      <span class="obl-id">#314</span>
+      <span class="obl-loc">L1444:34:1444:36</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#315</span>
+      <span class="obl-loc">L1444:37:1444:41</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-108')">
+    <span class="toggle leaf" id="toggle-node-108">&#9654;</span>
+    <span class="step-label">&lt;3&gt;7</span>
+    <span class="step-code">idx &gt; c[1]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-108">
+    <div class="obl-item">
+      <span class="obl-id">#316</span>
+      <span class="obl-loc">L1446:9:1446:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#317</span>
+      <span class="obl-loc">L1446:12:1446:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#318</span>
+      <span class="obl-loc">L1446:18:1446:22</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#319</span>
+      <span class="obl-loc">L1446:24:1446:28</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#320</span>
+      <span class="obl-loc">L1446:30:1446:34</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-109')">
+    <span class="toggle leaf" id="toggle-node-109">&#9654;</span>
+    <span class="step-label">&lt;3&gt;8</span>
+    <span class="step-comment">idx &lt;= Len(log[i])-1, so c[1] &lt; idx &lt;= Len(log[i])-1.</span>
+    <span class="step-code">idx &lt;= Len(log[i]) - 1 BY &lt;2&gt;6, &lt;3&gt;1, &lt;3&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-109">
+    <div class="obl-item">
+      <span class="obl-id">#321</span>
+      <span class="obl-loc">L1448:36:1448:38</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#322</span>
+      <span class="obl-loc">L1448:39:1448:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#323</span>
+      <span class="obl-loc">L1448:45:1448:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#324</span>
+      <span class="obl-loc">L1448:51:1448:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#325</span>
+      <span class="obl-loc">L1448:57:1448:61</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-110')">
+    <span class="toggle leaf" id="toggle-node-110">&#9654;</span>
+    <span class="step-label">&lt;3&gt;9</span>
+    <span class="step-code">idx \in Nat BY &lt;3&gt;4, &lt;3&gt;6a</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-110">
+    <div class="obl-item">
+      <span class="obl-id">#326</span>
+      <span class="obl-loc">L1449:25:1449:27</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#327</span>
+      <span class="obl-loc">L1449:28:1449:32</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#328</span>
+      <span class="obl-loc">L1449:34:1449:39</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-111')">
+    <span class="toggle leaf" id="toggle-node-111">&#9654;</span>
+    <span class="step-label">&lt;3&gt;10</span>
+    <span class="step-code">c[1] &lt;= Len(log[i]) - 1 BY &lt;3&gt;7, &lt;3&gt;8, &lt;3&gt;9, &lt;2&gt;3, &lt;3&gt;6a</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">6/6</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-111">
+    <div class="obl-item">
+      <span class="obl-id">#329</span>
+      <span class="obl-loc">L1450:38:1450:40</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#330</span>
+      <span class="obl-loc">L1450:41:1450:45</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#331</span>
+      <span class="obl-loc">L1450:47:1450:51</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#332</span>
+      <span class="obl-loc">L1450:53:1450:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#333</span>
+      <span class="obl-loc">L1450:59:1450:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#334</span>
+      <span class="obl-loc">L1450:65:1450:70</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-112')">
+    <span class="toggle leaf" id="toggle-node-112">&#9654;</span>
+    <span class="step-label">&lt;3&gt;11</span>
+    <span class="step-code">Len(log&#x27;[i]) = Len(log[i]) - 1 BY &lt;3&gt;1, &lt;3&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-112">
+    <div class="obl-item">
+      <span class="obl-id">#335</span>
+      <span class="obl-loc">L1451:45:1451:47</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#336</span>
+      <span class="obl-loc">L1451:48:1451:52</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#337</span>
+      <span class="obl-loc">L1451:54:1451:58</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#338</span>
+      <span class="obl-loc">L1451:60:1451:64</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-113')">
+    <span class="toggle leaf" id="toggle-node-113">&#9654;</span>
+    <span class="step-label">&lt;3&gt;12</span>
+    <span class="step-code">Len(log&#x27;[i]) &gt;= c[1] BY &lt;3&gt;11, &lt;3&gt;10, &lt;3&gt;6a, &lt;2&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-113">
+    <div class="obl-item">
+      <span class="obl-id">#339</span>
+      <span class="obl-loc">L1452:35:1452:37</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#340</span>
+      <span class="obl-loc">L1452:38:1452:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#341</span>
+      <span class="obl-loc">L1452:45:1452:50</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#342</span>
+      <span class="obl-loc">L1452:52:1452:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#343</span>
+      <span class="obl-loc">L1452:59:1452:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-114')">
+    <span class="toggle leaf" id="toggle-node-114">&#9654;</span>
+    <span class="step-label">&lt;3&gt;13</span>
+    <span class="step-code">c[1] \in DOMAIN log&#x27;[i] BY &lt;2&gt;3, &lt;3&gt;10, &lt;3&gt;11, &lt;3&gt;3, &lt;3&gt;6a</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">6/6</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-114">
+    <div class="obl-item">
+      <span class="obl-id">#344</span>
+      <span class="obl-loc">L1453:38:1453:40</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#345</span>
+      <span class="obl-loc">L1453:41:1453:45</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#346</span>
+      <span class="obl-loc">L1453:47:1453:52</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#347</span>
+      <span class="obl-loc">L1453:54:1453:59</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#348</span>
+      <span class="obl-loc">L1453:61:1453:65</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#349</span>
+      <span class="obl-loc">L1453:67:1453:72</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-115')">
+    <span class="toggle leaf" id="toggle-node-115">&#9654;</span>
+    <span class="step-label">&lt;3&gt;14</span>
+    <span class="step-code">log&#x27;[i][c[1]] = log[i][c[1]] BY &lt;3&gt;1, &lt;3&gt;13, &lt;3&gt;3, &lt;2&gt;4</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-115">
+    <div class="obl-item">
+      <span class="obl-id">#350</span>
+      <span class="obl-loc">L1454:43:1454:45</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#351</span>
+      <span class="obl-loc">L1454:46:1454:50</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#352</span>
+      <span class="obl-loc">L1454:52:1454:57</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#353</span>
+      <span class="obl-loc">L1454:59:1454:63</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#354</span>
+      <span class="obl-loc">L1454:65:1454:69</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-116')">
+    <span class="toggle leaf" id="toggle-node-116">&#9654;</span>
+    <span class="step-label">&lt;3&gt;15</span>
+    <span class="step-code">Len(log&#x27;[s]) &gt;= c[1] BY &lt;2&gt;6, &lt;3&gt;12</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-116">
+    <div class="obl-item">
+      <span class="obl-id">#355</span>
+      <span class="obl-loc">L1455:35:1455:37</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#356</span>
+      <span class="obl-loc">L1455:38:1455:42</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#357</span>
+      <span class="obl-loc">L1455:44:1455:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-117')">
+    <span class="toggle leaf" id="toggle-node-117">&#9654;</span>
+    <span class="step-label">&lt;3&gt;16</span>
+    <span class="step-code">log&#x27;[s][c[1]] = c[2] BY &lt;2&gt;6, &lt;3&gt;14, &lt;3&gt;5</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-117">
+    <div class="obl-item">
+      <span class="obl-id">#358</span>
+      <span class="obl-loc">L1456:35:1456:37</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#359</span>
+      <span class="obl-loc">L1456:38:1456:42</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#360</span>
+      <span class="obl-loc">L1456:44:1456:49</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#361</span>
+      <span class="obl-loc">L1456:51:1456:55</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-118')">
+    <span class="toggle leaf" id="toggle-node-118">&#9654;</span>
+    <span class="step-label">&lt;3&gt;.</span>
+    <span class="step-code">QED BY &lt;3&gt;15, &lt;3&gt;16</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-118">
+    <div class="obl-item">
+      <span class="obl-id">#292</span>
+      <span class="obl-loc">L1457:16:1457:18</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#293</span>
+      <span class="obl-loc">L1457:19:1457:24</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#294</span>
+      <span class="obl-loc">L1457:26:1457:31</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-119')">
+    <span class="toggle leaf" id="toggle-node-119">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">QED BY &lt;2&gt;5, &lt;2&gt;6</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-119">
+    <div class="obl-item">
+      <span class="obl-id">#278</span>
+      <span class="obl-loc">L1458:14:1458:16</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#279</span>
+      <span class="obl-loc">L1458:17:1458:21</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#280</span>
+      <span class="obl-loc">L1458:23:1458:27</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-120')">
+    <span class="toggle leaf" id="toggle-node-120">&#9654;</span>
+    <span class="step-label">&lt;1&gt;4</span>
+    <span class="step-comment">(H_LaterLogsHaveEarlierCommitted,BecomeLeaderAction)</span>
+    <span class="step-code">TypeOK /\ H_LaterLogsHaveEarlierCommitted /\ BecomeLeaderAction =&gt; H_LaterLogsHaveEarlierCommitted&#x27; BY DEF TypeOK,Become...</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-120">
+    <div class="obl-item">
+      <span class="obl-id">#362</span>
+      <span class="obl-loc">L1460:109:1460:111</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-121')">
+    <span class="toggle expanded" id="toggle-node-121">&#9654;</span>
+    <span class="step-label">&lt;1&gt;5</span>
+    <span class="step-comment">(H_LaterLogsHaveEarlierCommitted,CommitEntryAction)</span>
+    <span class="step-code">TypeOK /\ H_LogEntryImpliesSafeAtTerm /\ H_LaterLogsHaveEarlierCommitted /\ CommitEntryAction =&gt; H_LaterLogsHaveEarlierC...</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">59/59</span>
+    </span>
+  </div>
+  <div class="children " id="children-node-121">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-122')">
+    <span class="toggle leaf" id="toggle-node-122">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">SUFFICES ASSUME TypeOK, H_LogEntryImpliesSafeAtTerm, H_LaterLogsHaveEarlierCommitted, CommitEntryAction,</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-122">
+    <div class="obl-item">
+      <span class="obl-id">#367</span>
+      <span class="obl-loc">L1468:10:1468:12</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-123')">
+    <span class="toggle leaf" id="toggle-node-123">&#9654;</span>
+    <span class="step-label">&lt;2&gt;1</span>
+    <span class="step-code">PICK leader \in Server, commitQuorum \in Quorums(Server) : CommitEntry(leader, commitQuorum)</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-123">
+    <div class="obl-item">
+      <span class="obl-id">#368</span>
+      <span class="obl-loc">L1470:10:1470:12</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-124')">
+    <span class="toggle leaf" id="toggle-node-124">&#9654;</span>
+    <span class="step-label">&lt;2&gt;2</span>
+    <span class="step-code">UNCHANGED log BY &lt;2&gt;1 DEF CommitEntry</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-124">
+    <div class="obl-item">
+      <span class="obl-id">#369</span>
+      <span class="obl-loc">L1471:25:1471:27</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#370</span>
+      <span class="obl-loc">L1471:28:1471:32</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-125')">
+    <span class="toggle leaf" id="toggle-node-125">&#9654;</span>
+    <span class="step-label">&lt;2&gt;3</span>
+    <span class="step-code">CASE c \in immediatelyCommitted</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-125">
+    <div class="obl-item">
+      <span class="obl-id">#371</span>
+      <span class="obl-loc">L1473:7:1473:9</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#372</span>
+      <span class="obl-loc">L1473:10:1473:14</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#373</span>
+      <span class="obl-loc">L1473:16:1473:20</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-126')">
+    <span class="toggle " id="toggle-node-126">&#9654;</span>
+    <span class="step-label">&lt;2&gt;4</span>
+    <span class="step-code">CASE c = &lt;&lt;Len(log[leader]), currentTerm[leader]&gt;&gt; /\ c \notin immediatelyCommitted</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">48/48</span>
+    </span>
+  </div>
+  <div class="children hidden" id="children-node-126">
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-127')">
+    <span class="toggle leaf" id="toggle-node-127">&#9654;</span>
+    <span class="step-label">&lt;3&gt;1</span>
+    <span class="step-comment">Newly committed entry. Derive contradiction: no server can have entry &gt; currentTerm[leader].</span>
+    <span class="step-code">commitQuorum \subseteq Server BY DEF Quorums</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-127">
+    <div class="obl-item">
+      <span class="obl-id">#378</span>
+      <span class="obl-loc">L1476:43:1476:45</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-128')">
+    <span class="toggle leaf" id="toggle-node-128">&#9654;</span>
+    <span class="step-label">&lt;3&gt;2</span>
+    <span class="step-code">\A q \in commitQuorum : currentTerm[q] = currentTerm[leader]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-128">
+    <div class="obl-item">
+      <span class="obl-id">#379</span>
+      <span class="obl-loc">L1478:9:1478:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#380</span>
+      <span class="obl-loc">L1478:12:1478:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-129')">
+    <span class="toggle leaf" id="toggle-node-129">&#9654;</span>
+    <span class="step-label">&lt;3&gt;3</span>
+    <span class="step-code">idx \in DOMAIN log[s] /\ log[s][idx] &gt; currentTerm[leader] BY &lt;2&gt;2, &lt;2&gt;4 DEF TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-129">
+    <div class="obl-item">
+      <span class="obl-id">#381</span>
+      <span class="obl-loc">L1479:72:1479:74</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#382</span>
+      <span class="obl-loc">L1479:75:1479:79</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#383</span>
+      <span class="obl-loc">L1479:81:1479:85</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-130')">
+    <span class="toggle leaf" id="toggle-node-130">&#9654;</span>
+    <span class="step-label">&lt;3&gt;4</span>
+    <span class="step-code">\E Q2 \in Quorums(Server) : \A n \in Q2 : currentTerm[n] &gt;= log[s][idx]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-130">
+    <div class="obl-item">
+      <span class="obl-id">#384</span>
+      <span class="obl-loc">L1481:9:1481:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#385</span>
+      <span class="obl-loc">L1481:12:1481:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-131')">
+    <span class="toggle leaf" id="toggle-node-131">&#9654;</span>
+    <span class="step-label">&lt;3&gt;5</span>
+    <span class="step-code">IsFiniteSet(Server) BY DEF TypeOK</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-131">
+    <div class="obl-item">
+      <span class="obl-id">#386</span>
+      <span class="obl-loc">L1482:33:1482:35</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-132')">
+    <span class="toggle leaf" id="toggle-node-132">&#9654;</span>
+    <span class="step-label">&lt;3&gt;6</span>
+    <span class="step-comment">Quorum intersection.</span>
+    <span class="step-code">PICK Q2 \in Quorums(Server) : \A n \in Q2 : currentTerm[n] &gt;= log[s][idx]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">2/2</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-132">
+    <div class="obl-item">
+      <span class="obl-id">#387</span>
+      <span class="obl-loc">L1485:9:1485:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#388</span>
+      <span class="obl-loc">L1485:12:1485:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-133')">
+    <span class="toggle leaf" id="toggle-node-133">&#9654;</span>
+    <span class="step-label">&lt;3&gt;7</span>
+    <span class="step-code">Q2 \subseteq Server /\ commitQuorum \subseteq Server BY DEF Quorums</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-133">
+    <div class="obl-item">
+      <span class="obl-id">#389</span>
+      <span class="obl-loc">L1486:66:1486:68</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-134')">
+    <span class="toggle leaf" id="toggle-node-134">&#9654;</span>
+    <span class="step-label">&lt;3&gt;8</span>
+    <span class="step-code">IsFiniteSet(Q2) /\ IsFiniteSet(commitQuorum) BY &lt;3&gt;5, &lt;3&gt;7, FS_Subset</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-134">
+    <div class="obl-item">
+      <span class="obl-id">#390</span>
+      <span class="obl-loc">L1487:58:1487:60</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#391</span>
+      <span class="obl-loc">L1487:61:1487:65</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#392</span>
+      <span class="obl-loc">L1487:67:1487:71</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#393</span>
+      <span class="obl-loc">L1487:73:1487:82</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-135')">
+    <span class="toggle leaf" id="toggle-node-135">&#9654;</span>
+    <span class="step-label">&lt;3&gt;9</span>
+    <span class="step-code">Cardinality(Q2) \in Nat /\ Cardinality(commitQuorum) \in Nat /\ Cardinality(Server) \in Nat</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-135">
+    <div class="obl-item">
+      <span class="obl-id">#394</span>
+      <span class="obl-loc">L1489:9:1489:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#395</span>
+      <span class="obl-loc">L1489:12:1489:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#396</span>
+      <span class="obl-loc">L1489:18:1489:22</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#397</span>
+      <span class="obl-loc">L1489:24:1489:42</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-136')">
+    <span class="toggle leaf" id="toggle-node-136">&#9654;</span>
+    <span class="step-label">&lt;3&gt;10</span>
+    <span class="step-code">Cardinality(Q2) * 2 &gt; Cardinality(Server) /\ Cardinality(commitQuorum) * 2 &gt; Cardinality(Server)</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-136">
+    <div class="obl-item">
+      <span class="obl-id">#398</span>
+      <span class="obl-loc">L1491:9:1491:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#399</span>
+      <span class="obl-loc">L1491:12:1491:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#400</span>
+      <span class="obl-loc">L1491:18:1491:22</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-137')">
+    <span class="toggle leaf" id="toggle-node-137">&#9654;</span>
+    <span class="step-label">&lt;3&gt;11</span>
+    <span class="step-code">Cardinality(Q2) + Cardinality(commitQuorum) &gt; Cardinality(Server)</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-137">
+    <div class="obl-item">
+      <span class="obl-id">#401</span>
+      <span class="obl-loc">L1493:9:1493:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#402</span>
+      <span class="obl-loc">L1493:12:1493:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#403</span>
+      <span class="obl-loc">L1493:18:1493:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-138')">
+    <span class="toggle leaf" id="toggle-node-138">&#9654;</span>
+    <span class="step-label">&lt;3&gt;12</span>
+    <span class="step-code">Q2 \cap commitQuorum # {}</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">5/5</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-138">
+    <div class="obl-item">
+      <span class="obl-id">#404</span>
+      <span class="obl-loc">L1495:9:1495:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#405</span>
+      <span class="obl-loc">L1495:12:1495:16</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#406</span>
+      <span class="obl-loc">L1495:18:1495:22</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#407</span>
+      <span class="obl-loc">L1495:24:1495:29</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#408</span>
+      <span class="obl-loc">L1495:31:1495:53</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-139')">
+    <span class="toggle leaf" id="toggle-node-139">&#9654;</span>
+    <span class="step-label">&lt;3&gt;13</span>
+    <span class="step-code">PICK n \in Server : n \in Q2 /\ n \in commitQuorum</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-139">
+    <div class="obl-item">
+      <span class="obl-id">#409</span>
+      <span class="obl-loc">L1497:9:1497:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#410</span>
+      <span class="obl-loc">L1497:12:1497:17</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#411</span>
+      <span class="obl-loc">L1497:19:1497:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-140')">
+    <span class="toggle leaf" id="toggle-node-140">&#9654;</span>
+    <span class="step-label">&lt;3&gt;14</span>
+    <span class="step-code">currentTerm[n] &gt;= log[s][idx] /\ currentTerm[n] = currentTerm[leader]</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-140">
+    <div class="obl-item">
+      <span class="obl-id">#412</span>
+      <span class="obl-loc">L1499:9:1499:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#413</span>
+      <span class="obl-loc">L1499:12:1499:17</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#414</span>
+      <span class="obl-loc">L1499:19:1499:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#415</span>
+      <span class="obl-loc">L1499:25:1499:29</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-141')">
+    <span class="toggle leaf" id="toggle-node-141">&#9654;</span>
+    <span class="step-label">&lt;3&gt;14a</span>
+    <span class="step-code">idx \in DOMAIN log[s] BY &lt;2&gt;2, &lt;3&gt;3</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-141">
+    <div class="obl-item">
+      <span class="obl-id">#416</span>
+      <span class="obl-loc">L1500:37:1500:39</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#417</span>
+      <span class="obl-loc">L1500:40:1500:44</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#418</span>
+      <span class="obl-loc">L1500:46:1500:50</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-142')">
+    <span class="toggle leaf" id="toggle-node-142">&#9654;</span>
+    <span class="step-label">&lt;3&gt;15</span>
+    <span class="step-code">currentTerm[n] \in Nat /\ log[s][idx] \in Nat /\ currentTerm[leader] \in Nat</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">3/3</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-142">
+    <div class="obl-item">
+      <span class="obl-id">#419</span>
+      <span class="obl-loc">L1502:9:1502:11</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#420</span>
+      <span class="obl-loc">L1502:12:1502:17</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#421</span>
+      <span class="obl-loc">L1502:19:1502:25</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-143')">
+    <span class="toggle leaf" id="toggle-node-143">&#9654;</span>
+    <span class="step-label">&lt;3&gt;.</span>
+    <span class="step-code">QED BY &lt;3&gt;3, &lt;3&gt;14, &lt;3&gt;15</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-143">
+    <div class="obl-item">
+      <span class="obl-id">#374</span>
+      <span class="obl-loc">L1503:16:1503:18</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#375</span>
+      <span class="obl-loc">L1503:19:1503:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#376</span>
+      <span class="obl-loc">L1503:25:1503:30</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#377</span>
+      <span class="obl-loc">L1503:32:1503:37</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-144')">
+    <span class="toggle leaf" id="toggle-node-144">&#9654;</span>
+    <span class="step-label">&lt;2&gt;.</span>
+    <span class="step-code">QED BY &lt;2&gt;1, &lt;2&gt;3, &lt;2&gt;4 DEF CommitEntry</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">4/4</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-144">
+    <div class="obl-item">
+      <span class="obl-id">#363</span>
+      <span class="obl-loc">L1504:14:1504:16</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#364</span>
+      <span class="obl-loc">L1504:17:1504:21</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#365</span>
+      <span class="obl-loc">L1504:23:1504:27</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#366</span>
+      <span class="obl-loc">L1504:29:1504:33</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-145')">
+    <span class="toggle leaf" id="toggle-node-145">&#9654;</span>
+    <span class="step-label">&lt;1&gt;6</span>
+    <span class="step-comment">(H_LaterLogsHaveEarlierCommitted,UpdateTermsAction)</span>
+    <span class="step-code">TypeOK /\ H_LaterLogsHaveEarlierCommitted /\ UpdateTermsAction =&gt; H_LaterLogsHaveEarlierCommitted&#x27; BY DEF TypeOK,UpdateT...</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">1/1</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-145">
+    <div class="obl-item">
+      <span class="obl-id">#422</span>
+      <span class="obl-loc">L1506:108:1506:110</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+  </div>
+</div>
+<div class="tree-node">
+  <div class="step-header" onclick="toggleNode('node-146')">
+    <span class="toggle leaf" id="toggle-node-146">&#9654;</span>
+    <span class="step-label">&lt;1&gt;7</span>
+    <span class="step-code">QED BY &lt;1&gt;1,&lt;1&gt;2,&lt;1&gt;3,&lt;1&gt;4,&lt;1&gt;5,&lt;1&gt;6 DEF Next</span>
+    <span class="step-summary">
+      <span class="step-badge badge-proved">7/7</span>
+      <span class="step-badge badge-smt">smt</span>
+    </span>
+  </div>
+  <div class="obl-list" id="obls-node-146">
+    <div class="obl-item">
+      <span class="obl-id">#1</span>
+      <span class="obl-loc">L1507:11:1507:13</span>
+      <span class="step-badge badge-proved">proved</span>
+      <span class="step-badge badge-smt">smt</span>
+      <span class="obl-time">cached</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#2</span>
+      <span class="obl-loc">L1507:14:1507:18</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#3</span>
+      <span class="obl-loc">L1507:19:1507:23</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#4</span>
+      <span class="obl-loc">L1507:24:1507:28</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#5</span>
+      <span class="obl-loc">L1507:29:1507:33</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#6</span>
+      <span class="obl-loc">L1507:34:1507:38</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+    <div class="obl-item">
+      <span class="obl-id">#7</span>
+      <span class="obl-loc">L1507:39:1507:43</span>
+      <span class="step-badge badge-proved">trivial</span>
+      <span class="step-badge badge-tlapm">tlapm</span>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+
+<script>
+function toggleNode(nid) {
+  var children = document.getElementById('children-' + nid);
+  var obls = document.getElementById('obls-' + nid);
+  var toggle = document.getElementById('toggle-' + nid);
+  if (children) {
+    children.classList.toggle('hidden');
+    toggle.classList.toggle('expanded');
+  }
+  if (obls) {
+    obls.classList.toggle('show');
+  }
+}
+
+function expandAll() {
+  document.querySelectorAll('.children').forEach(function(el) { el.classList.remove('hidden'); });
+  document.querySelectorAll('.toggle').forEach(function(el) { if (!el.classList.contains('leaf')) el.classList.add('expanded'); });
+  document.querySelectorAll('.obl-list').forEach(function(el) { el.classList.add('show'); });
+}
+
+function collapseAll() {
+  document.querySelectorAll('.children').forEach(function(el) { el.classList.add('hidden'); });
+  document.querySelectorAll('.toggle').forEach(function(el) { el.classList.remove('expanded'); });
+  document.querySelectorAll('.obl-list').forEach(function(el) { el.classList.remove('show'); });
+}
+
+function expandLevel(maxLevel) {
+  collapseAll();
+  document.querySelectorAll('.tree-node').forEach(function(node) {
+    var label = node.querySelector('.step-label');
+    if (label) {
+      var match = label.textContent.match(/<(\d+)>/);
+      if (match) {
+        var level = parseInt(match[1]);
+        if (level <= maxLevel) {
+          var children = node.querySelector(':scope > .children');
+          var toggle = node.querySelector(':scope > .step-header > .toggle');
+          if (children) {
+            children.classList.remove('hidden');
+            if (toggle) toggle.classList.add('expanded');
+          }
+        }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
