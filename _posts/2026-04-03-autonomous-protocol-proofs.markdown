@@ -5,9 +5,9 @@ categories: formal-methods
 ---
 
 
-Writing formal proofs for distributed protocols is incredibly tedious and in almost all cases not worth the effort. In general, you have to come up with an [*inductive invariant*](https://web.eecs.umich.edu/~barisk/public/i4.pdf) which is already a very difficult task. At least a [few](https://academiccommons.columbia.edu/doi/10.7916/fexf-nt82/download) [separate](https://deepblue.lib.umich.edu/items/814d66d3-150c-4b14-9685-5456a5405b04) [PhD theses](https://www.wisdom.weizmann.ac.il/~padon/oded_padon_phd_thesis.pdf) were entirely devoted to automating this task in the past few years, and they still usually don't scale beyond protocols of a moderate size. After coming up with an inductive invariant, you then also need to prove that invariant is actually inductive, which on its own can be another difficult task. In most cases, even automating this checking step is [undecidable](https://cs.nyu.edu/~apanda/assets/papers/pldi16.pdf).
+Writing formal proofs for distributed protocols is tedious and usually not worth the effort for real-world systems. In general, you have to come up with an [*inductive invariant*](https://web.eecs.umich.edu/~barisk/public/i4.pdf) which is already a very difficult task. At least a [few](https://academiccommons.columbia.edu/doi/10.7916/fexf-nt82/download) [separate](https://deepblue.lib.umich.edu/items/814d66d3-150c-4b14-9685-5456a5405b04) [PhD theses](https://www.wisdom.weizmann.ac.il/~padon/oded_padon_phd_thesis.pdf) were entirely devoted to automating this task in the past few years, and they still usually don't scale beyond protocols of a moderate size. After coming up with an inductive invariant, you then also need to prove that invariant is actually inductive, which on its own can be another difficult task. In most cases, even automating this checking step is [undecidable](https://cs.nyu.edu/~apanda/assets/papers/pldi16.pdf). 
 
-If you can't hand the proof of an inductive invariant to an SMT solver and have it automatically solved, you need to put in some manual effort to essentially write a detailed proof yourself, with the help of a proof assistant. Doing this kind of proof in TLA+ via the TLA+ proof system (TLAPS) is feasible, but a major challenge for any nontrival protocols.
+If you can't give the inductive invariant to an SMT solver and have it automatically solved, you need to put in some manual effort to essentially write a detailed proof yourself, with the help of a proof assistant. In TLA+, doing this kind of proof via the [TLA+ proof system](https://proofs.tlapl.us/doc/web/content/Home.html) (TLAPS) is feasible, but a major challenge for any nontrival protocols.
 
 In some [prior research](https://will62794.github.io/assets/papers/nfm26-interactive-verif.pdf), we worked on better ways to come up with inductive invariants, and one product of this work was an [inductive invariant](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla#L10-L23) for an [abstract specification](https://github.com/will62794/autoproofs/blob/main/AbstractRaft.tla) of the Raft protocol in TLA+.
 
@@ -18,13 +18,13 @@ In some [prior research](https://will62794.github.io/assets/papers/nfm26-interac
   </div>
 </div>
 
- The invariant consists of 12 smaller lemma invariants, and is unable to be automatically verified by the TLA+ proof system (TLAPS). You can try to use TLC (for tiny protocols) or [Apalache](https://apalache-mc.org/) for verifying the correctness for finite versions of the protocol (e.g. finite number of nodes), but none of these give you a full, general proof of correctness.
+ The invariant consists of 12 smaller lemma invariants (definitions found [here](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft.tla#L270-L395)), and cannot be automatically verified by the TLA+ proof system (TLAPS). You can try to use TLC (for tiny protocols) or [Apalache](https://apalache-mc.org/) for verifying the correctness for finite versions of the protocol (e.g. finite number of nodes), but none of these give you a full, general machine-checked proof of correctness.
 
 
-In recent experiments re-checking these proofs, the latest Claude models (Opus 4.6) appear to do an excellent job of automatically writing TLAPS proofs for this. In the past, and from direct experience working on this during older research projects, this was typically at least weeks or months of effort for a highly capable master's or PhD student. It is incredibly tedious, meticulous, and mentally taxing work for humans to carry out, and can just be a huge time sink for dubious value.
+In recent experiments when re-checking these proofs, the latest Claude models (Opus 4.6) appeared to do an excellent job of automatically writing TLAPS proofs for this. In the past, and from direct experience working on this during older research projects, this was typically at least weeks or months of effort for a highly capable master's or PhD student. It is meticulous and mentally taxing work for humans to carry out, and can be a huge time sink.
 
 
-We can give our candidate inductive invariant and a [skeleton TLAPS proof](https://github.com/will62794/autoproofs/blob/main/AbstractRaft_IndProofs_test.tla) to Claude, along with a [few basic instructions](https://github.com/will62794/autoproofs/blob/main/AGENTS.md) about how to run TLAPS to check proof obligations. The ultimate goal is to check this induction step for [each separate lemma](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla#L58-L73) and [each action](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft.tla#L199-L205) of the protocol. We then Claude Code go with this, asking it prove each of the 12 top-level theorems, one by one, and to give us a nicely formatted report of its results upon completion.
+We can give our candidate inductive invariant and a [skeleton TLAPS proof](https://github.com/will62794/autoproofs/blob/main/AbstractRaft_IndProofs_test.tla) to Claude, along with a [few basic agent instructions](https://github.com/will62794/autoproofs/blob/main/AGENTS.md) about how to run TLAPS to check proof obligations. The ultimate goal is to check the induction proof step for [each separate lemma](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla#L58-L73) and [each action](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft.tla#L199-L205) of the protocol. We can let Claude Code go with this, asking it to prove each of the 12 top-level theorems, one by one, and to give us a nicely formatted report of its results upon completion.
 
 
 After around 4 hours of total runtime, with almost no human interaction, Claude was able to complete successful proofs for all of the 12 top-level theorems. The [full file](https://github.com/will62794/autoproofs/blob/proof-dev/AbstractRaft_IndProofs_test.tla) with complete proofs is around 1720 lines, up from a baseline of 296 lines in the starting [unproven file](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla).
@@ -271,7 +271,7 @@ After around 4 hours of total runtime, with almost no human interaction, Claude 
 </div>
 
 
-Overall, each theorem required roughly no more than 30-40 minutes of agent thinking time, with basically zero human intervention. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. More details on individual theorem proof stats from its report are shown below.
+Overall, each theorem required roughly no more than 30-40 minutes of thinking time, with basically zero human intervention. Initially it skipped over an obligation for one of the theorems, but with simple prodding was able to go back and try again and easily resolve it in a minute or so. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. More details on individual theorem proof stats from its report are shown below.
 
 
 <div class="proof-status-scope">
@@ -325,7 +325,7 @@ Overall, each theorem required roughly no more than 30-40 minutes of agent think
       background: #fff;
       border: 1px solid #dee2e6;
       border-radius: 8px;
-      padding: 20px;
+      padding: 10px;
       margin-top: 20px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
       overflow-x: auto;
@@ -340,11 +340,11 @@ Overall, each theorem required roughly no more than 30-40 minutes of agent think
     .proof-status-scope table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9em;
+      font-size: 0.8em;
     }
     .proof-status-scope th {
       text-align: left;
-      padding: 10px 12px;
+      padding: 5px 12px;
       border-bottom: 2px solid #dee2e6;
       color: #495057;
       font-weight: 600;
@@ -353,7 +353,7 @@ Overall, each theorem required roughly no more than 30-40 minutes of agent think
       letter-spacing: 0.3px;
     }
     .proof-status-scope td {
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-bottom: 1px solid #eee;
     }
     .proof-status-scope tr.success td:first-child { border-left: 3px solid #198754; }
@@ -549,9 +549,9 @@ Overall, each theorem required roughly no more than 30-40 minutes of agent think
 </div>
 
 
-There are definitely a few caveats here, but the results are impressive, and something outside the realm of possibility a few years ago. First, there is a lot of information about the Raft protocol on the web, and it is probably one of the most well-studied and widely implemented consensus protocols to date. Similarly, there has been [some amount of work](https://dl.acm.org/doi/10.1145/2854065.2854081) done on formally verified Raft proofs. This work is not done specifically in TLA+, but there is prior work in the area. Having said that, I still think this is a super impressive achievement. Even for an experienced engineer/researcher, going off and reading documentation on existing Raft proofs and synthesizing that into a correct TLAPS proof would be an extremely nontrivial task.
+There are definitely a few caveats here, but the results are impressive, and something outside the realm of possibility a few years ago. First, there is a lot of information about the Raft protocol on the web, and it is probably one of the most well-studied and widely implemented consensus protocols to date. Similarly, there has been [some amount of work](https://dl.acm.org/doi/10.1145/2854065.2854081) done on formally verified Raft proofs. This work is not done specifically in TLA+, but there is prior work in the area. Having said that, I still think this is still super impressive. Even for an experienced engineer/researcher, going off and reading documentation on existing Raft proofs and synthesizing that into a correct TLAPS proof would be an extremely nontrivial task.
 
-From a practical systems engineering and building standpoint, I'm also not so interested in fully automated proofs. I often still find that finite-state model checking over adequately large state spaces is still a better cost-benefit tradeoff, and makes things much easier to automate and re-verify upon modification. Also, I am still very unconvinced that we will ever be able to (or care about) proving properties of the actual, running system implementations. Regardless, this task is a great benchmark for understanding the frontier capabilities of these models.
+From a practical systems engineering and building standpoint, I'm also not too interested in fully automated proofs. That is, I often still find that finite-state model checking over adequately large state spaces is still a better cost-benefit tradeoff, and makes things much easier to automate and re-verify upon modification. Also, I am still quite unconvinced that we will ever be able to (or care about) proving properties of runnable system implementation code. Regardless, this task is a great benchmark for understanding the frontier capabilities of these models.
 
-Another thing that's becoming increasingly relevant as well is the speed bottlenecks on these models. Right now, the execution loops feel roughly in line with the speed of a human, or at least comprehensible to a human. But, for tasks that are largely inference bottlenecked, it is interesting to think about what is possible if these kind of tasks are massively parallelizable and/or can run at 100x or 1000x their current speed.
-This calculus also leads to other interesting questions, as we have done deep research and development on [intricate](https://people.eecs.berkeley.edu/~alanmi/courses/2007_290N/papers/inter_mcmillan_cav03.pdf) and [efficient](https://theory.stanford.edu/~arbrad/papers/arbrad-thesis.pdf) algorithms for automatically model checking these types of protocols. But, if we can run a general (super) intelligence at 1000x human speed, do these kind of specialized algorithms become increasingly less necessary? Special purpose algorithms might always be more efficient for specific tasks, but in a world where the cost of compute continues to fall we might not care that much, especially if the AI-driven methods are more flexible and general.
+Another issue that increasingly comes to mind is the speed bottlenecks on these models. Right now, the execution loops feel roughly in line with the speed of a human, or at least comprehensible to a human. But, for tasks that are largely inference bottlenecked, it is interesting to think about what is possible if these kind of tasks are massively parallelizable and/or can run at 100x or 1000x their current speed.
+This calculus also leads to other interesting questions about the role of specialized algorithms i.e. we have done deep research and development on [intricate](https://people.eecs.berkeley.edu/~alanmi/courses/2007_290N/papers/inter_mcmillan_cav03.pdf) and [efficient](https://theory.stanford.edu/~arbrad/papers/arbrad-thesis.pdf) algorithms for automatically model checking these types of protocols. But, if we can run a general (super) intelligence at 1000x human speed, do these kind of specialized algorithms become increasingly less necessary? Special purpose algorithms might always be more efficient for specific tasks, but in a world where the cost of compute continues to fall we might not care that much, especially if the AI-driven methods are more flexible and general.
