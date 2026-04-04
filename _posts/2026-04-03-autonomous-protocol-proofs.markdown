@@ -271,7 +271,7 @@ After around 4 hours of total runtime, with almost no human interaction, Claude 
 </div>
 
 
-Overall, each theorem required roughly no more than 30-40 minutes of thinking time, with basically zero human intervention. Initially it skipped over an obligation for one of the theorems, but with simple prodding was able to go back and try again and easily resolve it in a minute or so. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. More details on individual theorem proof stats from its report are shown below.
+Overall, each theorem required roughly no more than 30-40 minutes of thinking time, with basically zero human intervention. Initially it skipped over an obligation for one of the theorems, but with simple prodding was able to go back and try again and easily resolve it in a minute or so. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. More details on individual theorem proof stats from its report are shown below. It is also quite interesting to observe some of generated proofs which are quite nontrivial. For example, the longest individual theorem proof for `THEOREM L_6` (took Claude ~58 minutes) contains over [390 lines of TLAPS proof code](https://github.com/will62794/autoproofs/blob/fb377a29237b532f98514aabc064eca75b85f50b/AbstractRaft_IndProofs_test.tla#L463-L854), with a variety of fine-grained proof arguments and decomposition steps.
 
 
 <div class="proof-status-scope">
