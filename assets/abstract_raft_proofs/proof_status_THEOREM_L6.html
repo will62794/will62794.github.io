@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof Status: THEOREM L_6 (H_UniformLogEntries)</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 20px; background: #fff; color: #333; max-width: 1100px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
+  h2 { font-size: 1.1em; margin-top: 28px; }
+  .summary { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 16px; margin: 16px 0; }
+  .summary strong { color: #166534; }
+  .tree { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85em; line-height: 1.6; }
+  .node { margin-left: 0; }
+  .children { margin-left: 24px; border-left: 1px solid #e5e7eb; padding-left: 8px; }
+  .toggle { cursor: pointer; user-select: none; }
+  .toggle::before { content: '\25BC '; font-size: 0.7em; color: #6b7280; }
+  .toggle.collapsed::before { content: '\25B6 '; }
+  .proved { color: #166534; }
+  .badge { display: inline-block; font-size: 0.75em; padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
+  .badge-smt { background: #dbeafe; color: #1e40af; }
+  .badge-tlapm { background: #f3f4f6; color: #374151; }
+  .badge-proved { background: #dcfce7; color: #166534; }
+  .badge-cached { background: #fef9c3; color: #713f12; }
+  .line-ref { color: #9ca3af; font-size: 0.8em; }
+  code { background: #f3f4f6; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+  .action-label { font-weight: 600; color: #1d4ed8; }
+  .leaf { color: #166534; }
+  ol li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<h1>THEOREM L_6 &mdash; H_UniformLogEntries</h1>
+<div class="summary">
+  <strong>Status: ALL OBLIGATIONS PROVED</strong> &nbsp;|&nbsp;
+  6 top-level action sub-goals &nbsp;|&nbsp;
+  Lines 464&ndash;854 &nbsp;|&nbsp;
+  Prover: SMT (leaf steps), tlapm (trivial/QED) &nbsp;|&nbsp;
+  Timing: cached
+</div>
+<p><code>TypeOK /\ H_PrimaryHasOwnEntries /\ H_LogMatching /\ H_UniformLogEntries /\ Next =&gt; H_UniformLogEntries'</code></p>
+
+<div class="tree">
+
+<!-- ROOT -->
+<div class="node">
+  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+    <span class="proved">THEOREM L_6</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L464</span>
+  </div>
+  <div class="children">
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;. USE A0..A6</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L465</span>
+    </div>
+
+    <!-- <1>1 ClientRequestAction -->
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved action-label">&lt;1&gt;1.</span> <span class="proved">TypeOK /\ H_PrimaryHasOwnEntries /\ H_UniformLogEntries /\ ClientRequestAction =&gt; H_UniformLogEntries'</span>
+        <span class="badge badge-proved">proved</span> <span class="line-ref">L467</span>
+      </div>
+      <div class="children">
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. SUFFICES ASSUME TypeOK, H_PrimaryHasOwnEntries, H_UniformLogEntries, ClientRequest(p), ... PROVE ~(k &lt; i)</span>
+          <span class="badge badge-smt">smt</span> <span class="line-ref">L468&ndash;475</span>
+        </div>
+
+        <div class="node"><span class="proved">&lt;2&gt;1. log' = [log EXCEPT ![p] = Append(log[p], currentTerm[p])]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L476</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;2. state[p] = Primary</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L477</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;3. H_PrimaryHasOwnEntries: any server with currentTerm[p] in its log has it in log[p] too</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L478&ndash;479</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;a. log'[p] = Append(log[p], currentTerm[p])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L481&ndash;482</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;b. &forall; srv &ne; p: log'[srv] = log[srv]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L483&ndash;484</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;c. DOMAIN log'[p] = 1..(Len(log[p])+1)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L485&ndash;486</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;d. &forall; idx &isin; 1..Len(log[p]) : log'[p][idx] = log[p][idx]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L487&ndash;488</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;e. log'[p][Len(log[p])+1] = currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L489&ndash;490</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;f. DOMAIN log[p] = 1..Len(log[p])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L491&ndash;492</span></div>
+
+        <div class="node"><span class="proved">&lt;2&gt;6. CASE s &ne; p /\ t &ne; p</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L493&ndash;494</span></div>
+
+        <!-- <2>7 -->
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;7. CASE s = p /\ t &ne; p</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L495</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a. log'[t][k] = log'[p][i]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L497</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;b. uniqueness in log'[p]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L498</span></div>
+            <!-- <3>1 -->
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;1. CASE i &isin; DOMAIN log[p] (old entry)</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L499</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. log'[p][i] = log[p][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L501</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log'[t][k] = log[t][k]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L502</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. k &isin; DOMAIN log[t]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L503</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;4. log[t][k] = log[p][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L504&ndash;505</span></div>
+                <div class="node">
+                  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                    <span class="proved">&lt;4&gt;5. uniqueness lifts to pre-state log[p]</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L506</span>
+                  </div>
+                  <div class="children">
+                    <div class="node"><span class="proved">&lt;5&gt;. SUFFICES ASSUME j &isin; DOMAIN log[p], j &lt; i PROVE log[p][j] &ne; log[p][i]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L507</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;1. j &isin; DOMAIN log'[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L508</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;2. log'[p][j] = log[p][j]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L509</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;3. log'[p][j] &ne; log'[p][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L510</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L511</span></div>
+                  </div>
+                </div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED by H_UniformLogEntries</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L512</span></div>
+              </div>
+            </div>
+            <!-- <3>2 -->
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;2. CASE i &notin; DOMAIN log[p] (new entry = currentTerm[p])</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L513</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. i = Len(log[p]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L516&ndash;517</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log'[p][i] = currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L518&ndash;519</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. log'[t][k] = log[t][k]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L520</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;4. k &isin; DOMAIN log[t]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L521</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;5. log[t][k] = currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L522&ndash;523</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;6. k &isin; DOMAIN log[p] /\ log[p][k] = currentTerm[p] (H_PrimaryHasOwnEntries)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L524&ndash;525</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;7&ndash;10. log'[p][k] = currentTerm[p] = log'[p][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L526&ndash;531</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;11. k &lt; i =&gt; log'[p][k] &ne; log'[p][i] (uniqueness)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L534&ndash;535</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED: contradiction k &lt; i with equality</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L536</span></div>
+              </div>
+            </div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L537</span></div>
+          </div>
+        </div>
+
+        <!-- <2>8 -->
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;8. CASE s &ne; p /\ t = p</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L538</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;d. Setup: log'[s] = log[s], i &isin; DOMAIN log[s], uniqueness in log[s]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L540&ndash;543</span></div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;2. CASE k &isin; DOMAIN log[p] (k old)</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L544</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. log'[p][k] = log[p][k]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L546</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log[p][k] = log[s][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L547</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED by H_UniformLogEntries</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L548</span></div>
+              </div>
+            </div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;3. CASE k &notin; DOMAIN log[p] (k new)</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L549</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. k = Len(log[p]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L553&ndash;554</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log'[p][k] = currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L555</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3a&ndash;3. log[s][i] = currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L556&ndash;559</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;5. i &isin; DOMAIN log[p] (by H_PrimaryHasOwnEntries)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L561&ndash;562</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;6. i &isin; 1..Len(log[p]), so i &lt; k</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L563&ndash;564</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED: ~(k &lt; i)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L565</span></div>
+              </div>
+            </div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L566</span></div>
+          </div>
+        </div>
+
+        <!-- <2>9 -->
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;9. CASE s = p /\ t = p</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L567</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;b. log'[p][k] = log'[p][i], uniqueness in log'[p]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L569&ndash;570</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;1. CASE i,k &isin; DOMAIN log[p] (both old)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L571&ndash;582</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;2. CASE i old, k new &rarr; k = Len+1 &gt; i, so ~(k &lt; i)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L583&ndash;589</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;3. CASE i new, k old &rarr; contradiction via uniqueness + equality</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L590&ndash;601</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;4. CASE both new &rarr; i = k = Len+1, so ~(k &lt; i)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L602&ndash;608</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED (exhaustive case split)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L609</span></div>
+          </div>
+        </div>
+
+        <div class="node"><span class="proved">&lt;2&gt;. QED by &lt;2&gt;6, &lt;2&gt;7, &lt;2&gt;8, &lt;2&gt;9</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L610</span></div>
+      </div>
+    </div><!-- end <1>1 -->
+
+    <!-- <1>2 GetEntriesAction -->
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved action-label">&lt;1&gt;2.</span> <span class="proved">TypeOK /\ H_LogMatching /\ H_UniformLogEntries /\ GetEntriesAction =&gt; H_UniformLogEntries'</span>
+        <span class="badge badge-proved">proved</span> <span class="line-ref">L612</span>
+      </div>
+      <div class="children">
+
+        <div class="node"><span class="proved">&lt;2&gt;. SUFFICES ASSUME ..., GetEntries(r, sender), ... PROVE ~(k &lt; i)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L613&ndash;620</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;0. log' = [log EXCEPT ![r] = Append(log[r], newEntry)]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L622&ndash;625</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;1. Explicit form of log'</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L626&ndash;627</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;a&ndash;f. Append properties for log'[r]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L629&ndash;640</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;g. Len(log[sender]) &gt; Len(log[r])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L641&ndash;642</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;h. ~Empty(log[r]) =&gt; log[sender][Len(log[r])] = log[r][Len(log[r])]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L643&ndash;644</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;i. newEntryIndex = Len(log[r]) + 1 (in both Empty and non-Empty cases)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L648&ndash;649</span></div>
+
+        <div class="node"><span class="proved">&lt;2&gt;5. CASE s &ne; r /\ t &ne; r</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L650&ndash;651</span></div>
+
+        <!-- <2>6 -->
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;6. CASE s = r /\ t &ne; r</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L652</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;d. Setup: log'[t] = log[t], k &isin; DOMAIN log[t]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L654&ndash;657</span></div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;1. CASE i &isin; DOMAIN log[r] (old entry)</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L658</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. log'[r][i] = log[r][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L660</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log[t][k] = log[r][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L661</span></div>
+                <div class="node">
+                  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                    <span class="proved">&lt;4&gt;3. uniqueness in pre-state log[r]</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L662</span>
+                  </div>
+                  <div class="children">
+                    <div class="node"><span class="proved">&lt;5&gt;. SUFFICES j &isin; DOMAIN log[r], j &lt; i PROVE log[r][j] &ne; log[r][i]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L663</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;1&ndash;3. j lifted to DOMAIN log'[r], uniqueness in post-state</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L664&ndash;666</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L667</span></div>
+                  </div>
+                </div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED by H_UniformLogEntries</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L668</span></div>
+              </div>
+            </div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;2. CASE i &notin; DOMAIN log[r] (new entry from sender)</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L669</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. i = Len(log[r]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L671&ndash;672</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log'[r][i] = log[sender][Len(log[r]) + 1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L673&ndash;674</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. Len(log[r])+1 &isin; DOMAIN log[sender]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L677&ndash;678</span></div>
+                <div class="node">
+                  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                    <span class="proved">&lt;4&gt;4. uniqueness of log[sender][Len(log[r])+1] in sender's log (via H_LogMatching)</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L679</span>
+                  </div>
+                  <div class="children">
+                    <div class="node"><span class="proved">&lt;5&gt;. SUFFICES j2 &isin; DOMAIN log[sender], j2 &lt; Len(log[r])+1 PROVE log[sender][j2] &ne; log[sender][Len(log[r])+1]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L682&ndash;684</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;1. j2 &isin; 1..Len(log[r])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L685&ndash;686</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;2. j2 &isin; DOMAIN log[r]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L687&ndash;688</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;3&ndash;5. log'[r][j2] &ne; log'[r][i] via uniqueness in post-state</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L689&ndash;696</span></div>
+                    <div class="node">
+                      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                        <span class="proved">&lt;5&gt;8. CASE ~Empty(log[r]): log[sender][j2] = log[r][j2] by H_LogMatching</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L701</span>
+                      </div>
+                      <div class="children">
+                        <div class="node"><span class="proved">&lt;6&gt;1. log[sender][Len(log[r])] = log[r][Len(log[r])]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L703&ndash;704</span></div>
+                        <div class="node"><span class="proved">&lt;6&gt;2&ndash;4. SubSeq(log[r],1,Len) = SubSeq(log[sender],1,Len) by H_LogMatching</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L705&ndash;714</span></div>
+                        <div class="node"><span class="proved">&lt;6&gt;5. log[sender][j2] = log[r][j2]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L715&ndash;716</span></div>
+                        <div class="node"><span class="proved">&lt;6&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L717</span></div>
+                      </div>
+                    </div>
+                    <div class="node"><span class="proved">&lt;5&gt;7. CASE Empty(log[r]): contradicts j2 &ge; 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L698&ndash;700</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L718</span></div>
+                  </div>
+                </div>
+                <div class="node"><span class="proved">&lt;4&gt;5. log[t][k] = log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L719&ndash;720</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED: apply H_UniformLogEntries on sender's log</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L722</span></div>
+              </div>
+            </div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L723</span></div>
+          </div>
+        </div>
+
+        <!-- <2>7 -->
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;7. CASE s &ne; r /\ t = r</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L724</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;d. Setup: log'[s] = log[s], i &isin; DOMAIN log[s]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L726&ndash;729</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;1. CASE k &isin; DOMAIN log[r] (old): direct by H_UniformLogEntries</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L730&ndash;734</span></div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;2. CASE k &notin; DOMAIN log[r] (k = new entry)</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L735</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. k = Len(log[r]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L737&ndash;738</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log'[r][k] = log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L739&ndash;740</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. log[s][i] = log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L741&ndash;745</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;4. Len(log[r])+1 &isin; DOMAIN log[sender]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L747&ndash;748</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED: apply H_UniformLogEntries (s, i, sender, k) =&gt; ~(k &lt; i)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L749</span></div>
+              </div>
+            </div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L750</span></div>
+          </div>
+        </div>
+
+        <!-- <2>8 -->
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;8. CASE s = r /\ t = r</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L751</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;b. log'[r][k] = log'[r][i], uniqueness in log'[r]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L753&ndash;754</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;1. CASE i,k &isin; DOMAIN log[r] (both old)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L755&ndash;765</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;2. CASE i old, k new &rarr; k = Len+1 &gt; i</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L766&ndash;769</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;3. CASE i new, k old &rarr; contradiction via uniqueness</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L770&ndash;774</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;4. CASE both new &rarr; i = k = Len+1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L775&ndash;778</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED (exhaustive case split)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L779</span></div>
+          </div>
+        </div>
+
+        <div class="node"><span class="proved">&lt;2&gt;. QED by &lt;2&gt;5, &lt;2&gt;6, &lt;2&gt;7, &lt;2&gt;8</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L780</span></div>
+      </div>
+    </div><!-- end <1>2 -->
+
+    <!-- <1>3 RollbackEntriesAction -->
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved action-label">&lt;1&gt;3.</span> <span class="proved">TypeOK /\ H_UniformLogEntries /\ RollbackEntriesAction =&gt; H_UniformLogEntries'</span>
+        <span class="badge badge-proved">proved</span> <span class="line-ref">L782</span>
+      </div>
+      <div class="children">
+
+        <div class="node"><span class="proved">&lt;2&gt;. SUFFICES ASSUME ..., RollbackEntries(r, j), ... PROVE ~(k &lt; i)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L783&ndash;790</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;1. log' = [log EXCEPT ![r] = SubSeq(log[r], 1, Len(log[r])-1)]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L791&ndash;792</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;b. &forall; srv &ne; r : log'[srv] = log[srv]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L793&ndash;794</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;c. SubSeq preserves all entries: &forall; idx &isin; DOMAIN log'[r] : log'[r][idx] = log[r][idx]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L796&ndash;797</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;d. DOMAIN log'[r] downward-closed in DOMAIN log[r]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L800&ndash;801</span></div>
+
+        <div class="node"><span class="proved">&lt;2&gt;3. CASE s &ne; r /\ t &ne; r</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L802&ndash;803</span></div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;5. CASE s = r /\ t &ne; r</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L804</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;d. Setup</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L806&ndash;809</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;1. i &isin; DOMAIN log[r] /\ log'[r][i] = log[r][i] (SubSeq preserves)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L811</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;2. log[t][k] = log[r][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L812</span></div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;3. uniqueness in pre-state log[r]</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L813</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;. SUFFICES jj &isin; DOMAIN log[r], jj &lt; i</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L814</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;0. i &isin; DOMAIN log'[r]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L815</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;1. jj &isin; DOMAIN log'[r] (downward-closed)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L816&ndash;817</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2&ndash;3. log'[r][jj] = log[r][jj], uniqueness in post-state</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L818&ndash;819</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L820</span></div>
+              </div>
+            </div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED by H_UniformLogEntries</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L821</span></div>
+          </div>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;6. CASE s &ne; r /\ t = r</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L822</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;d. log'[s] = log[s], i &isin; DOMAIN log[s], uniqueness in log[s]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L824&ndash;827</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;1. k &isin; DOMAIN log[r] /\ log'[r][k] = log[r][k]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L829</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;2. log[r][k] = log[s][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L830</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED by H_UniformLogEntries</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L831</span></div>
+          </div>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved">&lt;2&gt;7. CASE s = r /\ t = r</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L832</span>
+          </div>
+          <div class="children">
+            <div class="node"><span class="proved">&lt;3&gt;a&ndash;b. log'[r][k] = log'[r][i], uniqueness in log'[r]</span> <span class="badge badge-tlapm">tlapm</span> <span class="line-ref">L833&ndash;834</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;1. i &isin; DOMAIN log[r], log'[r][i] = log[r][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L835</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;2. k &isin; DOMAIN log[r], log'[r][k] = log[r][k]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L836</span></div>
+            <div class="node"><span class="proved">&lt;3&gt;3. log[r][k] = log[r][i]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L837</span></div>
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved">&lt;3&gt;4. uniqueness in pre-state log[r]</span> <span class="badge badge-proved">proved</span> <span class="line-ref">L838</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. i &isin; DOMAIN log'[r]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L840</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. jj &isin; DOMAIN log'[r] (downward-closed)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L841&ndash;842</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3&ndash;4. log'[r][jj] = log[r][jj], uniqueness in post-state</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L843&ndash;844</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L845</span></div>
+              </div>
+            </div>
+            <div class="node"><span class="proved">&lt;3&gt;. QED by H_UniformLogEntries</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L846</span></div>
+          </div>
+        </div>
+
+        <div class="node"><span class="proved">&lt;2&gt;. QED by &lt;2&gt;3, &lt;2&gt;5, &lt;2&gt;6, &lt;2&gt;7</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L847</span></div>
+      </div>
+    </div><!-- end <1>3 -->
+
+    <!-- <1>4..6 simple -->
+    <div class="node">
+      <span class="proved action-label">&lt;1&gt;4.</span>
+      <span class="proved">TypeOK /\ H_UniformLogEntries /\ BecomeLeaderAction =&gt; H_UniformLogEntries'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L849</span>
+    </div>
+
+    <div class="node">
+      <span class="proved action-label">&lt;1&gt;5.</span>
+      <span class="proved">TypeOK /\ H_UniformLogEntries /\ CommitEntryAction =&gt; H_UniformLogEntries'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L851</span>
+    </div>
+
+    <div class="node">
+      <span class="proved action-label">&lt;1&gt;6.</span>
+      <span class="proved">TypeOK /\ H_UniformLogEntries /\ UpdateTermsAction =&gt; H_UniformLogEntries'</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L853</span>
+    </div>
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;7. QED by &lt;1&gt;1..&lt;1&gt;6 DEF Next</span>
+      <span class="badge badge-smt">smt</span> <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L854</span>
+    </div>
+
+  </div>
+</div><!-- end root -->
+
+</div><!-- end tree -->
+
+<h2>Proof Strategy</h2>
+<p>
+  <strong>H_UniformLogEntries</strong> states that within any server's log, term values uniquely determine their
+  position: if two entries in two (possibly identical) servers' logs have the same term value, the one with the
+  lower index cannot appear <em>after</em> the other (formally: the index bearing the matching value is
+  never strictly less than the first occurrence's index). The invariant is proved by induction over every
+  Next action.
+</p>
+<ol>
+  <li>
+    <strong>ClientRequestAction</strong> (most complex): The appended entry carries
+    <code>currentTerm[p]</code>. Four sub-cases split on whether each of the two witness indices
+    <em>s, t</em> is the primary <em>p</em> or not. When <em>i</em> is the newly appended index,
+    uniqueness follows either trivially (the new index is the largest) or from
+    <strong>H_PrimaryHasOwnEntries</strong>, which guarantees that any server already carrying
+    <code>currentTerm[p]</code> in its log must have it at a position that already existed in
+    <code>log[p]</code>, keeping the new tail entry truly unique.
+  </li>
+  <li>
+    <strong>GetEntriesAction</strong>: The receiver <em>r</em> appends one entry from the sender.
+    When the new entry is at <code>Len(log[r])+1</code>, uniqueness within the sender's log is
+    established first (using <strong>H_LogMatching</strong> to equate the shared prefix), then
+    H_UniformLogEntries is applied to the sender's log to conclude ~(k &lt; i).
+  </li>
+  <li>
+    <strong>RollbackEntriesAction</strong>: The log shrinks (SubSeq). Since every entry in the
+    new shorter log was already in the old log at the same index, and the old log satisfied
+    H_UniformLogEntries, the shortened log trivially inherits the property. The key lemma used
+    is that <code>DOMAIN log'[r]</code> is downward-closed inside <code>DOMAIN log[r]</code>, so
+    any <em>j &lt; i</em> with <em>i</em> in the new domain is also in the new domain.
+  </li>
+  <li>
+    <strong>BecomeLeaderAction, CommitEntryAction, UpdateTermsAction</strong>: None of these
+    modify <code>log</code>, so H_UniformLogEntries is preserved by definition. Each dispatches
+    directly to SMT with the relevant action definition unfolded.
+  </li>
+</ol>
+<p style="color:#6b7280; font-size:0.85em;">
+  Proof lines: 464&ndash;854 &nbsp;|&nbsp;
+  Log: <code>output/L6_full_test4.log</code> &nbsp;|&nbsp;
+  All obligations: proved (SMT / tlapm trivial) &nbsp;|&nbsp;
+  Timing: cached (previously verified)
+</p>
+
+<script>
+// Collapse all children by default except the root level
+document.querySelectorAll('.children').forEach(function(c) {
+  // Keep root children open; collapse deeper nesting
+  if (c.parentElement && c.parentElement.parentElement &&
+      c.parentElement.parentElement.classList.contains('children')) {
+    c.style.display = 'none';
+    var toggle = c.previousElementSibling;
+    if (toggle && toggle.classList.contains('toggle')) {
+      toggle.classList.add('collapsed');
+    }
+  }
+});
+</script>
+
+</body>
+</html>

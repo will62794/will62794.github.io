@@ -9,15 +9,227 @@ Writing formal proofs for distributed protocols is incredibly tedious and in alm
 
 If you can't hand the proof of an inductive invariant to an SMT solver and have it automatically solved, you need to put in some manual effort to essentially write a detailed proof yourself, with the help of a proof assistant. Doing this kind of proof in TLA+ via the TLA+ proof system (TLAPS) is feasible, but a major challenge for any nontrival protocols.
 
-In some [prior research](https://will62794.github.io/assets/papers/nfm26-interactive-verif.pdf), we worked on better ways to come up with inductive invariants, and one product of this work was a [candidate inductive invariant](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla#L10-L23) for an abstract version of the Raft protocol specified in TLA+. The invariant consists of 12 smaller lemma invariants, and is unable to be automatically verified by the TLA+ proof system (TLAPS). You can try to use TLC (for tiny protocols) or [Apalache](https://apalache-mc.org/) for verifying the correctness for finite versions of the protocol (e.g. finite number of nodes), but none of these give you a full, general proof of correctness.
+In some [prior research](https://will62794.github.io/assets/papers/nfm26-interactive-verif.pdf), we worked on better ways to come up with inductive invariants, and one product of this work was an [inductive invariant](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla#L10-L23) for an [abstract specification](https://github.com/will62794/autoproofs/blob/main/AbstractRaft.tla) of the Raft protocol in TLA+.
 
 <div style="text-align:center;">
   <img width="420px" src="{{ site.url }}/assets/abstract_raft_graph.png" alt="Abstract Raft Graph">
+  <div style="font-size: 0.95em; color: #666; margin-top: 6px;">
+    <a href="https://will62794.github.io/distributed-systems/formal-methods/2024/10/15/inductive-proof-graphs.html">Inductive proof graph</a> for the lemmas in our abstract Raft protocol inductive invariant.
+  </div>
 </div>
 
-In recent experiments re-checking these proofs, the latest Claude models (Opus 4.6) appear to do an excellent job of automatically writing these proofs. In the past, and from direct experience working on this during past research projects, this was typically at least a months long effort for a highly capable master's or PhD student. It is also incredibly tedious, meticulous, and mentally taxing work for humans to carry out. In other words, it can just be a huge time sink, for questionable value.
+ The invariant consists of 12 smaller lemma invariants, and is unable to be automatically verified by the TLA+ proof system (TLAPS). You can try to use TLC (for tiny protocols) or [Apalache](https://apalache-mc.org/) for verifying the correctness for finite versions of the protocol (e.g. finite number of nodes), but none of these give you a full, general proof of correctness.
 
-We can take the candidate inductive invariant as a starting point, and give Claude a [few basic instructions](https://github.com/will62794/autoproofs/blob/main/AGENTS.md) about how to run TLAPS to check proof obligations. The ultimate goal is to check this induction step for each separate lemma and action of the protocol. We then let it go, asking it prove each theorem one by one. We can also ask for a nice HTML report of the proofs generated after each one is done, where we can also drill into the proof of each individual theorem.
+
+In recent experiments re-checking these proofs, the latest Claude models (Opus 4.6) appear to do an excellent job of automatically writing TLAPS proofs for this. In the past, and from direct experience working on this during older research projects, this was typically at least weeks or months of effort for a highly capable master's or PhD student. It is incredibly tedious, meticulous, and mentally taxing work for humans to carry out, and can just be a huge time sink for dubious value.
+
+
+We can give our candidate inductive invariant and a [skeleton TLAPS proof](https://github.com/will62794/autoproofs/blob/main/AbstractRaft_IndProofs_test.tla) to Claude, along with a [few basic instructions](https://github.com/will62794/autoproofs/blob/main/AGENTS.md) about how to run TLAPS to check proof obligations. The ultimate goal is to check this induction step for [each separate lemma](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla#L58-L73) and [each action](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft.tla#L199-L205) of the protocol. We then Claude Code go with this, asking it prove each of the 12 top-level theorems, one by one, and to give us a nicely formatted report of its results upon completion.
+
+
+After around 4 hours of total runtime, with almost no human interaction, Claude was able to complete successful proofs for all of the 12 top-level theorems. The [full file](https://github.com/will62794/autoproofs/blob/proof-dev/AbstractRaft_IndProofs_test.tla) with complete proofs is around 1720 lines, up from a baseline of 296 lines in the starting [unproven file](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla).
+
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 24px; background: #fff; color: #333; }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 4px; }
+  .subtitle { color: #6c757d; font-size: 0.9em; margin-bottom: 20px; }
+  .chart-container { position: relative; width: 100%; max-width: 960px; margin: 0 auto; }
+  canvas { width: 100% !important; }
+  .legend { display: flex; gap: 24px; justify-content: center; margin-top: 12px; font-size: 0.85em; color: #555; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; }
+</style>
+
+<h1>Proof Progress</h1>
+<div class="subtitle">AbstractRaft Inductive Invariant Proofs &middot; Claude Code Session &middot; 2026-04-03</div>
+
+<div class="chart-container">
+  <canvas id="progressChart"></canvas>
+</div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#2563eb;"></div> Theorems Proved (cumulative)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#f59e0b;"></div> Obligations Proved (cumulative)</div>
+</div>
+
+<script>
+// Raw data: [time_minutes_from_start, cumulative_theorems, cumulative_obligations, label]
+const events = [
+  { t: 0,    th: 0,  ob: 0,     label: "Session start" },
+  { t: 0,    th: 2,  ob: 321,   label: "L_1 + L_2 (13:21)" },
+  { t: 1.5,  th: 3,  ob: 342,   label: "L_3 (13:22)" },
+  { t: 16.4, th: 4,  ob: 437,   label: "L_4 (13:37)" },
+  { t: 45.2, th: 5,  ob: 569,   label: "L_5 (14:06)" },
+  { t: 102.8,th: 6,  ob: 1209,  label: "L_6 (15:03)" },
+  { t: 111.2,th: 7,  ob: 1436,  label: "L_7 (15:12)" },
+  { t: 112.9,th: 8,  ob: 1456,  label: "L_8 (15:13)" },
+  { t: 149.2,th: 9,  ob: 1874,  label: "L_9 (15:50)" },
+  { t: 209.9,th: 11, ob: 2421,  label: "L_10 + L_11 (16:50)" },
+  { t: 237.1,th: 12, ob: 2559,  label: "L_12 (17:18)" },
+];
+
+const canvas = document.getElementById('progressChart');
+const ctx = canvas.getContext('2d');
+
+function draw() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const W = rect.width;
+  const H = 400;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const pad = { top: 30, right: 70, bottom: 50, left: 60 };
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top - pad.bottom;
+
+  const maxT = 250;
+  const maxTh = 13;
+  const maxOb = 2800;
+
+  function xPos(t) { return pad.left + (t / maxT) * plotW; }
+  function yTh(v) { return pad.top + plotH - (v / maxTh) * plotH; }
+  function yOb(v) { return pad.top + plotH - (v / maxOb) * plotH; }
+
+  // Grid
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = pad.top + (i / 5) * plotH;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + plotW, y); ctx.stroke();
+  }
+  for (let t = 0; t <= maxT; t += 30) {
+    const x = xPos(t);
+    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, pad.top + plotH); ctx.lineTo(pad.left + plotW, pad.top + plotH); ctx.stroke();
+
+  // X-axis labels (time)
+  ctx.fillStyle = '#555';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  for (let t = 0; t <= maxT; t += 30) {
+    const hrs = Math.floor(t / 60);
+    const mins = t % 60;
+    ctx.fillText(`+${hrs}h${mins.toString().padStart(2,'0')}m`, xPos(t), pad.top + plotH + 18);
+  }
+  ctx.fillText('Time elapsed', pad.left + plotW / 2, pad.top + plotH + 40);
+
+  // Left Y-axis: Theorems
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#2563eb';
+  ctx.font = 'bold 11px system-ui, sans-serif';
+  ctx.save();
+  ctx.translate(14, pad.top + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Theorems', 0, 0);
+  ctx.restore();
+  ctx.font = '11px system-ui, sans-serif';
+  for (let v = 0; v <= 12; v += 2) {
+    ctx.fillText(v.toString(), pad.left - 8, yTh(v) + 4);
+  }
+
+  // Right Y-axis: Obligations
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#f59e0b';
+  ctx.font = 'bold 11px system-ui, sans-serif';
+  ctx.save();
+  ctx.translate(W - 8, pad.top + plotH / 2);
+  ctx.rotate(Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillText('Obligations', 0, 0);
+  ctx.restore();
+  ctx.font = '11px system-ui, sans-serif';
+  for (let v = 0; v <= 2800; v += 500) {
+    ctx.fillText(v.toString(), pad.left + plotW + 8, yOb(v) + 4);
+  }
+
+  // Obligations line (step function)
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let i = 0; i < events.length; i++) {
+    const x = xPos(events[i].t);
+    const y = yOb(events[i].ob);
+    if (i === 0) { ctx.moveTo(x, y); }
+    else {
+      ctx.lineTo(x, yOb(events[i - 1].ob));
+      ctx.lineTo(x, y);
+    }
+  }
+  // Extend to end
+  ctx.lineTo(xPos(maxT), yOb(events[events.length - 1].ob));
+  ctx.stroke();
+
+  // Obligations dots
+  ctx.fillStyle = '#f59e0b';
+  for (let i = 1; i < events.length; i++) {
+    ctx.beginPath();
+    ctx.arc(xPos(events[i].t), yOb(events[i].ob), 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Theorems line (step function)
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let i = 0; i < events.length; i++) {
+    const x = xPos(events[i].t);
+    const y = yTh(events[i].th);
+    if (i === 0) { ctx.moveTo(x, y); }
+    else {
+      ctx.lineTo(x, yTh(events[i - 1].th));
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.lineTo(xPos(maxT), yTh(events[events.length - 1].th));
+  ctx.stroke();
+
+  // Theorem dots and labels
+  ctx.fillStyle = '#2563eb';
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  const labelOffsets = [
+    null,
+    { dx: 6, dy: -8 },   // L1+L2
+    { dx: 6, dy: -8 },   // L3
+    { dx: 6, dy: -8 },   // L4
+    { dx: 6, dy: -8 },   // L5
+    { dx: 6, dy: -8 },   // L6
+    { dx: 6, dy: 14 },   // L7 (below to avoid overlap)
+    { dx: 6, dy: 14 },   // L8
+    { dx: 6, dy: -8 },   // L9
+    { dx: -60, dy: -8 },   // L10+L11
+    { dx: 6, dy: -8 },   // L12
+  ];
+  for (let i = 1; i < events.length; i++) {
+    const x = xPos(events[i].t);
+    const y = yTh(events[i].th);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    const off = labelOffsets[i] || { dx: 6, dy: -8 };
+    ctx.fillStyle = '#1e3a5f';
+    ctx.fillText(events[i].label.split(' (')[0], x + off.dx, y + off.dy);
+    ctx.fillStyle = '#2563eb';
+  }
+}
+
+draw();
+window.addEventListener('resize', draw);
+</script>
+
+
+Overall, each theorem required roughly no more than 30-40 minutes of agent thinking time, with basically zero human intervention. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. More details on individual theorem proof stats from its report are shown below.
+
+
 <div class="proof-status-scope">
   <style>
     .proof-status-scope, .proof-status-scope * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,14 +238,14 @@ We can take the candidate inductive invariant as a starting point, and give Clau
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
       background: #f8f9fa;
       color: #333;
-      padding: 24px;
+      padding: 18px;
       line-height: 1.5;
     }
     .proof-status-scope .header {
       background: #fff;
       border: 1px solid #dee2e6;
       border-radius: 8px;
-      padding: 24px;
+      padding: 14px;
       margin-bottom: 20px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
@@ -56,12 +268,12 @@ We can take the candidate inductive invariant as a starting point, and give Clau
       background: #fff;
       border: 1px solid #dee2e6;
       border-radius: 8px;
-      padding: 8px 10px;
-      min-width: 140px;
+      padding: 4px 6px;
+      min-width: 120px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     .proof-status-scope .stat-card .label { color: #6c757d; font-size: 0.6em; text-transform: uppercase; letter-spacing: 0.5px; }
-    .proof-status-scope .stat-card .value { font-size: 1.0em; font-weight: 700; color: #1a1a2e; }
+    .proof-status-scope .stat-card .value { font-size: 0.9em; font-weight: 700; color: #1a1a2e; }
     .proof-status-scope .stat-card.success .value { color: #198754; }
     .proof-status-scope .stat-card.time .value { color: #6f42c1; }
 
@@ -117,9 +329,8 @@ We can take the candidate inductive invariant as a starting point, and give Clau
     }
   </style>
   <div class="header">
-    <h1>AbstractRaft Inductive Invariant Proofs</h1>
     <div class="subtitle">TLAPS proof status summary &middot; AbstractRaft_IndProofs_test.tla</div>
-    <div class="stats">
+      <div class="stats">
       <div class="stat-card success">
         <div class="label">Total Obligations</div>
         <div class="value">2559/2559</div>
@@ -134,14 +345,14 @@ We can take the candidate inductive invariant as a starting point, and give Clau
       </div>
       <div class="stat-card time">
         <div class="label">Total Claude Code Time</div>
-        <div class="value">~37 min+</div>
+        <div class="value">~3h 45m</div>
       </div>
     </div>
   </div>
 
   <div class="table-container">
     <h2>Theorem Summary</h2>
-    <table>
+<table>
       <thead>
         <tr>
           <th>Theorem</th>
@@ -157,7 +368,7 @@ We can take the candidate inductive invariant as a starting point, and give Clau
       </thead>
       <tbody>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L1.html">L_1</a></td>
+        <td>L_1</td>
         <td>H_OnePrimaryPerTerm</td>
         <td>139/139</td>
         <td>47</td>
@@ -168,7 +379,7 @@ We can take the candidate inductive invariant as a starting point, and give Clau
         <td>8</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L2.html">L_2</a></td>
+        <td>L_2</td>
         <td>H_PrimaryHasOwnEntries</td>
         <td>182/182</td>
         <td>63</td>
@@ -179,7 +390,7 @@ We can take the candidate inductive invariant as a starting point, and give Clau
         <td>4</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L3.html">L_3</a></td>
+        <td>L_3</td>
         <td>H_LogMatching</td>
         <td>21/21</td>
         <td>7</td>
@@ -190,7 +401,7 @@ We can take the candidate inductive invariant as a starting point, and give Clau
         <td>2</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L4.html">L_4</a></td>
+        <td>L_4</td>
         <td>H_PrimaryTermGTELogTerm</td>
         <td>95/95</td>
         <td>37</td>
@@ -201,29 +412,29 @@ We can take the candidate inductive invariant as a starting point, and give Clau
         <td>9</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L5.html">L_5</a></td>
+        <td>L_5</td>
         <td>H_QuorumsSafeAtTerms</td>
         <td>132/132</td>
         <td>132</td>
         <td>0</td>
         <td>0</td>
         <td>cached</td>
-        <td>&mdash;</td>
+        <td>~12 min</td>
         <td>6</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L6.html">L_6</a></td>
+        <td>L_6</td>
         <td>H_UniformLogEntries</td>
         <td>640/640</td>
         <td>640</td>
         <td>0</td>
         <td>0</td>
         <td>cached</td>
-        <td>&mdash;</td>
+        <td>~58 min</td>
         <td>&mdash;</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L7.html">L_7</a></td>
+        <td>L_7</td>
         <td>H_TermsMonotonic</td>
         <td>227/227</td>
         <td>227</td>
@@ -234,82 +445,69 @@ We can take the candidate inductive invariant as a starting point, and give Clau
         <td>6</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L8.html">L_8</a></td>
+        <td>L_8</td>
         <td>H_LogEntryImpliesSafeAtTerm</td>
         <td>20/20</td>
         <td>20</td>
         <td>0</td>
         <td>0</td>
         <td>cached</td>
-        <td>&mdash;</td>
+        <td>~2 min</td>
         <td>&mdash;</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L9.html">L_9</a></td>
+        <td>L_9</td>
         <td>H_LeaderCompleteness</td>
         <td>418/418</td>
         <td>159</td>
         <td>0</td>
         <td>257</td>
         <td>4.1s</td>
-        <td>&mdash;</td>
+        <td>~36 min</td>
         <td>&mdash;</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L10.html">L_10</a></td>
+        <td>L_10</td>
         <td>H_LaterLogsHaveEarlierCommitted</td>
         <td>422/422</td>
         <td>131</td>
         <td>0</td>
         <td>291</td>
         <td>cached</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
+        <td>~45 min</td>
+        <td>8</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L11.html">L_11</a></td>
+        <td>L_11</td>
         <td>H_CommittedEntryIsOnQuorum</td>
         <td>125/125</td>
         <td>125</td>
         <td>0</td>
         <td>0</td>
         <td>cached</td>
-        <td>&mdash;</td>
+        <td>~15 min</td>
         <td>&mdash;</td>
       </tr>
       <tr class="success">
-        <td><a href="/assets/abstract_raft_proofs/proof_status_THEOREM_L12.html">L_12</a></td>
+        <td>L_12</td>
         <td>H_StateMachineSafety</td>
         <td>138/138</td>
         <td>54</td>
         <td>0</td>
         <td>84</td>
         <td>cached</td>
-        <td>~5 min</td>
+        <td>~12 min</td>
         <td>3</td>
       </tr>
-      <tr class="success">
-        <td>&mdash;</td>
-        <td>Init =&gt; IndGlobal</td>
-        <td>N/A</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-        <td>&mdash;</td>
-      </tr>
-
       </tbody>
     </table>
   </div>
 </div>
 
-Overall, each theorem required roughly no more than 30-40 minutes of agent thinking time, and with little to no human intervention. The arguments and steps generated by Claude automatically were all impressive, and something I was not expecting it do so well at. The final version of the generated proof can be found [here](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. The full file with complete proofs is around 1720 lines, up from a baseline of 296 lines in the starting [unproven file](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla).
 
-There are definitely a few caveats here, but the results are still incredibly impressive, and something completely out of realm of possibility a few years ago. Importantly, there is a lot of information about the Raft protocol on the web, and it is probably one of the most well-studied and widely implemented consensus protocols to date. Similarly, there has been [some amount of work](https://dl.acm.org/doi/10.1145/2854065.2854081) done on formally verified Raft proofs. This work is not done specifically in TLA+, but there is prior work in the area. Having said that, I still think this is a super impressive achievement. Even for an experienced engineer/researcher, going off and reading documentation on existing Raft proofs and synthesizing that into a correct TLAPS proof would be an extremely nontrivial task.
+There are definitely a few caveats here, but the results are impressive, and something outside the realm of possibility a few years ago. First, there is a lot of information about the Raft protocol on the web, and it is probably one of the most well-studied and widely implemented consensus protocols to date. Similarly, there has been [some amount of work](https://dl.acm.org/doi/10.1145/2854065.2854081) done on formally verified Raft proofs. This work is not done specifically in TLA+, but there is prior work in the area. Having said that, I still think this is a super impressive achievement. Even for an experienced engineer/researcher, going off and reading documentation on existing Raft proofs and synthesizing that into a correct TLAPS proof would be an extremely nontrivial task.
 
-From a practical systems engineering and building standpoint, I'm still not that interested in fully automated proofs. I often still find that finite-state model checking over adequately large state spaces is still a better cost-benefit tradeoff, and makes things much easier to automate and re-verify upon modification. Also, I am still very unconvinced that we will ever be able to (or care about) proving properties of the actual, running system implementations. Regardless, this task is a great benchmark for understanding the frontier capabilities of these models.
+From a practical systems engineering and building standpoint, I'm also not so interested in fully automated proofs. I often still find that finite-state model checking over adequately large state spaces is still a better cost-benefit tradeoff, and makes things much easier to automate and re-verify upon modification. Also, I am still very unconvinced that we will ever be able to (or care about) proving properties of the actual, running system implementations. Regardless, this task is a great benchmark for understanding the frontier capabilities of these models.
 
 Another thing that's becoming increasingly relevant as well is the speed bottlenecks on these models. Right now, the execution loops feel roughly in line with the speed of a human, or at least comprehensible to a human. But, for tasks that are largely inference bottlenecked, it is interesting to think about what is possible if these kind of tasks are massively parallelizable and/or can run at 100x or 1000x their current speed.
 This calculus also leads to other interesting questions, as we have done deep research and development on [intricate](https://people.eecs.berkeley.edu/~alanmi/courses/2007_290N/papers/inter_mcmillan_cav03.pdf) and [efficient](https://theory.stanford.edu/~arbrad/papers/arbrad-thesis.pdf) algorithms for automatically model checking these types of protocols. But, if we can run a general (super) intelligence at 1000x human speed, do these kind of specialized algorithms become increasingly less necessary? Special purpose algorithms might always be more efficient for specific tasks, but in a world where the cost of compute continues to fall we might not care that much, especially if the AI-driven methods are more flexible and general.

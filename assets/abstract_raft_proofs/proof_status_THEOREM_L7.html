@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof Status: THEOREM L_7 (H_TermsMonotonic)</title>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 20px; background: #fff; color: #333; max-width: 1100px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.4em; border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
+  h2 { font-size: 1.1em; margin-top: 28px; color: #1e3a5f; }
+  .summary { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 16px; margin: 16px 0; }
+  .summary strong { color: #166534; }
+  .meta { font-size: 0.85em; color: #6b7280; margin-bottom: 16px; }
+  .tree { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85em; line-height: 1.7; }
+  .node { margin-left: 0; }
+  .children { margin-left: 24px; border-left: 1px solid #e5e7eb; padding-left: 8px; }
+  .toggle { cursor: pointer; user-select: none; }
+  .toggle::before { content: '\25BC '; font-size: 0.7em; color: #6b7280; }
+  .toggle.collapsed::before { content: '\25B6 '; }
+  .proved { color: #166534; }
+  .badge { display: inline-block; font-size: 0.75em; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+  .badge-smt { background: #dbeafe; color: #1e40af; }
+  .badge-trivial { background: #f3f4f6; color: #6b7280; }
+  .badge-proved { background: #dcfce7; color: #166534; }
+  .line-ref { color: #9ca3af; font-size: 0.8em; margin-left: 6px; }
+  .time-ref { color: #d97706; font-size: 0.78em; margin-left: 4px; }
+  code { background: #f3f4f6; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+  .comment { color: #64748b; font-style: italic; }
+  .step-label { font-weight: 600; }
+  .obl-count { font-size: 0.78em; color: #9ca3af; margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<h1>THEOREM L_7 &mdash; H_TermsMonotonic</h1>
+
+<div class="summary">
+  <strong>Status: ALL 227 OBLIGATIONS PROVED</strong>
+  &nbsp;|&nbsp; 6 top-level action cases + 1 QED
+  &nbsp;|&nbsp; Provers: SMT, trivial (tlapm)
+  &nbsp;|&nbsp; TLAPM 1.5.0 &bull; 8 threads
+</div>
+
+<div class="meta">
+  Proved: 2026-04-03 15:04&ndash;15:12 (approx. 8 min total across 6 runs)
+  &bull; Final run: <code>tlapm --threads 8 --toolbox 858 994 AbstractRaft_IndProofs_test.tla</code>
+</div>
+
+<p><code>TypeOK /\ H_PrimaryTermGTELogTerm /\ H_TermsMonotonic /\ Next =&gt; H_TermsMonotonic'</code></p>
+
+<div class="tree">
+
+<div class="node">
+  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+    <span class="proved step-label">THEOREM L_7</span>
+    <span class="badge badge-proved">proved</span>
+    <span class="line-ref">L858</span>
+    <span class="obl-count">227 obligations</span>
+  </div>
+  <div class="children">
+
+    <div class="node">
+      <span class="proved">&lt;1&gt;. USE A0, A1, A2, A3, A4, A5, A6</span>
+      <span class="badge badge-trivial">trivial</span>
+      <span class="line-ref">L859</span>
+    </div>
+
+    <!-- <1>1 ClientRequestAction -->
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved step-label">&lt;1&gt;1.</span>
+        <span class="proved"> TypeOK /\ H_PrimaryTermGTELogTerm /\ H_TermsMonotonic /\ ClientRequestAction =&gt; H_TermsMonotonic'</span>
+        <span class="badge badge-proved">proved</span>
+        <span class="line-ref">L861</span>
+      </div>
+      <div class="children">
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. SUFFICES ASSUME TypeOK, H_PrimaryTermGTELogTerm, H_TermsMonotonic,</span>
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="proved">NEW p &isin; Server, ClientRequest(p), NEW sv, ii, jj, ii &le; jj</span>
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="proved">PROVE log'[sv][ii] &le; log'[sv][jj]</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L862&ndash;867</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;1. log' = [log EXCEPT ![p] = Append(log[p], currentTerm[p])]</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L868</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;a. log'[p] = Append(log[p], currentTerm[p])</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L869</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;b. &forall; idx &isin; 1..Len(log[p]): log'[p][idx] = log[p][idx]</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L870</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;c. log'[p][Len(log[p])+1] = currentTerm[p]</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L871</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;d. DOMAIN log[p] = 1..Len(log[p])</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L872</span>
+        </div>
+        <div class="node">
+          <span class="proved">&lt;2&gt;e. DOMAIN log'[p] = 1..(Len(log[p])+1)</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L873</span>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;2. CASE sv &ne; p</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L874&ndash;875</span>
+        </div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved step-label">&lt;2&gt;3.</span>
+            <span class="proved"> CASE sv = p</span>
+            <span class="badge badge-proved">proved</span>
+            <span class="line-ref">L876</span>
+          </div>
+          <div class="children">
+
+            <div class="node">
+              <span class="proved">&lt;3&gt;1. CASE ii &isin; DOMAIN log[p] /\ jj &isin; DOMAIN log[p]</span>
+              <span class="badge badge-smt">smt</span>
+              <span class="line-ref">L877&ndash;878</span>
+              <span class="comment"> &mdash; by H_TermsMonotonic directly</span>
+            </div>
+
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved step-label">&lt;3&gt;2.</span>
+                <span class="proved"> CASE ii &isin; DOMAIN log[p] /\ jj &notin; DOMAIN log[p]</span>
+                <span class="badge badge-proved">proved</span>
+                <span class="line-ref">L879</span>
+                <span class="comment"> &mdash; jj = Len+1; use H_PrimaryTermGTELogTerm</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. jj = Len(log[p]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L882</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log'[p][jj] = currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L883</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. log'[p][ii] = log[p][ii]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L884</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;4. state[p] = Primary</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L885</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;5. log[p][ii] &le; currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L886&ndash;887</span> <span class="comment"> &mdash; H_PrimaryTermGTELogTerm</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;6. log'[sv][ii] &le; log'[sv][jj]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L888&ndash;889</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L890</span></div>
+              </div>
+            </div>
+
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved step-label">&lt;3&gt;3.</span>
+                <span class="proved"> CASE ii &notin; DOMAIN log[p] /\ jj &notin; DOMAIN log[p]</span>
+                <span class="badge badge-proved">proved</span>
+                <span class="line-ref">L891</span>
+                <span class="comment"> &mdash; both = Len+1, so ii = jj</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. ii = Len(log[p]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L893</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. jj = Len(log[p]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L894</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. ii = jj</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L895</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;4. log'[sv][ii] = log'[sv][jj]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L896</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;5. log'[p][ii] = currentTerm[p]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L897</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;6. currentTerm[p] &isin; Nat</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L898</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L899</span></div>
+              </div>
+            </div>
+
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved step-label">&lt;3&gt;4.</span>
+                <span class="proved"> CASE ii &notin; DOMAIN log[p] /\ jj &isin; DOMAIN log[p]</span>
+                <span class="badge badge-proved">proved</span>
+                <span class="line-ref">L900</span>
+                <span class="comment"> &mdash; contradiction: ii = Len+1 &gt; jj violates ii &le; jj</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. ii = Len(log[p]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L902</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. jj &isin; 1..Len(log[p])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L903</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED (contradiction)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L904</span></div>
+              </div>
+            </div>
+
+            <div class="node">
+              <span class="proved">&lt;3&gt;. QED (case split on domain membership)</span>
+              <span class="badge badge-smt">smt</span>
+              <span class="line-ref">L905</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. QED BY &lt;2&gt;2, &lt;2&gt;3</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L906</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- <1>2 GetEntriesAction -->
+    <div class="node">
+      <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+        <span class="proved step-label">&lt;1&gt;2.</span>
+        <span class="proved"> TypeOK /\ H_TermsMonotonic /\ GetEntriesAction =&gt; H_TermsMonotonic'</span>
+        <span class="badge badge-proved">proved</span>
+        <span class="line-ref">L908</span>
+        <span class="comment"> &mdash; most complex case; chained monotonicity argument</span>
+      </div>
+      <div class="children">
+
+        <div class="node">
+          <span class="proved">&lt;2&gt;. SUFFICES ASSUME TypeOK, H_TermsMonotonic,</span>
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="proved">NEW r, sender, GetEntries(r, sender), NEW sv, ii, jj, ii &le; jj</span>
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="proved">PROVE log'[sv][ii] &le; log'[sv][jj]</span>
+          <span class="badge badge-smt">smt</span>
+          <span class="line-ref">L909&ndash;914</span>
+        </div>
+
+        <div class="node"><span class="proved">&lt;2&gt;1. log' = [log EXCEPT ![r] = Append(log[r], log[sender][Len(log[r])+1])]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L915&ndash;916</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;a. log'[r] = Append(log[r], log[sender][...])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L917&ndash;918</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;b. &forall; idx &isin; 1..Len(log[r]): log'[r][idx] = log[r][idx]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L919</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;c. DOMAIN log[r] = 1..Len(log[r])</span> <span class="badge badge-trivial">trivial</span> <span class="line-ref">L920</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;d. DOMAIN log'[r] = 1..(Len(log[r])+1)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L921</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;e. (IF Empty(log[r]) THEN 1 ELSE Len(log[r])+1) = Len(log[r])+1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L922&ndash;923</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;f. log'[r][Len(log[r])+1] = log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L924&ndash;925</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;g. Len(log[sender]) &gt; Len(log[r])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L926</span></div>
+        <div class="node"><span class="proved">&lt;2&gt;h. &not;Empty(log[r]) &Rightarrow; log[sender][Len(log[r])] = log[r][Len(log[r])]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L927&ndash;928</span></div>
+
+        <div class="node"><span class="proved">&lt;2&gt;2. CASE sv &ne; r</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L929&ndash;930</span></div>
+
+        <div class="node">
+          <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+            <span class="proved step-label">&lt;2&gt;3.</span>
+            <span class="proved"> CASE sv = r</span>
+            <span class="badge badge-proved">proved</span>
+            <span class="line-ref">L931</span>
+          </div>
+          <div class="children">
+
+            <div class="node"><span class="proved">&lt;3&gt;1. CASE ii &isin; DOMAIN log[r] /\ jj &isin; DOMAIN log[r]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L932&ndash;933</span> <span class="comment"> &mdash; direct from H_TermsMonotonic</span></div>
+
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved step-label">&lt;3&gt;2.</span>
+                <span class="proved"> CASE ii &isin; DOMAIN log[r] /\ jj &notin; DOMAIN log[r]</span>
+                <span class="badge badge-proved">proved</span>
+                <span class="line-ref">L934</span>
+                <span class="comment"> &mdash; new entry from sender; chain monotonicity</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. jj = Len(log[r]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L939</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. log'[r][jj] = log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L940</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. log'[r][ii] = log[r][ii]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L941</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;4. CASE Empty(log[r]) &mdash; contradiction (ii &isin; DOMAIN log[r])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L942&ndash;944</span></div>
+                <div class="node">
+                  <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                    <span class="proved step-label">&lt;4&gt;5.</span>
+                    <span class="proved"> CASE &not;Empty(log[r]) &mdash; chained inequality</span>
+                    <span class="badge badge-proved">proved</span>
+                    <span class="line-ref">L945</span>
+                  </div>
+                  <div class="children">
+                    <div class="node"><span class="proved">&lt;5&gt;1. Len(log[r]) &isin; DOMAIN log[r]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L946&ndash;947</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;2. ii &isin; 1..Len(log[r])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L948</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;3. log[r][ii] &le; log[r][Len(log[r])]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L949&ndash;950</span> <span class="comment"> &mdash; H_TermsMonotonic on r</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;4. log[sender][Len(log[r])] = log[r][Len(log[r])]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L951&ndash;952</span> <span class="comment"> &mdash; from GetEntries logOk</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;5. Len(log[r]) &ge; 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L953&ndash;954</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;6. Len(log[r]) &isin; DOMAIN log[sender]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L955&ndash;956</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;7. Len(log[r])+1 &isin; DOMAIN log[sender]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L957&ndash;958</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;8. log[sender][Len(log[r])] &le; log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L959&ndash;960</span> <span class="comment"> &mdash; H_TermsMonotonic on sender</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;9. log[r][Len(log[r])] &le; log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L961&ndash;962</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;10. Nat type witnesses</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L963&ndash;964</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;11. log[r][ii] &le; log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L965&ndash;966</span> <span class="comment"> &mdash; transitivity</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;12. log'[sv][ii] &le; log'[sv][jj]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L967&ndash;968</span></div>
+                    <div class="node"><span class="proved">&lt;5&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L969</span></div>
+                  </div>
+                </div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L970</span></div>
+              </div>
+            </div>
+
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved step-label">&lt;3&gt;3.</span>
+                <span class="proved"> CASE ii &notin; DOMAIN log[r] /\ jj &notin; DOMAIN log[r]</span>
+                <span class="badge badge-proved">proved</span>
+                <span class="line-ref">L971</span>
+                <span class="comment"> &mdash; both = Len+1, trivially equal</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. ii = Len(log[r]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L972</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. jj = Len(log[r]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L973</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;3. ii = jj</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L974</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;4. log'[sv][ii] = log'[sv][jj]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L975</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;5. log'[r][ii] = log[sender][Len(log[r])+1]</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L976</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;6. log[sender][Len(log[r])+1] &isin; Nat</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L977&ndash;978</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L979</span></div>
+              </div>
+            </div>
+
+            <div class="node">
+              <div class="toggle" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+                <span class="proved step-label">&lt;3&gt;4.</span>
+                <span class="proved"> CASE ii &notin; DOMAIN log[r] /\ jj &isin; DOMAIN log[r]</span>
+                <span class="badge badge-proved">proved</span>
+                <span class="line-ref">L980</span>
+                <span class="comment"> &mdash; contradiction: ii = Len+1 &gt; jj violates ii &le; jj</span>
+              </div>
+              <div class="children">
+                <div class="node"><span class="proved">&lt;4&gt;1. ii = Len(log[r]) + 1</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L981</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;2. jj &isin; 1..Len(log[r])</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L982</span></div>
+                <div class="node"><span class="proved">&lt;4&gt;. QED (contradiction)</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L983</span></div>
+              </div>
+            </div>
+
+            <div class="node"><span class="proved">&lt;3&gt;. QED</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L984</span></div>
+          </div>
+        </div>
+
+        <div class="node"><span class="proved">&lt;2&gt;. QED BY &lt;2&gt;2, &lt;2&gt;3</span> <span class="badge badge-smt">smt</span> <span class="line-ref">L985</span></div>
+
+      </div>
+    </div>
+
+    <!-- <1>3 RollbackEntriesAction -->
+    <div class="node">
+      <span class="proved step-label">&lt;1&gt;3.</span>
+      <span class="proved"> TypeOK /\ H_TermsMonotonic /\ RollbackEntriesAction =&gt; H_TermsMonotonic'</span>
+      <span class="badge badge-smt">smt</span>
+      <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L987</span>
+      <span class="comment"> &mdash; BY DEF TypeOK, RollbackEntriesAction, RollbackEntries, H_TermsMonotonic</span>
+    </div>
+
+    <!-- <1>4 BecomeLeaderAction -->
+    <div class="node">
+      <span class="proved step-label">&lt;1&gt;4.</span>
+      <span class="proved"> TypeOK /\ H_TermsMonotonic /\ BecomeLeaderAction =&gt; H_TermsMonotonic'</span>
+      <span class="badge badge-smt">smt</span>
+      <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L989</span>
+      <span class="comment"> &mdash; BY DEF TypeOK, BecomeLeaderAction, BecomeLeader, H_TermsMonotonic</span>
+    </div>
+
+    <!-- <1>5 CommitEntryAction -->
+    <div class="node">
+      <span class="proved step-label">&lt;1&gt;5.</span>
+      <span class="proved"> TypeOK /\ H_TermsMonotonic /\ CommitEntryAction =&gt; H_TermsMonotonic'</span>
+      <span class="badge badge-smt">smt</span>
+      <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L991</span>
+      <span class="comment"> &mdash; BY DEF TypeOK, CommitEntryAction, CommitEntry, H_TermsMonotonic</span>
+    </div>
+
+    <!-- <1>6 UpdateTermsAction -->
+    <div class="node">
+      <span class="proved step-label">&lt;1&gt;6.</span>
+      <span class="proved"> TypeOK /\ H_TermsMonotonic /\ UpdateTermsAction =&gt; H_TermsMonotonic'</span>
+      <span class="badge badge-smt">smt</span>
+      <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L993</span>
+      <span class="comment"> &mdash; BY DEF TypeOK, UpdateTermsAction, UpdateTerms, H_TermsMonotonic</span>
+    </div>
+
+    <!-- <1>7 QED -->
+    <div class="node">
+      <span class="proved step-label">&lt;1&gt;7. QED</span>
+      <span class="badge badge-smt">smt</span>
+      <span class="badge badge-proved">proved</span>
+      <span class="line-ref">L994</span>
+      <span class="comment"> &mdash; BY &lt;1&gt;1, &lt;1&gt;2, &lt;1&gt;3, &lt;1&gt;4, &lt;1&gt;5, &lt;1&gt;6 DEF Next</span>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<h2>Proof Strategy</h2>
+<p>
+  <strong>H_TermsMonotonic</strong> asserts that for every server <code>sv</code>, the term sequence
+  <code>log[sv]</code> is monotonically non-decreasing: <code>&forall; i &le; j &isin; DOMAIN log[sv]: log[sv][i] &le; log[sv][j]</code>.
+  The proof proceeds by case analysis over each action in <code>Next</code>.
+</p>
+<ol>
+  <li>
+    <strong>RollbackEntries, BecomeLeader, CommitEntry, UpdateTerms</strong> (steps &lt;1&gt;3&ndash;&lt;1&gt;6):
+    None of these actions modify <code>log</code> in a way that can decrease an entry, so the invariant is
+    preserved trivially via definitional unfolding. SMT discharges these in a single step.
+  </li>
+  <li>
+    <strong>ClientRequest</strong> (step &lt;1&gt;1): The only log change is appending <code>currentTerm[p]</code>
+    to server <code>p</code>'s log. The proof splits into four domain-membership cases for indices <code>ii, jj</code>:
+    <ul>
+      <li>Both old indices: direct from H_TermsMonotonic.</li>
+      <li><code>ii</code> old, <code>jj</code> new (= Len+1): <strong>H_PrimaryTermGTELogTerm</strong> guarantees
+          <code>log[p][ii] &le; currentTerm[p]</code> since <code>state[p] = Primary</code>.</li>
+      <li>Both new: both equal Len+1, so <code>ii = jj</code> and the inequality is trivial.</li>
+      <li><code>ii</code> new, <code>jj</code> old: impossible since Len+1 &gt; any old index, contradicting <code>ii &le; jj</code>.</li>
+    </ul>
+  </li>
+  <li>
+    <strong>GetEntries</strong> (step &lt;1&gt;2): The hardest case. Server <code>r</code> appends one entry from
+    <code>sender</code> at position <code>Len(log[r])+1</code>. The proof again uses four domain cases.
+    The critical sub-case is <code>ii</code> old, <code>jj</code> new, requiring:
+    <code>log[r][ii] &le; log[sender][Len(log[r])+1]</code>. This is established by chaining two
+    applications of H_TermsMonotonic:
+    <ul>
+      <li><code>log[r][ii] &le; log[r][Len(log[r])]</code> &mdash; monotonicity on <code>r</code>.</li>
+      <li><code>log[r][Len(log[r])] = log[sender][Len(log[r])]</code> &mdash; from <code>GetEntries</code> logOk condition.</li>
+      <li><code>log[sender][Len(log[r])] &le; log[sender][Len(log[r])+1]</code> &mdash; monotonicity on <code>sender</code>.</li>
+    </ul>
+    Transitivity (with explicit Nat witnesses for SMT) closes the goal.
+  </li>
+</ol>
+
+<h2>Proof Metrics</h2>
+<table style="border-collapse:collapse; font-size:0.88em; width:100%;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="text-align:left; padding:6px 12px; border:1px solid #e2e8f0;">Step</th>
+      <th style="text-align:left; padding:6px 12px; border:1px solid #e2e8f0;">Action</th>
+      <th style="text-align:center; padding:6px 12px; border:1px solid #e2e8f0;">Prover</th>
+      <th style="text-align:center; padding:6px 12px; border:1px solid #e2e8f0;">Status</th>
+      <th style="text-align:right; padding:6px 12px; border:1px solid #e2e8f0;">Timing</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">&lt;1&gt;1</td>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">ClientRequestAction</td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0;"><span class="badge badge-smt">smt</span></td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0; color:#166534;">proved</td>
+      <td style="text-align:right; padding:5px 12px; border:1px solid #e2e8f0; color:#9ca3af;">cached</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">&lt;1&gt;2</td>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">GetEntriesAction</td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0;"><span class="badge badge-smt">smt</span></td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0; color:#166534;">proved</td>
+      <td style="text-align:right; padding:5px 12px; border:1px solid #e2e8f0; color:#9ca3af;">~8 min (multi-run)</td>
+    </tr>
+    <tr>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">&lt;1&gt;3</td>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">RollbackEntriesAction</td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0;"><span class="badge badge-smt">smt</span></td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0; color:#166534;">proved</td>
+      <td style="text-align:right; padding:5px 12px; border:1px solid #e2e8f0; color:#9ca3af;">cached</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">&lt;1&gt;4</td>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">BecomeLeaderAction</td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0;"><span class="badge badge-smt">smt</span></td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0; color:#166534;">proved</td>
+      <td style="text-align:right; padding:5px 12px; border:1px solid #e2e8f0; color:#9ca3af;">cached</td>
+    </tr>
+    <tr>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">&lt;1&gt;5</td>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">CommitEntryAction</td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0;"><span class="badge badge-smt">smt</span></td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0; color:#166534;">proved</td>
+      <td style="text-align:right; padding:5px 12px; border:1px solid #e2e8f0; color:#9ca3af;">cached</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">&lt;1&gt;6</td>
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;">UpdateTermsAction</td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0;"><span class="badge badge-smt">smt</span></td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0; color:#166534;">proved</td>
+      <td style="text-align:right; padding:5px 12px; border:1px solid #e2e8f0; color:#9ca3af;">cached</td>
+    </tr>
+    <tr style="font-weight:600; background:#f0fdf4;">
+      <td style="padding:5px 12px; border:1px solid #e2e8f0;" colspan="2">Total: 227 obligations</td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0;"><span class="badge badge-smt">smt</span> + <span class="badge badge-trivial">trivial</span></td>
+      <td style="text-align:center; padding:5px 12px; border:1px solid #e2e8f0; color:#166534;">ALL PROVED</td>
+      <td style="text-align:right; padding:5px 12px; border:1px solid #e2e8f0;">~8 min total</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="font-size:0.8em; color:#9ca3af; margin-top:24px;">
+  Generated 2026-04-03 &bull; TLAPM 1.5.0 &bull; 8 threads &bull;
+  Final run: <code>tlapm --threads 8 --toolbox 858 994 AbstractRaft_IndProofs_test.tla</code>
+  &bull; All 227 obligations proved (6 runs, 15:04&ndash;15:12)
+</p>
+
+<script>
+  // Initialize all toggles as expanded
+  document.querySelectorAll('.toggle').forEach(function(t) {
+    t.addEventListener('click', function() {
+      // toggle is handled inline; ensure children start visible
+    });
+  });
+</script>
+
+</body>
+</html>
