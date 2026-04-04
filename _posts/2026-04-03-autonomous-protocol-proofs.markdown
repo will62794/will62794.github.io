@@ -29,202 +29,246 @@ We can give our candidate inductive invariant and a [skeleton TLAPS proof](https
 
 After around 4 hours of total runtime, with almost no human interaction, Claude was able to complete successful proofs for all of the 12 top-level theorems. The [full file](https://github.com/will62794/autoproofs/blob/proof-dev/AbstractRaft_IndProofs_test.tla) with complete proofs is around 1720 lines, up from a baseline of 296 lines in the starting [unproven file](https://github.com/will62794/autoproofs/blob/b61461f42b530232af2f039851a80f1120dc8046/AbstractRaft_IndProofs_test.tla).
 
-<style>
-  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 24px; background: #fff; color: #333; }
-  h1 { font-size: 1.4em; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 4px; }
-  .subtitle { color: #6c757d; font-size: 0.9em; margin-bottom: 20px; }
-  .chart-container { position: relative; width: 100%; max-width: 960px; margin: 0 auto; }
-  canvas { width: 100% !important; }
-  .legend { display: flex; gap: 24px; justify-content: center; margin-top: 12px; font-size: 0.85em; color: #555; }
-  .legend-item { display: flex; align-items: center; gap: 6px; }
-  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; }
-</style>
-
-<h1>Proof Progress</h1>
-<div class="subtitle">AbstractRaft Inductive Invariant Proofs &middot; Claude Code Session &middot; 2026-04-03</div>
-
-<div class="chart-container">
-  <canvas id="progressChart"></canvas>
-</div>
-<div class="legend">
-  <div class="legend-item"><div class="legend-swatch" style="background:#2563eb;"></div> Theorems Proved (cumulative)</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#f59e0b;"></div> Obligations Proved (cumulative)</div>
-</div>
-
-<script>
-// Raw data: [time_minutes_from_start, cumulative_theorems, cumulative_obligations, label]
-const events = [
-  { t: 0,    th: 0,  ob: 0,     label: "Session start" },
-  { t: 0,    th: 2,  ob: 321,   label: "L_1 + L_2 (13:21)" },
-  { t: 1.5,  th: 3,  ob: 342,   label: "L_3 (13:22)" },
-  { t: 16.4, th: 4,  ob: 437,   label: "L_4 (13:37)" },
-  { t: 45.2, th: 5,  ob: 569,   label: "L_5 (14:06)" },
-  { t: 102.8,th: 6,  ob: 1209,  label: "L_6 (15:03)" },
-  { t: 111.2,th: 7,  ob: 1436,  label: "L_7 (15:12)" },
-  { t: 112.9,th: 8,  ob: 1456,  label: "L_8 (15:13)" },
-  { t: 149.2,th: 9,  ob: 1874,  label: "L_9 (15:50)" },
-  { t: 209.9,th: 11, ob: 2421,  label: "L_10 + L_11 (16:50)" },
-  { t: 237.1,th: 12, ob: 2559,  label: "L_12 (17:18)" },
-];
-
-const canvas = document.getElementById('progressChart');
-const ctx = canvas.getContext('2d');
-
-function draw() {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  const W = rect.width;
-  const H = 400;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width = W + 'px';
-  canvas.style.height = H + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-  const pad = { top: 30, right: 70, bottom: 50, left: 60 };
-  const plotW = W - pad.left - pad.right;
-  const plotH = H - pad.top - pad.bottom;
-
-  const maxT = 250;
-  const maxTh = 13;
-  const maxOb = 2800;
-
-  function xPos(t) { return pad.left + (t / maxT) * plotW; }
-  function yTh(v) { return pad.top + plotH - (v / maxTh) * plotH; }
-  function yOb(v) { return pad.top + plotH - (v / maxOb) * plotH; }
-
-  // Grid
-  ctx.strokeStyle = '#e5e7eb';
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 5; i++) {
-    const y = pad.top + (i / 5) * plotH;
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + plotW, y); ctx.stroke();
-  }
-  for (let t = 0; t <= maxT; t += 30) {
-    const x = xPos(t);
-    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
-  }
-
-  // Axes
-  ctx.strokeStyle = '#333';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, pad.top + plotH); ctx.lineTo(pad.left + plotW, pad.top + plotH); ctx.stroke();
-
-  // X-axis labels (time)
-  ctx.fillStyle = '#555';
-  ctx.font = '11px system-ui, sans-serif';
-  ctx.textAlign = 'center';
-  for (let t = 0; t <= maxT; t += 30) {
-    const hrs = Math.floor(t / 60);
-    const mins = t % 60;
-    ctx.fillText(`+${hrs}h${mins.toString().padStart(2,'0')}m`, xPos(t), pad.top + plotH + 18);
-  }
-  ctx.fillText('Time elapsed', pad.left + plotW / 2, pad.top + plotH + 40);
-
-  // Left Y-axis: Theorems
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#2563eb';
-  ctx.font = 'bold 11px system-ui, sans-serif';
-  ctx.save();
-  ctx.translate(14, pad.top + plotH / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = 'center';
-  ctx.fillText('Theorems', 0, 0);
-  ctx.restore();
-  ctx.font = '11px system-ui, sans-serif';
-  for (let v = 0; v <= 12; v += 2) {
-    ctx.fillText(v.toString(), pad.left - 8, yTh(v) + 4);
-  }
-
-  // Right Y-axis: Obligations
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#f59e0b';
-  ctx.font = 'bold 11px system-ui, sans-serif';
-  ctx.save();
-  ctx.translate(W - 8, pad.top + plotH / 2);
-  ctx.rotate(Math.PI / 2);
-  ctx.textAlign = 'center';
-  ctx.fillText('Obligations', 0, 0);
-  ctx.restore();
-  ctx.font = '11px system-ui, sans-serif';
-  for (let v = 0; v <= 2800; v += 500) {
-    ctx.fillText(v.toString(), pad.left + plotW + 8, yOb(v) + 4);
-  }
-
-  // Obligations line (step function)
-  ctx.strokeStyle = '#f59e0b';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  for (let i = 0; i < events.length; i++) {
-    const x = xPos(events[i].t);
-    const y = yOb(events[i].ob);
-    if (i === 0) { ctx.moveTo(x, y); }
-    else {
-      ctx.lineTo(x, yOb(events[i - 1].ob));
-      ctx.lineTo(x, y);
+<!-- Scope this block's style and elements locally with a wrapper div and descendant selectors -->
+<div class="proof-progress-scope">
+  <style>
+    .proof-progress-scope {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #fff;
+      color: #333;
+      margin: 0;
+      padding: 24px;
     }
-  }
-  // Extend to end
-  ctx.lineTo(xPos(maxT), yOb(events[events.length - 1].ob));
-  ctx.stroke();
-
-  // Obligations dots
-  ctx.fillStyle = '#f59e0b';
-  for (let i = 1; i < events.length; i++) {
-    ctx.beginPath();
-    ctx.arc(xPos(events[i].t), yOb(events[i].ob), 4, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Theorems line (step function)
-  ctx.strokeStyle = '#2563eb';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  for (let i = 0; i < events.length; i++) {
-    const x = xPos(events[i].t);
-    const y = yTh(events[i].th);
-    if (i === 0) { ctx.moveTo(x, y); }
-    else {
-      ctx.lineTo(x, yTh(events[i - 1].th));
-      ctx.lineTo(x, y);
+    .proof-progress-scope h1 {
+      font-size: 1.4em;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 8px;
+      margin-bottom: 4px;
     }
-  }
-  ctx.lineTo(xPos(maxT), yTh(events[events.length - 1].th));
-  ctx.stroke();
+    .proof-progress-scope .subtitle {
+      color: #6c757d;
+      font-size: 0.9em;
+      margin-bottom: 20px;
+    }
+    .proof-progress-scope .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .proof-progress-scope canvas {
+      width: 100% !important;
+      display: block;
+    }
+    .proof-progress-scope .legend {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: 0.85em;
+      color: #555;
+    }
+    .proof-progress-scope .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .proof-progress-scope .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+  </style>
 
-  // Theorem dots and labels
-  ctx.fillStyle = '#2563eb';
-  ctx.font = '10px system-ui, sans-serif';
-  ctx.textAlign = 'left';
-  const labelOffsets = [
-    null,
-    { dx: 6, dy: -8 },   // L1+L2
-    { dx: 6, dy: -8 },   // L3
-    { dx: 6, dy: -8 },   // L4
-    { dx: 6, dy: -8 },   // L5
-    { dx: 6, dy: -8 },   // L6
-    { dx: 6, dy: 14 },   // L7 (below to avoid overlap)
-    { dx: 6, dy: 14 },   // L8
-    { dx: 6, dy: -8 },   // L9
-    { dx: -60, dy: -8 },   // L10+L11
-    { dx: 6, dy: -8 },   // L12
-  ];
-  for (let i = 1; i < events.length; i++) {
-    const x = xPos(events[i].t);
-    const y = yTh(events[i].th);
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fill();
-    const off = labelOffsets[i] || { dx: 6, dy: -8 };
-    ctx.fillStyle = '#1e3a5f';
-    ctx.fillText(events[i].label.split(' (')[0], x + off.dx, y + off.dy);
-    ctx.fillStyle = '#2563eb';
-  }
-}
+  <h1>Proof Progress</h1>
+  <div class="subtitle">AbstractRaft Inductive Invariant Proofs &middot; Claude Code Session &middot; 2026-04-03</div>
 
-draw();
-window.addEventListener('resize', draw);
-</script>
+  <div class="chart-container">
+    <canvas id="progressChart"></canvas>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:#2563eb;"></div> Theorems Proved (cumulative)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#f59e0b;"></div> Obligations Proved (cumulative)</div>
+  </div>
+
+  <script>
+  // Ensure style scoping by element selection within this block
+  (function() {
+    // Raw data: [time_minutes_from_start, cumulative_theorems, cumulative_obligations, label]
+    const events = [
+      { t: 0,    th: 0,  ob: 0,     label: "Session start" },
+      { t: 0,    th: 2,  ob: 321,   label: "L_1 + L_2 (13:21)" },
+      { t: 1.5,  th: 3,  ob: 342,   label: "L_3 (13:22)" },
+      { t: 16.4, th: 4,  ob: 437,   label: "L_4 (13:37)" },
+      { t: 45.2, th: 5,  ob: 569,   label: "L_5 (14:06)" },
+      { t: 102.8,th: 6,  ob: 1209,  label: "L_6 (15:03)" },
+      { t: 111.2,th: 7,  ob: 1436,  label: "L_7 (15:12)" },
+      { t: 112.9,th: 8,  ob: 1456,  label: "L_8 (15:13)" },
+      { t: 149.2,th: 9,  ob: 1874,  label: "L_9 (15:50)" },
+      { t: 209.9,th: 11, ob: 2421,  label: "L_10 + L_11 (16:50)" },
+      { t: 237.1,th: 12, ob: 2559,  label: "L_12 (17:18)" },
+    ];
+    // Find the right canvas
+    const progressChart = document.querySelector('.proof-progress-scope #progressChart');
+    if (!progressChart) return;
+    const ctx = progressChart.getContext('2d');
+
+    function draw() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = progressChart.parentElement.getBoundingClientRect();
+      const W = rect.width;
+      const H = 400;
+      progressChart.width = W * dpr;
+      progressChart.height = H * dpr;
+      progressChart.style.width = W + 'px';
+      progressChart.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const pad = { top: 30, right: 70, bottom: 50, left: 60 };
+      const plotW = W - pad.left - pad.right;
+      const plotH = H - pad.top - pad.bottom;
+
+      const maxT = 250;
+      const maxTh = 13;
+      const maxOb = 2800;
+
+      function xPos(t) { return pad.left + (t / maxT) * plotW; }
+      function yTh(v) { return pad.top + plotH - (v / maxTh) * plotH; }
+      function yOb(v) { return pad.top + plotH - (v / maxOb) * plotH; }
+
+      // Grid
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = pad.top + (i / 5) * plotH;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + plotW, y); ctx.stroke();
+      }
+      for (let t = 0; t <= maxT; t += 30) {
+        const x = xPos(t);
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
+      }
+
+      // Axes
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, pad.top + plotH); ctx.lineTo(pad.left + plotW, pad.top + plotH); ctx.stroke();
+
+      // X-axis labels (time)
+      ctx.fillStyle = '#555';
+      ctx.font = '11px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      for (let t = 0; t <= maxT; t += 30) {
+        const hrs = Math.floor(t / 60);
+        const mins = t % 60;
+        ctx.fillText(`+${hrs}h${mins.toString().padStart(2,'0')}m`, xPos(t), pad.top + plotH + 18);
+      }
+      ctx.fillText('Time elapsed', pad.left + plotW / 2, pad.top + plotH + 40);
+
+      // Left Y-axis: Theorems
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#2563eb';
+      ctx.font = 'bold 11px system-ui, sans-serif';
+      ctx.save();
+      ctx.translate(14, pad.top + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillText('Theorems', 0, 0);
+      ctx.restore();
+      ctx.font = '11px system-ui, sans-serif';
+      for (let v = 0; v <= 12; v += 2) {
+        ctx.fillText(v.toString(), pad.left - 8, yTh(v) + 4);
+      }
+
+      // Right Y-axis: Obligations
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = 'bold 11px system-ui, sans-serif';
+      ctx.save();
+      ctx.translate(W - 8, pad.top + plotH / 2);
+      ctx.rotate(Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillText('Obligations', 0, 0);
+      ctx.restore();
+      ctx.font = '11px system-ui, sans-serif';
+      for (let v = 0; v <= 2800; v += 500) {
+        ctx.fillText(v.toString(), pad.left + plotW + 8, yOb(v) + 4);
+      }
+
+      // Obligations line (step function)
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let i = 0; i < events.length; i++) {
+        const x = xPos(events[i].t);
+        const y = yOb(events[i].ob);
+        if (i === 0) { ctx.moveTo(x, y); }
+        else {
+          ctx.lineTo(x, yOb(events[i - 1].ob));
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.lineTo(xPos(maxT), yOb(events[events.length - 1].ob));
+      ctx.stroke();
+
+      // Obligations dots
+      ctx.fillStyle = '#f59e0b';
+      for (let i = 1; i < events.length; i++) {
+        ctx.beginPath();
+        ctx.arc(xPos(events[i].t), yOb(events[i].ob), 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Theorems line (step function)
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let i = 0; i < events.length; i++) {
+        const x = xPos(events[i].t);
+        const y = yTh(events[i].th);
+        if (i === 0) { ctx.moveTo(x, y); }
+        else {
+          ctx.lineTo(x, yTh(events[i - 1].th));
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.lineTo(xPos(maxT), yTh(events[events.length - 1].th));
+      ctx.stroke();
+
+      // Theorem dots and labels
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      const labelOffsets = [
+        null,
+        { dx: 6, dy: -8 },   // L1+L2
+        { dx: 6, dy: -8 },   // L3
+        { dx: 6, dy: -8 },   // L4
+        { dx: 6, dy: -8 },   // L5
+        { dx: 6, dy: -8 },   // L6
+        { dx: 6, dy: 14 },   // L7 (below to avoid overlap)
+        { dx: 6, dy: 14 },   // L8
+        { dx: 6, dy: -8 },   // L9
+        { dx: -60, dy: -8 },   // L10+L11
+        { dx: 6, dy: -8 },   // L12
+      ];
+      for (let i = 1; i < events.length; i++) {
+        const x = xPos(events[i].t);
+        const y = yTh(events[i].th);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        const off = labelOffsets[i] || { dx: 6, dy: -8 };
+        ctx.fillStyle = '#1e3a5f';
+        ctx.fillText(events[i].label.split(' (')[0], x + off.dx, y + off.dy);
+        ctx.fillStyle = '#2563eb';
+      }
+    }
+
+    draw();
+    window.addEventListener('resize', draw, { passive: true });
+  })();
+  </script>
+</div>
 
 
 Overall, each theorem required roughly no more than 30-40 minutes of agent thinking time, with basically zero human intervention. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. More details on individual theorem proof stats from its report are shown below.
