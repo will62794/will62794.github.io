@@ -271,8 +271,7 @@ After around 4 hours of total runtime, with almost no human interaction, Claude 
 </div>
 
 
-Overall, each theorem required roughly no more than 30-40 minutes of thinking time, with basically zero human intervention. Initially it skipped over an obligation for one of the theorems, but with simple prodding was able to go back and try again and easily resolve it in a minute or so. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. More details on individual theorem proof stats from its report are shown below. It is also interesting to observe some of the generated proofs in detail, which are quite nontrivial. For example, the longest individual theorem proof for `THEOREM L_6` (took Claude ~58 minutes) contains over [390 lines of TLAPS proof code](https://github.com/will62794/autoproofs/blob/fb377a29237b532f98514aabc064eca75b85f50b/AbstractRaft_IndProofs_test.tla#L463-L854), with a variety of fine-grained proof arguments and decomposition steps.
-
+Overall, each theorem required roughly no more than 30-40 minutes of thinking time, with basically zero human intervention. Initially it skipped over an obligation for one of the theorems, but with simple prodding was able to go back and try again and easily resolve it in a minute or so. The final version of the generated proof is on [this branch](https://github.com/will62794/autoproofs/tree/proof-dev), along with associated commits made as it proved each theorem. Details on individual theorem proof stats are shown in the table below. 
 
 <div class="proof-status-scope">
   <style>
@@ -547,6 +546,8 @@ Overall, each theorem required roughly no more than 30-40 minutes of thinking ti
     </table>
   </div>
 </div>
+It is also interesting to observe some of the generated proofs in detail, which are quite nontrivial. For example, the longest individual theorem proof for `THEOREM L_6` (took Claude ~58 minutes) contains over [390 lines of TLAPS proof code](https://github.com/will62794/autoproofs/blob/fb377a29237b532f98514aabc064eca75b85f50b/AbstractRaft_IndProofs_test.tla#L463-L854), with a variety of fine-grained proof arguments and decomposition steps. It is difficult to imagine a human expert developing the same proof in a comparable amount of time.
+
 
 
 There are definitely a few caveats here, but the results are impressive, and something outside the realm of possibility a few years ago. First, there is a lot of information about the Raft protocol on the web, and it is probably one of the most well-studied and widely implemented consensus protocols to date. Similarly, there has been [some amount of work](https://dl.acm.org/doi/10.1145/2854065.2854081) done on formally verified Raft proofs. This work is not done specifically in TLA+, but there is prior work in the area. Having said that, I still think this is still super impressive. Even for an experienced engineer/researcher, going off and reading documentation on existing Raft proofs and synthesizing that into a correct TLAPS proof would be an extremely nontrivial task.
