@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Models for Transactional Programming"
+title:  "Models of Transactional Programming"
 categories: databases transactions programming
 ---
 
