@@ -4,7 +4,7 @@ title:  "Transactional Programming Interfaces"
 categories: databases transactions programming
 ---
 
-Transactions are a defining historical feature of database systems, but have often been developed in a lineage somewhat distinct from the programming language community, with ad hoc exchange of ideas between both. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as a given. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. The world of transactional programming interfaces is quite diverse, and offers interesting possibilites for performance and correctness considerations in database systems. There also seems to be lack of convergence on accepted interfaces here, with proliferation of different, often system or domain-specific approaches.
+Transactions are a defining historical feature of database systems, but have often developed in a lineage somewhat distinct from the programming language community, with ad hoc exchange of ideas between both. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. Thus, the world of transactional programming interfaces is quite diverse, and offers interesting possibilites for performance and correctness considerations in database systems. There also seems to be lack of convergence on accepted interfaces here, with proliferation of different, often system or domain-specific approaches.
 
 
 
@@ -51,12 +51,17 @@ DECLARE
   END;
 ```
 
+### [Spanner](https://docs.cloud.google.com/spanner/docs/transactions)
+  - Appears that there is actually a special "[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api)" API as well, which are designed for only writing data (?) This is apparently in contrast to [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks) (data manipulation language)
+- RethinkDB transactions
+
+
 
 ### DynamoDB
 
 <a name="dynamodb"></a>
 
-DynamoDB is a key-value store that recently [added support for transactions](https://www.usenix.org/system/files/atc23-idziorek.pdf) (USENIX ATC 2023) in the last few years. Notably, they essentially adopt a truly "one-shot" model, which comes with some pros and cons.
+DynamoDB is a key-value store that somewhat recently [added support for transactions](https://www.usenix.org/system/files/atc23-idziorek.pdf) (USENIX ATC 2023).  They essentially adopt a truly "one-shot" model, which comes with some pros and cons.
 All transactions submitted as single request, using either a `TransactWriteItems` or `TransactGetItems` command. The general model of DynamoDB is basically a flat KV store, and you can set or update keys on a given table. A write-transaction can include, `PutItem`, `UpdateItem`, or `DeleteItem` as basic operations.
 
 <div style="justify-content:center; gap:20px; padding-bottom:17px;">
@@ -66,6 +71,16 @@ All transactions submitted as single request, using either a `TransactWriteItems
 
 
 <img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px;" />
+
+
+### Calvin
+
+[Calvin](https://dl.acm.org/doi/10.1145/2213836.2213838) (SIGMOD 2012) was not directly a proposal for a transactional programming model itself, but relied on some core assumptions about the underlying model to make its key ideas work. In particular, it made assumptions that transactions were expressed as C++ functions that access data using a basic CRUD interface. This facilitates analysis of a transaction's full static read/write sets for deterministic scheduling and conflict avoidance. Transactions that must perform reads in order to determine their full read/write sets are not natively supported, but they can kind of work around this with *reconnaissance queries*, that run a first round of reads to determine these sets. The important aspect here, though, is the strong assumption on static read/write set analysis, which is often not easy in practice for transactions normally written in a dynamic/interactive approach.
+
+### Fauna Query Language (FQL)
+
+[FaunaDB](https://faunadb.org/), (now [defunct](https://news.ycombinator.com/item?id=43414742)), was an attempt at building a production-ready distributed database on many of the concepts from the Calvin and deterministic transaction ideas. The [Fauna Query Language ](https://faunadb-docs.netlify.app/fauna/current/learn/query/)(FQL) was a proprietary, TypeScript-like language they developed for reading/writing data in Fauna.
+
 
 ### Aurora DSQL
 
@@ -81,6 +96,28 @@ They note the following about their transactional programming model and query pr
 
 This seems more similar to original Spanner read-write transactions, which buffered all writes at the client before submitting them to the server. 
 
+
+
+### MongoDB
+
+For several years MongoDB has provided [multi-document transactions](https://www.mongodb.com/docs/manual/core/transactions/) that run at up to snapshot isolation. MongoDB provides a fairly standard, imperative style interface for programming with transactions, since transactional operations are expressed as standard CRUD queries within existing driver programming interfaces. So, this leads to a slightly more natural mapping to standard programming language constructs and control flow. 
+
+```javascript
+// Start transaction.
+session.startTransaction();
+
+db.collection.find({ _id: "123" })
+
+// Update document.
+db.collection.updateOne(
+  { _id: "123" },
+  { $set: { name: "John" } }
+)
+
+// Commit transaction.
+session.commitTransaction();
+```
+There are also a few subtle interface choices one can make when programming in this manner, in particular with regards to how updates are expressed. For example, in general, you have access to the full feature set of the host programming language, and so could express updates in any way you might express mutation in that language. Alternatively, you can also represent updates more "natively" using MongoDB specific [update operators](https://www.mongodb.com/docs/manual/reference/mql/update/). This encodes the full semantic content of the update to the database in a more explicit way.
 
 
 ### [Convex](https://docs.convex.dev/database/advanced/occ)
@@ -105,37 +142,8 @@ export default mutation(async ({ db }, email, post) => {
 
 
 
-### [Fauna Query Language (FQL)](https://faunadb-docs.netlify.app/fauna/current/learn/query/)
 
-[FaunaDB](https://faunadb.org/), (now [defunct](https://news.ycombinator.com/item?id=43414742)), was an attempt at building a production-ready distributed database on many of the concepts from the Calvin and deterministic transaction ideas. The Fauna Query Language (FQL) was a proprietary, TypeScript-like language they developed for reading/writing data in Fauna.
-
-
-### Calvin
-
-[Calvin](https://dl.acm.org/doi/10.1145/2213836.2213838) (SIGMOD 2012) was not directly a proposal for a transactional programming model itself, but relied on some core assumptions about the underlying model to make its key ideas work. In particular, it made assumptions that transactions were expressed as C++ functions that access data using a basic CRUD interface. This facilitates analysis of a transaction's full static read/write sets for deterministic scheduling and conflict avoidance. Transactions that must perform reads in order to determine their full read/write sets are not natively supported, but they can kind of work around this with *reconnaissance queries*, that run a first round of reads to determine these sets. The important aspect here, though, is the strong assumption on static read/write set analysis, which is often not easy in practice for transactions normally written in a dynamic/interactive approach.
-
-### MongoDB
-
-For several years MongoDB has provided [multi-document transactions](https://www.mongodb.com/docs/manual/core/transactions/) that run at up to snapshot isolation. MongoDB provides a fairly standard, imperative style interface for programming with transactions, since transactional operations are expressed as standard CRUD queries within existing driver programming interfaces. So, this leads to a slightly more natural mapping to standard programming language constructs and control flow. 
-
-```javascript
-// Start transaction.
-session.startTransaction();
-
-db.collection.find({ _id: "123" })
-
-// Update document.
-db.collection.updateOne(
-  { _id: "123" },
-  { $set: { name: "John" } }
-)
-
-// Commit transaction.
-session.commitTransaction();
-```
-There are also a few subtle interface choices one can make when programming in this manner, in particular with regards to how updates are expressed. For example, in general, you have access to the full feature set of the host programming language, and so could express updates in any way you might express mutation in that language. Alternatively, you can also represent updates more "natively" using MongoDB specific [update operators](https://www.mongodb.com/docs/manual/reference/mql/update/). This encodes the full semantic content of the update to the database in a more explicit way.
-
-### [Transactional memory](https://en.wikipedia.org/wiki/Transactional_memory)
+### Transactional Memory
 
 Software Transactional Memory, originally [explored](https://www.microsoft.com/en-us/research/publication/beautiful-concurrency/) in the context of Haskell, was an attempt to provide a concurrent programming model that avoided the use of locks. This essentially provides an optimistic like transactional concurrency control mechanism within a standard programming language environment. There have also been experimental attempts at integrating these techniques into other programming languages e.g. in [Python](https://dl.acm.org/doi/abs/10.1145/3359619.3359747). None of these appear mainstream, though.
 
@@ -152,13 +160,9 @@ These ideas are actually quite similar to the modern form of transactions implem
 
 There are a subset of research projects that take a similar, dataflow-oriented perspective on representing transactions. [Hackwrench](https://cs.nyu.edu/~apanda/assets/papers/hackwrench-vldb23.pdf) is a recent project that takes a particular view on the semantics of transactions explicitly as dataflow graphs. [Morty](https://www.cs.cornell.edu/~matthelb/papers/morty-eurosys23.pdf) is a another project that aims to innovate on concurrency control approaches througuh a similar "re-execution" style approach, but also adopts essentially a bespoke transactional programming model to make this work. It decides on something possibly equally arcane, which is continuation-passing style representation of each transaction. This makes it easy to trace the dataflow and re-execute sub-chunks of the transactions as needed, but is also quite non-standard and is not clear in its mappability to SQL systems.
 
-### [Spanner](https://docs.cloud.google.com/spanner/docs/transactions)
-  - Appears that there is actually a special "[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api)" API as well, which are designed for only writing data (?) This is apparently in contrast to [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks) (data manipulation language)
-- RethinkDB transactions
-
-
 <!-- viewing transactions largely in terms of their functional inputs/outputs and dataflow seems like a better standardization. There are cases when transactions may do "external" actions based on the results of data inside the transaction, but may not be core use cases. -->
 
+## Unified Perspective
 
 A lot of these techniques and systems take quite a specific perspective on how to model and program transactions. 
 In the most abstract view, though, we can in some sense view transactions as *functions* that operate over database state i.e. they transform the database from one *input* state to another *output* state. The way in which these functions are expressed is the more pertinent and interesting question, with the approaches above taking varying levels of perpsectives on this. There seems to be a reasonable abstraction of transactions that essentially still follows teh functional view, but rather breaks down the overall transaction function into a series of common sub-components. In the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key.
