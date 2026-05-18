@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Transactional Programming Models"
+title:  "The Landscape of Transactional Programming"
 categories: databases transactions programming
 ---
 
@@ -8,7 +8,7 @@ Transactions are a defining historical feature of database systems. These featur
 
 
 
-## Landscape of Transactions
+## Transactional Interfaces
 
 <!-- One key tradeoffs in transactional programming models is the "interactive" vs. "one-shot" or "batch" models. The former being naturally the more intuitive and natural way of programming with transactions for a user, but one-shot transactions potentially simplifying concurrency control mechanisms and/or boosting performance and cutting down round-trip latency between the client and server. -->
 
@@ -110,11 +110,30 @@ export default mutation(async ({ db }, email, post) => {
 [FaunaDB](https://faunadb.org/), (now [defunct](https://news.ycombinator.com/item?id=43414742)), was an attempt at building a production-ready distributed database on many of the concepts from the Calvin and deterministic transaction ideas. The Fauna Query Language (FQL) was a proprietary, TypeScript-like language they developed for reading/writing data in Fauna.
 
 
-### [Calvin](https://cs.yale.edu/homes/thomson/publications/calvin-sigmod12.pdf)
+### Calvin
 
-Calvin was not directly a proposal for a transactional programming model itself, but relied on some assumptions about the underlying model to make its key ideas work. In particular, it made assumptions that transactions were expressed as C++ functions that access data using a basic CRUD interface. This facilitates analysis of a transaction's full static read/write sets for deterministic scheduling and conflict avoidance. Transactions that must perform reads in order to determine their full read/write sets are not natively supported, but they can kind of work around this with *reconnaissance queries*, that run a first round of reads to determine these sets. The important aspect here, though, is the strong assumption on static read/write set analysis, which is often not easy in practice for transactions normally written in a dynamic/interactive approach.
+[Calvin](https://dl.acm.org/doi/10.1145/2213836.2213838) was not directly a proposal for a transactional programming model itself, but relied on some core assumptions about the underlying model to make its key ideas work. In particular, it made assumptions that transactions were expressed as C++ functions that access data using a basic CRUD interface. This facilitates analysis of a transaction's full static read/write sets for deterministic scheduling and conflict avoidance. Transactions that must perform reads in order to determine their full read/write sets are not natively supported, but they can kind of work around this with *reconnaissance queries*, that run a first round of reads to determine these sets. The important aspect here, though, is the strong assumption on static read/write set analysis, which is often not easy in practice for transactions normally written in a dynamic/interactive approach.
 
-### [MongoDB](https://www.mongodb.com/docs/manual/core/transactions/) (and [aggregation update](https://www.mongodb.com/docs/manual/tutorial/update-documents-with-aggregation-pipeline/) operators)
+### MongoDB
+
+For several years MongoDB has provided [multi-document transactions](https://www.mongodb.com/docs/manual/core/transactions/) that run at up to snapshot isolation. MongoDB provides a fairly standard, imperative style interface for programming with transactions, since transactional operations are expressed as standard CRUD queries within existing driver programming interfaces. So, this leads to a slightly more natural mapping to standard programming language constructs and control flow. 
+
+```javascript
+// Start transaction.
+session.startTransaction();
+
+db.collection.find({ _id: "123" })
+
+// Update document.
+db.collection.updateOne(
+  { _id: "123" },
+  { $set: { name: "John" } }
+)
+
+// Commit transaction.
+session.commitTransaction();
+```
+There are also a few subtle interface choices one can make when programming in this manner, in particular with regards to how updates are expressed. For example, in general, you have access to the full feature set of the host programming language, and so could express updates in any way you might express mutation in that language. Alternatively, you can also represent updates more "natively" using MongoDB specific [update operators](https://www.mongodb.com/docs/manual/reference/mql/update/). This encodes the full semantic content of the update to the database in a more explicit way.
 
 ### [Transactional memory](https://en.wikipedia.org/wiki/Transactional_memory)
 
