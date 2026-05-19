@@ -51,9 +51,9 @@ DECLARE
   END;
 ```
 
-### [Spanner](https://docs.cloud.google.com/spanner/docs/transactions)
-  - Appears that there is actually a special "[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api)" API as well, which are designed for only writing data (?) This is apparently in contrast to [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks) (data manipulation language)
-- RethinkDB transactions
+### Spanner
+
+Like BigTable, writes in [Spanner](https://docs.cloud.google.com/spanner/docs/transactions) that occur in a read-write transaction are buffered at the client until commit, so reads will not observe the effects of the transaction's writes. Modern versions of Spanner also support a *[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api)* API, which is dedicated for writing data within transactions. They also include a dedicated language for manipulating data, [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks). 
 
 
 
