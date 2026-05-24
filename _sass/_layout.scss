@@ -371,7 +371,11 @@
 		display: flex;
 		align-items: baseline;
 		gap: 8px;
-		flex-wrap: wrap;
+	}
+
+	.post-list-row b {
+		flex: 1;
+		min-width: 0;
 	}
 
 	.post-link {
