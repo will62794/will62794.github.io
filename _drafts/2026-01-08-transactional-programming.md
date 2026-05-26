@@ -172,17 +172,14 @@ There are a subset of research projects that take a similar, dataflow-oriented p
 A lot of these techniques and systems take quite a specific perspective on how to model and program transactions. 
 In a more abstract view, we may in some sense view transactions as *functions* that operate over database state i.e. they mutate the database from one *input* state to another *output* state. The primary question is then the way in which we express this function, with the approaches above taking varying perpsectives. 
 
-Most models can break this down into *read phase* and *write phase*, especially for systems operating under snapshot read semantics. That is, if transactinos operate over a consistent snapshot of the database, then all decisions based on reads that occur in the transaction are stable i.e. will not change regardless of when they occur within the transaction. So, in theory, it suffices to execute all reads upfront.
+Most models can break this down into *read phase* and *write phase*, especially for systems operating under snapshot read semantics. That is, if transactions operate over a consistent snapshot of the database, then all decisions based on reads that occur in the transaction are stable i.e. will not change regardless of when they occur within the transaction. So, in theory, it suffices to execute all reads upfront and this gives us the information we need to execute the writes of the transaction.
 
-Conditional writes?.
-
-Deciding which keys to update?.
-
-A reasonable abstraction of transactions is one that essentially still follows the functional view, but rather breaks down the overall transaction function into a series of common sub-components. 
+So, a reasonable generic abstraction breaks down transactions into the following phase-based components:
 
 - **Read phase** executes reads and outputs: (1) set of keys $$K_w$$ to update and (2) $$K_u$$ set of keys whose values will be used in the updates of those keys, and (3) a set of update functions $$F_U : K_w \rightarrow (K_u \rightarrow v_u)$$ where each $$f \in F_U$$ is a function for updating a specific key using a subset of key values as input.
 
 - **Write phase** writes each key in $$K_W$$, by applying the update function $$f_u(v_u)$$ where $$v_u \subseteq K_u$$
+- 
 
 In general, from an application perspective, it may be impossible to directly compute the full set of keys to be read upfront. For example, for general transaction code where the set of keys read is dependent on control flow choices: 
 
@@ -195,21 +192,38 @@ else:
 ```
 we may not be able to determine the full set of keys to read upfront based only an initial read set. So, we can view the read phase as potentially several, iterative sub-phases, each of which may modify the sets $$K_W$$ and $$K_U$$. The assumption is that, for loop-free transactions code, this should terminate at a fixed point after a finite number rounds, though in the most general case (e.g. in presence of loops) this may not hold.
 
-Making control flow decisions based on the return status of certain updates is also theoretically possible, and doesn't cleanly fit into this model. But, I believe this is quite rare since most errors on updates may typically lead to a full transaction abort, and so no further operations are needed.
-
-<!-- So, in the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key. -->
 
 ```mermaid
 flowchart LR
-    A[Current DB State] --> B[Read Phase]
-    B --> C[[Keys to Write: K_w]]
-    B --> D[[Values Needed: K_u]]
-    B --> E[[Update Functions: F_U]]
+    %% Black and White Style
+    %% Use sharp edges, grayscale fills, and monochrome arrows/nodes
+
+    %% Define style classes for black/white mode
+    classDef bwNode fill:#fff,stroke:#111,color:#000,stroke-width:2px
+    classDef bwEmph fill:#eee,stroke:#111,color:#000,stroke-width:2px,font-weight:bold
+    classDef bwPhase fill:#fff,stroke:#111,color:#1a1a1a,stroke-width:2px
+
+    A[Current DB State]:::bwNode --> B[Read Phase]:::bwEmph
+    B --> C[[Keys to Write: K_w]]:::bwNode
+    B --> D[[Values Read: K_u]]:::bwNode
+    D --> B
+    B --> E[[Update Functions: F_U]]:::bwNode
     subgraph Write Phase
-        C & D & E --> F[Apply Update Functions]
+        C & D & E --> F[Apply Update Functions]:::bwEmph
     end
-    F --> G[Write Values to Keys]
+    F --> G[Write Values to Keys]:::bwNode
 ```
+<!-- 
+To achieve black and white style, we define custom node classes with only grayscale and black/white palette.
+If your site/process supports mermaid "themeVariables", you could add:
+%%{init: {"themeVariables": {"primaryColor":"#fff", "primaryTextColor":"#111", "primaryBorderColor":"#111", "nodeTextColor":"#111", "secondaryColor":"#eee", "edgeLabelBackground":"#fff"}}}%%
+But as per instruction, using classDef for portable B&W style in standard markdown embeds.
+-->
+
+Making control flow decisions based on the return status of certain updates is also theoretically possible, and doesn't cleanly fit into this model. But, I believe this is quite rare since most errors on updates may typically lead to a full transaction abort, and so the entire transaction has terminated anyway.
+
+<!-- So, in the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key. -->
+
 <!-- *Input to the read phase is the current database state. The read phase produces: (1) a set of keys to write ($$K_w$$), (2) values ($$K_u$$) needed to update those keys, and (3) update functions ($$F_U$$). The write phase applies the update functions to produce final key/value updates to the database.* -->
 
 One question is whether we might have techniques that can, with suitable program analysis, do a kind of speculative read phase in a single shoy, but specualitvely executing reads along all possible control paths. This might be wasteful in some cases in terms of reading extra data we don't end up needing, but would reduce the additional sub-rounds of the read phase.
