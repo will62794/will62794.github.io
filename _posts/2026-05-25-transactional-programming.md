@@ -51,11 +51,6 @@ DECLARE
   END;
 ```
 
-### Spanner
-
-Like BigTable, writes in [Spanner](https://docs.cloud.google.com/spanner/docs/transactions) that occur in a read-write transaction are buffered at the client until commit, so reads will not observe the effects of the transaction's writes. Modern versions of Spanner also support a *[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api)* API, which is dedicated for writing data within transactions. They also include a dedicated language for manipulating data, [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks). 
-
-
 ### Sinfonia
 
 [Sinfonia](https://dl.acm.org/doi/10.1145/1294261.1294278) (SOSP 2007) was a research system that basically asked a question of what is the minimal primitive needed to build useful transactional applications. The ideas was to provide a single, *minitransaction* primitive on which to build more complex transactional applications or components. Essentially, this provides atomic access and conditional modifications at multiple memory nodes. It consists simply of a set of *compare items*, *read items*, and *write items*. Upon execution, if any comparison items fail to match the values specified, the transactions fails and aborts. 
@@ -65,47 +60,20 @@ Like BigTable, writes in [Spanner](https://docs.cloud.google.com/spanner/docs/tr
 These ideas are actually quite similar to the modern form of transactions implemented in [DynamoDB](#dynamodb). It assumes the kind of low-level but sufficiently expressive primitive approach for building simple but scalable transaction systems. I'm not sure how ergonomic this interface is for developers, though, and what type of applications are willing to drop down to this lower level abstraction in practice. On the other hand, perhaps there are better programming interfaces/models that can be built on top of this, with tools for translation into these lower level primitive operations.
 
 
-### DynamoDB
-
-<a name="dynamodb"></a>
-
-DynamoDB is a key-value store that somewhat recently [added support for transactions](https://www.usenix.org/system/files/atc23-idziorek.pdf) (USENIX ATC 2023).  They essentially adopt a truly "one-shot" model, which comes with some pros and cons.
-All transactions submitted as single request, using either a `TransactWriteItems` or `TransactGetItems` command. The general model of DynamoDB is basically a flat KV store, and you can set or update keys on a given table. A write-transaction can include, `PutItem`, `UpdateItem`, or `DeleteItem` as basic operations.
-
-<div style="justify-content:center; gap:20px; padding-bottom:17px;">
-  <img src="/assets/aws-dynamodb-1.png" alt="transactions programming models diagram" style="width:400px;" />
-  <img src="/assets/aws-dynamodb-txn-api.png" alt="transactions programming models diagram" style="width:300px;" />
-</div>
-
-
-<img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
-
-A `TransactWriteItems` transaction may optionally include one or more preconditions on the current values of the items, and the transaction will be rejected if any of its preconditions are not met.
-
-
 ### Calvin
 
 [Calvin](https://dl.acm.org/doi/10.1145/2213836.2213838) (SIGMOD 2012) was not directly a proposal for a transactional programming model itself, but relied on some core assumptions about the underlying model to make its key ideas work. In particular, it made assumptions that transactions were expressed as C++ functions that access data using a basic CRUD interface. This facilitates analysis of a transaction's full static read/write sets for deterministic scheduling and conflict avoidance. Transactions that must perform reads in order to determine their full read/write sets are not natively supported, but they can kind of work around this with *reconnaissance queries*, that run a first round of reads to determine these sets. The important aspect here, though, is the strong assumption on static read/write set analysis, which is often not easy in practice for transactions normally written in a dynamic/interactive approach.
+
 
 ### Fauna Query Language (FQL)
 
 [FaunaDB](https://faunadb.org/), (now [defunct](https://news.ycombinator.com/item?id=43414742)), was an attempt at building a production-ready distributed database on many of the concepts from the Calvin and deterministic transaction ideas. The [Fauna Query Language ](https://faunadb-docs.netlify.app/fauna/current/learn/query/)(FQL) was a proprietary, TypeScript-like language they developed for reading/writing data in Fauna.
 
+### Spanner
 
-### Aurora DSQL
+Like BigTable, writes in [Spanner](https://docs.cloud.google.com/spanner/docs/transactions) that occur in a read-write transaction are buffered at the client until commit, so reads will not observe the effects of the transaction's writes. Original versions of Spanner (as described in [OSDI 2012](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf)) supported its own query language that was generally SQL-like.
 
-Amazon [Aurora DSQL](https://aws.amazon.com/blogs/database/everything-you-dont-need-to-know-about-amazon-aurora-dsql-part-3-transaction-processing/) is a serverless, distributed, transactional database system that was made generally available by AWS in 2025. 
-
-They note the following about their transactional programming model and query processing engine, which provides snapshot isolation as the default:
-
-> When write operations occur, the QP stores the results of these database changes locally, effectively spooling the writes throughout the transaction’s duration. In the event of a rollback or any disconnect, the QP discards the spooled writes.
-
-
-
-<img src="/assets/dsql-read-write-arch.png" alt="transactions programming models diagram" style="width:550px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 16px;" />
-
-This seems more similar to original Spanner read-write transactions, which buffered all writes at the client before submitting them to the server. 
-
+Modern versions of Spanner also support a *[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api#python)* API, which is dedicated for writing data within transactions. They also include a dedicated language for manipulating data, [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks). 
 
 
 ### MongoDB
@@ -130,6 +98,38 @@ session.commitTransaction();
 There are also a few subtle interface choices one can make when programming in this manner, in particular with regards to how updates are expressed. For example, in general, you have access to the full feature set of the host programming language, and so could express updates in any way you might express mutation in that language. Alternatively, you can also represent updates more "natively" using MongoDB specific [update operators](https://www.mongodb.com/docs/manual/reference/mql/update/). This encodes the full semantic content of the update to the database in a more explicit way.
 
 
+### Aurora DSQL
+
+Amazon [Aurora DSQL](https://aws.amazon.com/blogs/database/everything-you-dont-need-to-know-about-amazon-aurora-dsql-part-3-transaction-processing/) is a serverless, distributed, transactional database system that was made generally available by AWS in 2025. 
+
+They note the following about their transactional programming model and query processing engine, which provides snapshot isolation as the default:
+
+> When write operations occur, the QP stores the results of these database changes locally, effectively spooling the writes throughout the transaction’s duration. In the event of a rollback or any disconnect, the QP discards the spooled writes.
+
+
+
+<img src="/assets/dsql-read-write-arch.png" alt="transactions programming models diagram" style="width:550px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 16px;" />
+
+This seems more similar to original Spanner read-write transactions, which buffered all writes at the client before submitting them to the server. 
+
+
+### DynamoDB
+
+<a name="dynamodb"></a>
+
+DynamoDB is a key-value store that somewhat recently [added support for transactions](https://www.usenix.org/system/files/atc23-idziorek.pdf) (USENIX ATC 2023).  They essentially adopt a truly "one-shot" model, which comes with some pros and cons.
+All transactions submitted as single request, using either a `TransactWriteItems` or `TransactGetItems` command. The general model of DynamoDB is basically a flat KV store, and you can set or update keys on a given table. A write-transaction can include, `PutItem`, `UpdateItem`, or `DeleteItem` as basic operations.
+
+<div style="justify-content:center; gap:20px; padding-bottom:17px;">
+  <img src="/assets/aws-dynamodb-1.png" alt="transactions programming models diagram" style="width:400px;" />
+  <img src="/assets/aws-dynamodb-txn-api.png" alt="transactions programming models diagram" style="width:300px;" />
+</div>
+
+
+<img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
+
+A `TransactWriteItems` transaction may optionally include one or more preconditions on the current values of the items, and the transaction will be rejected if any of its preconditions are not met.
+
 ### Convex
 
 [Convex](https://docs.convex.dev/database/advanced/occ) is not a database, strictly speaking, but is rather a full end-to-end framework for building database-backed applications in a convenient, all-in-one package. All of your application and infra code and configuration is essentially bundled together in one place, which provides nice opportunities for easily co-designing and optimizing these components together. They take a quite [opinioniated view on things](https://stack.convex.dev/not-sql), but have clearly put careful thought into how we might re-design modern application and data stacks without the baggage of (50 year old) SQL.
@@ -149,15 +149,6 @@ export default mutation(async ({ db }, email, post) => {
 });
 ```
 
-
-
-
-
-### Transactional Memory
-
-Software Transactional Memory, originally [explored](https://www.microsoft.com/en-us/research/publication/beautiful-concurrency/) in the context of Haskell, was an attempt to provide a concurrent programming model that avoided the use of locks. This essentially provides an optimistic like transactional concurrency control mechanism within a standard programming language environment. There have also been experimental attempts at integrating these techniques into other programming languages e.g. in [Python](https://dl.acm.org/doi/abs/10.1145/3359619.3359747). None of these appear mainstream, though.
-
-
 ### Dataflow Models
 
 There are a subset of research projects that take a similar, dataflow-oriented perspective on representing transactions. [Hackwrench](https://cs.nyu.edu/~apanda/assets/papers/hackwrench-vldb23.pdf) is a recent project that takes a particular view on the semantics of transactions explicitly as dataflow graphs. [Morty](https://www.cs.cornell.edu/~matthelb/papers/morty-eurosys23.pdf) is a another project that aims to innovate on concurrency control approaches througuh a similar "re-execution" style approach, but also adopts essentially a bespoke transactional programming model to make this work, based on a continuation-passing style programming model. This makes it easy to trace the dataflow and re-execute sub-chunks of the transactions as needed, but is also quite non-standard and is not clear in its mappability to SQL systems.
@@ -166,6 +157,11 @@ There are a subset of research projects that take a similar, dataflow-oriented p
 
 
 <!-- viewing transactions largely in terms of their functional inputs/outputs and dataflow seems like a better standardization. There are cases when transactions may do "external" actions based on the results of data inside the transaction, but may not be core use cases. -->
+
+### Transactional Memory
+
+Outside of databases, Software Transactional Memory, originally [explored](https://www.microsoft.com/en-us/research/publication/beautiful-concurrency/) in the context of Haskell, was an attempt to provide a concurrent programming model that avoided the use of locks. This essentially provides an optimistic like transactional concurrency control mechanism within a standard programming language environment. There have also been experimental attempts at integrating these techniques into other programming languages e.g. in [Python](https://dl.acm.org/doi/abs/10.1145/3359619.3359747). None of these appear mainstream, though.
+
 
 ## Unified Perspectives
 
