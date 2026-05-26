@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Transactional Programming Interfaces"
+title:  "Transactional Programming Models"
 categories: databases transactions programming
 ---
 
@@ -233,7 +233,7 @@ If your site/process supports mermaid "themeVariables", you could add:
 But as per instruction, using classDef for portable B&W style in standard markdown embeds.
 -->
 
-Making control flow decisions based on the return status of certain updates is also theoretically possible, and doesn't cleanly fit into this model. I believe this is quite rare, though, since most errors on updates may typically lead to a full transaction abort, and so the entire transaction has terminated anyway.
+Making control flow decisions based on the return status of certain updates is also theoretically possible, and doesn't cleanly fit into this model. I believe this is quite rare, though, since most errors on updates may typically lead to a full transaction abort, and so the entire transaction has terminated anyway. The notion of *predicate writes* should also reduce to this model in almost all cases, since the result of a predicate that defines which keys are to be updated should always be stable, and so should be possible to compute upfront, and then directly specify the point query updates needed in the write phase.
 <!-- So, in the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key. -->
 <!-- *Input to the read phase is the current database state. The read phase produces: (1) a set of keys to write ($$K_w$$), (2) values ($$K_u$$) needed to update those keys, and (3) update functions ($$F_U$$). The write phase applies the update functions to produce final key/value updates to the database.* -->
 
