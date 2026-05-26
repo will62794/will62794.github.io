@@ -475,6 +475,12 @@
 			font-size: 18px;
 		}
 	}
+
+	.mermaid {
+		margin: $spacing-unit 0;
+		text-align: center;
+		overflow-x: auto;
+	}
 }
 
 .blog a{

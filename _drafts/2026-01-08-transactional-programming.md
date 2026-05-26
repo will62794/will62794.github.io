@@ -4,7 +4,7 @@ title:  "Transactional Programming Interfaces"
 categories: databases transactions programming
 ---
 
-Transactions are a defining historical feature of database systems, but have often developed in a lineage somewhat distinct from the programming languages community, with ad hoc exchange of ideas between both. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. Thus, the world of transactional programming interfaces is quite diverse, with a lack of convergence on accepted interfaces, and proliferation of different, often system or domain-specific approaches.
+Transactions are a defining feature of databases, but have often developed in a lineage somewhat distinct from the programming languages community, with ad hoc exchange of ideas between both. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. Thus, the world of transactional programming interfaces is quite diverse, with a lack of convergence on accepted interfaces, and proliferation of different, often system or domain-specific approaches.
 
 
 
@@ -60,7 +60,7 @@ Like BigTable, writes in [Spanner](https://docs.cloud.google.com/spanner/docs/tr
 
 [Sinfonia](https://dl.acm.org/doi/10.1145/1294261.1294278) (SOSP 2007) was a research system that basically asked a question of what is the minimal primitive needed to build useful transactional applications. The ideas was to provide a single, *minitransaction* primitive on which to build more complex transactional applications or components. Essentially, this provides atomic access and conditional modifications at multiple memory nodes. It consists simply of a set of *compare items*, *read items*, and *write items*. Upon execution, if any comparison items fail to match the values specified, the transactions fails and aborts. 
 
-<img src="/assets/sinfonia-minitxns.png" alt="transactions programming models diagram" style="width:460px;display:block;margin:auto;padding-bottom:17px;" />
+<img src="/assets/sinfonia-minitxns.png" alt="transactions programming models diagram" style="width:460px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
 
 These ideas are actually quite similar to the modern form of transactions implemented in [DynamoDB](#dynamodb). It assumes the kind of low-level but sufficiently expressive primitive approach for building simple but scalable transaction systems. I'm not sure how ergonomic this interface is for developers, though, and what type of applications are willing to drop down to this lower level abstraction in practice. On the other hand, perhaps there are better programming interfaces/models that can be built on top of this, with tools for translation into these lower level primitive operations.
 
@@ -78,7 +78,9 @@ All transactions submitted as single request, using either a `TransactWriteItems
 </div>
 
 
-<img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px;" />
+<img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
+
+A `TransactWriteItems` transaction may optionally include one or more preconditions on the current values of the items, and the transaction will be rejected if any of its preconditions are not met.
 
 
 ### Calvin
@@ -100,7 +102,7 @@ They note the following about their transactional programming model and query pr
 
 
 
-<img src="/assets/dsql-read-write-arch.png" alt="transactions programming models diagram" style="width:550px;display:block;margin:auto;padding-bottom:17px;" />
+<img src="/assets/dsql-read-write-arch.png" alt="transactions programming models diagram" style="width:550px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 16px;" />
 
 This seems more similar to original Spanner read-write transactions, which buffered all writes at the client before submitting them to the server. 
 
@@ -160,14 +162,59 @@ Software Transactional Memory, originally [explored](https://www.microsoft.com/e
 
 There are a subset of research projects that take a similar, dataflow-oriented perspective on representing transactions. [Hackwrench](https://cs.nyu.edu/~apanda/assets/papers/hackwrench-vldb23.pdf) is a recent project that takes a particular view on the semantics of transactions explicitly as dataflow graphs. [Morty](https://www.cs.cornell.edu/~matthelb/papers/morty-eurosys23.pdf) is a another project that aims to innovate on concurrency control approaches througuh a similar "re-execution" style approach, but also adopts essentially a bespoke transactional programming model to make this work, based on a continuation-passing style programming model. This makes it easy to trace the dataflow and re-execute sub-chunks of the transactions as needed, but is also quite non-standard and is not clear in its mappability to SQL systems.
 
+<img src="/assets/mortycps.png" alt="transactions programming models diagram" style="width:430px;display:block;margin:auto;padding-bottom:17px;border:1.5px solid #ccc;border-radius:7px;" />
+
+
 <!-- viewing transactions largely in terms of their functional inputs/outputs and dataflow seems like a better standardization. There are cases when transactions may do "external" actions based on the results of data inside the transaction, but may not be core use cases. -->
 
-## Unified Perspective
+## Unified Perspectives
 
 A lot of these techniques and systems take quite a specific perspective on how to model and program transactions. 
-In a more abstract view, we may in some sense view transactions as *functions* that operate over database state i.e. they mutate the database from one *input* state to another *output* state. The way in which these functions are expressed is the more interesting question, with the approaches above taking varying perpsectives. 
+In a more abstract view, we may in some sense view transactions as *functions* that operate over database state i.e. they mutate the database from one *input* state to another *output* state. The primary question is then the way in which we express this function, with the approaches above taking varying perpsectives. 
 
-A reasonable abstraction of transactions is one that essentially still follows the functional view, but rather breaks down the overall transaction function into a series of common sub-components. In the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key.
+Most models can break this down into *read phase* and *write phase*, especially for systems operating under snapshot read semantics. That is, if transactinos operate over a consistent snapshot of the database, then all decisions based on reads that occur in the transaction are stable i.e. will not change regardless of when they occur within the transaction. So, in theory, it suffices to execute all reads upfront.
+
+Conditional writes?.
+
+Deciding which keys to update?.
+
+A reasonable abstraction of transactions is one that essentially still follows the functional view, but rather breaks down the overall transaction function into a series of common sub-components. 
+
+- **Read phase** executes reads and outputs: (1) set of keys $$K_w$$ to update and (2) $$K_u$$ set of keys whose values will be used in the updates of those keys, and (3) a set of update functions $$F_U : K_w \rightarrow (K_u \rightarrow v_u)$$ where each $$f \in F_U$$ is a function for updating a specific key using a subset of key values as input.
+
+- **Write phase** writes each key in $$K_W$$, by applying the update function $$f_u(v_u)$$ where $$v_u \subseteq K_u$$
+
+In general, from an application perspective, it may be impossible to directly compute the full set of keys to be read upfront. For example, for general transaction code where the set of keys read is dependent on control flow choices: 
+
+```python
+vx = read(x)
+if vx > 0
+ vz = read(z)   
+else:
+ vy = read(y)
+```
+we may not be able to determine the full set of keys to read upfront based only an initial read set. So, we can view the read phase as potentially several, iterative sub-phases, each of which may modify the sets $$K_W$$ and $$K_U$$. The assumption is that, for loop-free transactions code, this should terminate at a fixed point after a finite number rounds, though in the most general case (e.g. in presence of loops) this may not hold.
+
+Making control flow decisions based on the return status of certain updates is also theoretically possible, and doesn't cleanly fit into this model. But, I believe this is quite rare since most errors on updates may typically lead to a full transaction abort, and so no further operations are needed.
+
+<!-- So, in the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key. -->
+
+```mermaid
+flowchart LR
+    A[Current DB State] --> B[Read Phase]
+    B --> C[[Keys to Write: K_w]]
+    B --> D[[Values Needed: K_u]]
+    B --> E[[Update Functions: F_U]]
+    subgraph Write Phase
+        C & D & E --> F[Apply Update Functions]
+    end
+    F --> G[Write Values to Keys]
+```
+<!-- *Input to the read phase is the current database state. The read phase produces: (1) a set of keys to write ($$K_w$$), (2) values ($$K_u$$) needed to update those keys, and (3) update functions ($$F_U$$). The write phase applies the update functions to produce final key/value updates to the database.* -->
+
+One question is whether we might have techniques that can, with suitable program analysis, do a kind of speculative read phase in a single shoy, but specualitvely executing reads along all possible control paths. This might be wasteful in some cases in terms of reading extra data we don't end up needing, but would reduce the additional sub-rounds of the read phase.
 
 
-There is also a question of how much programming language interface for transactions matters and impacts developer usage and adoption. Giving a lower level, one-shot API is conceptually simpler and perhaps easier to implement, but often seems a fundamental impedance mismatch with how developers actually want to write their applications i.e. in terms of standard programming language constructs and control flow.
+The conditional writes model (e.g. of Sinfonia, DynamoDB, etc.) is an interesting special case of this model, since it is essentially equvialent to reading all keys upfront, and conditionally deciding to update a set of keys based on the output of these reads e.g. equivalent to a read phase that returns $$K_u = \emptyset$$ if any of the preconditions fail. In practice, this may manifest as abort/rejection, but is functionally equivalent to a transaction with an empty write set.
+
+This takes a more theoretical perspective on transactional semantics, but a broader question here is around how much programming language interface for transactions matters and impacts developer usage and adoption. Giving a lower level, one-shot API (Sinfonia or DynamoDB style) may be conceptually simpler and easier to implement, but often seems a fundamental impedance mismatch with how developers actually want to write their applications i.e. in terms of standard programming language constructs and control flow.
