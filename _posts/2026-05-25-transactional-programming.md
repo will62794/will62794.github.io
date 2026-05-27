@@ -54,7 +54,7 @@ DECLARE
      c := a + b ;
   END;
 ```
-Similarly, [Transact-SQL](https://en.wikipedia.org/wiki/Transact-SQL) (T-SQL) was Microsoft's and Sybase's proprierty extension to SQL present in the late 1980s that introduced similar procedural programming constructs.
+Similarly, [Transact-SQL](https://en.wikipedia.org/wiki/Transact-SQL) (T-SQL) was Microsoft's and Sybase's proprietary extension to SQL present in the late 1980s that introduced similar procedural programming constructs.
 
 ### Sinfonia
 
