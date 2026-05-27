@@ -107,21 +107,6 @@ session.commitTransaction();
 There are also a few subtle interface choices one can make when programming in this manner, in particular with regards to how updates are expressed. For example, in general, you have access to the full feature set of the host programming language, and so could express updates in any way you might express mutation in that language. Alternatively, you can also represent updates more "natively" using MongoDB specific [update operators](https://www.mongodb.com/docs/manual/reference/mql/update/). This encodes the full semantic content of the update to the database in a more explicit way.
 
 
-### Aurora DSQL
-
-Amazon [Aurora DSQL](https://aws.amazon.com/blogs/database/everything-you-dont-need-to-know-about-amazon-aurora-dsql-part-3-transaction-processing/) is a serverless, distributed, transactional database system that was made generally available by AWS in 2025. 
-
-They note the following about their transactional programming model and query processing engine, which provides snapshot isolation as the default:
-
-> When write operations occur, the QP stores the results of these database changes locally, effectively spooling the writes throughout the transaction’s duration. In the event of a rollback or any disconnect, the QP discards the spooled writes.
-
-
-
-<img src="/assets/dsql-read-write-arch.png" alt="transactions programming models diagram" style="width:550px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 16px;" />
-
-This seems more similar to original Spanner read-write transactions, which buffered all writes at the client before submitting them to the server. 
-
-
 ### DynamoDB
 
 <a name="dynamodb"></a>
@@ -138,6 +123,22 @@ All transactions submitted as single request, using either a `TransactWriteItems
 <img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
 
 A `TransactWriteItems` transaction may optionally include one or more preconditions on the current values of the items, and the transaction will be rejected if any of its preconditions are not met. These ideas are actually quite similar to the ones introduced in the [Sinfonia](#sinfonia) system, and is briefly referenced in their paper.
+
+### Aurora DSQL
+
+Amazon [Aurora DSQL](https://aws.amazon.com/blogs/database/everything-you-dont-need-to-know-about-amazon-aurora-dsql-part-3-transaction-processing/) is a serverless, distributed, transactional database system that was made generally available by AWS in 2025. 
+
+They note the following about their transactional programming model and query processing engine, which provides snapshot isolation as the default:
+
+> When write operations occur, the QP stores the results of these database changes locally, effectively spooling the writes throughout the transaction’s duration. In the event of a rollback or any disconnect, the QP discards the spooled writes.
+
+
+
+<img src="/assets/dsql-read-write-arch.png" alt="transactions programming models diagram" style="width:550px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 16px;" />
+
+This seems more similar to original Spanner read-write transactions, which buffered all writes at the client before submitting them to the server. 
+
+
 
 ### Convex
 
