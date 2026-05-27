@@ -14,7 +14,7 @@ Transactions are a defining feature of databases, but transactional systems were
 
 <!-- One key tradeoffs in transactional programming models is the "interactive" vs. "one-shot" or "batch" models. The former being naturally the more intuitive and natural way of programming with transactions for a user, but one-shot transactions potentially simplifying concurrency control mechanisms and/or boosting performance and cutting down round-trip latency between the client and server. -->
 
-If we look at transactions from a programming language perspective, rather than a database or execution oriented perspective (e.g. a transaction that executes over many round trip interactions with a server), we can examine a variety of the models that exist in practice. Since it is often the case that systems will introduce their own somewhat custom or opinionated programming model, it is also useful to look at these categorizations in terms of both the underlying abstract models and the dominant transactional database systems that introduced them.
+If we look at transactions from a programming language perspective, rather than a database or execution oriented perspective (e.g. a transaction that executes over many round trip interactions with a server), we can examine a variety of the models that exist in practice. Since it is often the case that systems will introduce their own somewhat custom or opinionated programming model, it is useful to look at these categorizations in terms of both the underlying abstract models and the dominant transactional database systems that introduced them.
 
 <!-- Note that some categorizations can be in terms of the system that introduced or makes use of them rather than the language or technique itself.  -->
 
