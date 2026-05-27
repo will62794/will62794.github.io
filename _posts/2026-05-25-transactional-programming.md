@@ -181,14 +181,14 @@ In a more abstract view, we may in some sense view transactions as *functions* t
 
 For most models we can break any transaction down into a *read phase* and *write phase*, in particular under the assumption that systems are operating under snapshot read semantics. That is, if transactions operate over a consistent snapshot of the database, then all decisions based on reads that occur in the transaction are stable i.e. will not change regardless of when they occur within the transaction. So, in theory, it suffices to execute all reads upfront and this gives us the information we need to execute the writes of the transaction.
 
-So, a reasonable generic abstraction breaks down transactions into the following phase-based components:
+So, a reasonable generic abstraction for transactional system over an underlying key-space $$K$$ breaks down transactions into the following phase-based components:
 
-- **Read phase** executes reads and outputs: 
-  1. Set of keys to update, $$K_w$$.
-  2. Set of keys, $$K_v$$, whose values are can be used in the updates of keys during the write phase.
-  3. Set of update functions $$F_U$$, where each $$f : K_v \rightarrow V \in F_u$$ is a function for updating a specific key using the read values (or a subset of) key values read in $$K_v$$ as input and $$V$$ is simply the set of possible output values.
+- **Read phase** executes read operations and outputs: 
+  1. Set of keys to update, $$K_w \subseteq K$$.
+  2. Set of keys, $$K_v \subseteq K$$, whose values are can be used in the updates of keys during the write phase.
+  3. Set of update functions $$F_U$$, where each $$f_u^k : K_v \rightarrow V \in F_u$$ is a function for updating a key $$k \in K_w$$ using the values read in $$K_v$$ as input and $$V$$ is the set of possible output values.
 
-- **Write phase** writes each key in $$K_w$$, by applying the update function $$f_u(k_v)$$ where $$k_v \subseteq K_v$$.
+- **Write phase**: for each key $$ k \in K_w$$, updates its value in the input database state by applying its update function $$f_u^k(K_v)$$. In practice each update function will depend on a subset of keys in $$K_v$$, but for generality can assume it accepts this full set as input.
 
 In general, from an application perspective, it may be impossible to directly compute the full set of keys to be read upfront. For example, for general transactions code where the set of keys read is dependent on control flow choices: 
 
@@ -214,7 +214,7 @@ flowchart LR
     classDef bwBox fill:#fff,stroke:#888,stroke-width:2px,color:#111
 
     A(Input DB State):::bwNode --> B
-    B(<b>Read Phase</b> : <br> DB State → Updates):::bwEmph --> C(<b>Update Set</b> <br> K_w: keys to update <br> K_v: key values read <br> F_u: update functions):::bwNode
+    B(<b>Read Phase</b> : <br> DB State → Updates):::bwEmph --> C(<b>Update Set</b> <br> <i>K_w</i>: keys to update <br> <i>K_v</i>: key values read <br> <i>F_u</i>: update functions):::bwNode
     B2 --> D(Output DB State):::bwNode
     A --> B2
     C -- More reads--> B
@@ -231,7 +231,7 @@ flowchart LR
 
 <!-- This is similar to the considerations of *dependent transactions* in Calvin, though they mostly only worried about one round of reconnaissance reads in the initial phase. -->
 
-If you can know statically what keys to write and what values to write for them, then the *read phase* can be omitted or, in other words, its outputs simply don't depend on the current DB state. In general, though, a read phase is almost always conceptually required since the output of updates will in some way depend on the values read from the database.
+If you can know statically what keys to write and what values to write for them, then the *read phase* can be omitted (in other words, its outputs don't depend on the current DB state). In general, though, a read phase is typically required since updates will in some way depend on the values read from the database.
 
 
 <!-- 
@@ -245,9 +245,8 @@ Making control flow decisions based on the return status of individual updates i
 <!-- So, in the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key. -->
 <!-- *Input to the read phase is the current database state. The read phase produces: (1) a set of keys to write ($$K_w$$), (2) values ($$K_u$$) needed to update those keys, and (3) update functions ($$F_U$$). The write phase applies the update functions to produce final key/value updates to the database.* -->
 
-One other question is whether we might have techniques that can, with a suitable program analysis, do a kind of speculative read phase in a single shot, by speculatively executing reads along all possible control paths. This might be wasteful in some cases in terms of reading extra data we don't end up needing, but would reduce the additional sub-rounds of the read phase.
+Also, in cases where we require multiple iterations of the read phase, we can consider the question of whether, with suitable control flow program analysis, we can do a kind of speculative read phase in a single shot. That is, by speculatively executing reads along all possible control paths. This might be wasteful in some cases in terms of reading extra data we don't end up needing, but would reduce the additional sub-rounds of the read phase.
 
+It is also instructive to consider some of the above systems in this framework. For example, the conditional writes model (e.g. of Sinfonia, DynamoDB, etc.) is an interesting special case of this model. It is essentially equvialent to reading all keys upfront, and conditionally deciding to update a set of keys based on the output of these reads e.g. equivalent to a read phase that returns $$K_u = \emptyset$$ if any of the preconditions fail. In practice, this may manifest as abort/rejection, but is functionally equivalent to a transaction with an empty write set. Note that a limitation of these models, though, is that the set of keys to update ($$K_w$$) isn't able to dynamically depend on what is read inside the transaction i.e. it must be statically declared upfront.
 
-The conditional writes model (e.g. of Sinfonia, DynamoDB, etc.) is an interesting special case of this model, since it is essentially equvialent to reading all keys upfront, and conditionally deciding to update a set of keys based on the output of these reads e.g. equivalent to a read phase that returns $$K_u = \emptyset$$ if any of the preconditions fail. In practice, this may manifest as abort/rejection, but is functionally equivalent to a transaction with an empty write set.
-
-This takes a more theoretical perspective on transactional semantics, but a broader question here is around how much programming language interface for transactions matters and impacts developer usage and adoption. Giving a lower level, one-shot API (Sinfonia or DynamoDB style) may be conceptually simpler and easier to implement, but often seems a fundamental impedance mismatch with how developers actually want to write their applications i.e. in terms of standard programming language constructs and control flow.
+The above is one, more abstract view on transactional programming models and their semantics. Another, broader question is around how much the programming language interface for transactions matters and impacts developer productivity and adoption. Giving a lower level, one-shot API (Sinfonia or DynamoDB style) may be conceptually simpler and easier to implement for system builders, but often seems a fundamental impedance mismatch with how developers actually write their applications i.e. in terms of standard programming language constructs and control flow. On the other hand, providing APIs that are too expressive (e.g. express arbitrary programs) may also lead to unnecessary performance hits e.g. in cases where a suitable class of transactions can reduce to the two-phase read-write framework above.
