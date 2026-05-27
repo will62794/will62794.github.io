@@ -4,11 +4,11 @@ title:  "Transactional Programming Models"
 categories: databases transactions programming
 ---
 
-Transactions are a defining feature of databases, but have often developed in a lineage somewhat distinct from the programming languages community, with ad hoc exchange of ideas between both. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. Thus, the world of transactional programming interfaces is quite diverse, with a lack of convergence on accepted interfaces, and proliferation of different, often system or domain-specific approaches.
+Transactions are a defining feature of databases, but often developed in a lineage somewhat distinct from the programming languages community. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. Thus, the world of transactional programming interfaces is quite diverse, with a lack of convergence on accepted interfaces, and proliferation of different, often system or domain-specific approaches.
 
 
 
-## Programming with Transactions
+## Programming Transactions
 
 <!-- One key tradeoffs in transactional programming models is the "interactive" vs. "one-shot" or "batch" models. The former being naturally the more intuitive and natural way of programming with transactions for a user, but one-shot transactions potentially simplifying concurrency control mechanisms and/or boosting performance and cutting down round-trip latency between the client and server. -->
 
@@ -35,8 +35,10 @@ WHERE AccountID = 'B';
 -- Commit the transaction if both operations succeed
 COMMIT;
 ```
+Interestingly, SQL itself wasn't necessarily coupled with a transactional model, but over time these became more intertwined and transactions as a core feature within SQL. Codd's original [paper on the relational model](https://dl.acm.org/doi/10.1145/362384.362685) (1970) doesn't explicitly mention transactions or SQL, the language only later beind introduced in the [SEQUEL paper](https://dl.acm.org/doi/10.1145/800296.811515) (1974). Transactions seem to most directly appear formally in the [System R](https://www.cs.cmu.edu/~natassa/courses/15-721/papers/p97-astrahan.pdf) work (1976).
 
-[PL/SQL](https://www.geeksforgeeks.org/sql/pl-sql-transactions/) embeds standard sequential/imperative programming constructs into SQL. It extends classic SQL with loops, conditionals, error handling, and allows for transactions to be expressed in a *stored procedure* style. A simple stored procedure might look like the following:
+
+[PL/SQL](https://www.geeksforgeeks.org/sql/pl-sql-transactions/), introduced around 1995, embeds standard sequential/imperative programming constructs into SQL. It extends classic SQL with loops, conditionals, error handling, and allows for transactions to be expressed in a *stored procedure* style. A simple stored procedure might look like the following:
 
 ```sql
 DECLARE
@@ -53,16 +55,20 @@ DECLARE
 
 ### Sinfonia
 
+<a name="sinfonia"></a>
+
 [Sinfonia](https://dl.acm.org/doi/10.1145/1294261.1294278) (SOSP 2007) was a research system that basically asked a question of what is the minimal primitive needed to build useful transactional applications. The ideas was to provide a single, *minitransaction* primitive on which to build more complex transactional applications or components. Essentially, this provides atomic access and conditional modifications at multiple memory nodes. It consists simply of a set of *compare items*, *read items*, and *write items*. Upon execution, if any comparison items fail to match the values specified, the transactions fails and aborts. 
 
 <img src="/assets/sinfonia-minitxns.png" alt="transactions programming models diagram" style="width:460px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
 
-These ideas are actually quite similar to the modern form of transactions implemented in [DynamoDB](#dynamodb). It assumes the kind of low-level but sufficiently expressive primitive approach for building simple but scalable transaction systems. I'm not sure how ergonomic this interface is for developers, though, and what type of applications are willing to drop down to this lower level abstraction in practice. On the other hand, perhaps there are better programming interfaces/models that can be built on top of this, with tools for translation into these lower level primitive operations.
+It assumes the kind of low-level but sufficiently expressive primitive approach for building simple but scalable transaction systems. I'm not sure how ergonomic this interface is for developers, though, and what type of applications are willing to drop down to this lower level abstraction in practice. On the other hand, perhaps there are better programming interfaces/models that can be built on top of this, with tools for translation into these lower level primitive operations.
 
 
 ### Calvin
 
-[Calvin](https://dl.acm.org/doi/10.1145/2213836.2213838) (SIGMOD 2012) was not directly a proposal for a transactional programming model itself, but relied on some core assumptions about the underlying model to make its key ideas work. In particular, it made assumptions that transactions were expressed as C++ functions that access data using a basic CRUD interface. This facilitates analysis of a transaction's full static read/write sets for deterministic scheduling and conflict avoidance. Transactions that must perform reads in order to determine their full read/write sets are not natively supported, but they can kind of work around this with *reconnaissance queries*, that run a first round of reads to determine these sets. The important aspect here, though, is the strong assumption on static read/write set analysis, which is often not easy in practice for transactions normally written in a dynamic/interactive approach.
+[Calvin](https://dl.acm.org/doi/10.1145/2213836.2213838) (SIGMOD 2012) was not directly a proposal for a transactional programming model itself, but relied on some core assumptions about the underlying model to make its key ideas work. In particular, it made assumptions that transactions were expressed as C++ functions that access data using a basic CRUD interface. This facilitates analysis of a transaction's full static read/write sets for deterministic scheduling and conflict avoidance. 
+
+Transactions that must perform reads in order to determine their full read/write sets are not natively supported, but they can kind of work around this with *reconnaissance queries*, that run a first round of reads to determine these sets. The important aspect here, though, is the strong assumption on static read/write set analysis, which is often not easy in practice for transactions normally written in a dynamic/interactive approach.
 
 
 ### Fauna Query Language (FQL)
@@ -71,7 +77,7 @@ These ideas are actually quite similar to the modern form of transactions implem
 
 ### Spanner
 
-Like BigTable, writes in [Spanner](https://docs.cloud.google.com/spanner/docs/transactions) that occur in a read-write transaction are buffered at the client until commit, so reads will not observe the effects of the transaction's writes. Original versions of Spanner (as described in [OSDI 2012](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf)) supported its own query language that was generally SQL-like.
+[Spanner](https://docs.cloud.google.com/spanner/docs/transactions) provides externally-consistent distributed transactions, where operations that occur in a read-write transaction are buffered at the client until commit, so reads will not observe the effects of the transaction's writes. Original versions of Spanner (as described in [OSDI 2012](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf)) supported its own query language that was generally SQL-like.
 
 Modern versions of Spanner also support a *[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api#python)* API, which is dedicated for writing data within transactions. They also include a dedicated language for manipulating data, [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks). 
 
@@ -128,7 +134,7 @@ All transactions submitted as single request, using either a `TransactWriteItems
 
 <img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
 
-A `TransactWriteItems` transaction may optionally include one or more preconditions on the current values of the items, and the transaction will be rejected if any of its preconditions are not met.
+A `TransactWriteItems` transaction may optionally include one or more preconditions on the current values of the items, and the transaction will be rejected if any of its preconditions are not met. These ideas are actually quite similar to the ones introduced in the [Sinfonia](#sinfonia) system, and is briefly referenced in their paper.
 
 ### Convex
 
