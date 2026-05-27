@@ -38,7 +38,7 @@ WHERE AccountID = 'B';
 -- Commit the transaction if both operations succeed
 COMMIT;
 ```
-Interestingly, the ideas behind SQL itself weren't initially coupled with a transactional model. Codd's original [paper on the relational model](https://dl.acm.org/doi/10.1145/362384.362685) (1970) doesn't explicitly mention transactions or SQL, the language only later being introduced in [SEQUEL](https://dl.acm.org/doi/10.1145/800296.811515) (1974). Transactions seem to first appear most directly in the [System R](https://www.cs.cmu.edu/~natassa/courses/15-721/papers/p97-astrahan.pdf) work (1976), and over time became more intertwined with and a core feature of SQL.
+Notably, the ideas behind SQL itself weren't initially coupled with a transactional model. Codd's original [paper on the relational model](https://dl.acm.org/doi/10.1145/362384.362685) (1970) doesn't explicitly mention transactions or SQL, the language only later being introduced in [SEQUEL](https://dl.acm.org/doi/10.1145/800296.811515) (1974). Transactions seem to first appear most directly in the [System R](https://www.cs.cmu.edu/~natassa/courses/15-721/papers/p97-astrahan.pdf) work (1976), and over time became more intertwined with and a core feature of SQL.
 
 Making SQL a more generic programming environment required later extensions. [PL/SQL](https://www.geeksforgeeks.org/sql/pl-sql-transactions/), first introduced around 1988 (Oracle v6), embeds standard sequential/imperative programming constructs into SQL. It extends classic SQL with loops, conditionals, error handling, and allows for transactions to be expressed in a *stored procedure* style. A simple stored procedure might look like the following:
 
@@ -80,7 +80,7 @@ Transactions that must perform reads in order to determine their full read/write
 
 ### Spanner
 
-[Spanner](https://docs.cloud.google.com/spanner/docs/transactions) provides externally-consistent distributed transactions, where operations that occur in a read-write transaction are buffered at the client until commit, so reads will not observe the effects of the transaction's writes. Original versions of Spanner (as described in [OSDI 2012](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf)) supported its own query language that was generally SQL-like.
+[Spanner](https://docs.cloud.google.com/spanner/docs/transactions) provides externally consistent (≈ strictly serializable) distributed transactions, where operations that occur in a read-write transaction are buffered at the client until commit, so reads will not observe the effects of the transaction's writes. Original versions of Spanner (as described in [OSDI 2012](https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf)) supported its own query language that was generally SQL-like.
 
 Modern versions of Spanner also support a *[mutations](https://docs.cloud.google.com/spanner/docs/modify-mutation-api#python)* API, which is dedicated for writing data within transactions. They also include a dedicated language for manipulating data, [DML](https://docs.cloud.google.com/spanner/docs/dml-tasks). 
 
@@ -120,7 +120,7 @@ All transactions submitted as single request, using either a `TransactWriteItems
 </div>
 
 
-<img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:680px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
+<img src="/assets/aws-dynamodb-ex.png" alt="transactions programming models diagram" style="width:705px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 2px;" />
 
 A `TransactWriteItems` transaction may optionally include one or more preconditions on the current values of the items, and the transaction will be rejected if any of its preconditions are not met. These ideas are actually quite similar to the ones introduced in the [Sinfonia](#sinfonia) system, and is briefly referenced in their paper.
 
@@ -142,7 +142,7 @@ This seems more similar to original Spanner read-write transactions, which buffe
 
 ### Convex
 
-[Convex](https://docs.convex.dev/database/advanced/occ) is not a database, strictly speaking, but is rather a full end-to-end framework for building database-backed applications in a convenient, all-in-one package. All of your application and infra code and configuration is essentially bundled together in one place, which provides nice opportunities for easily co-designing and optimizing these components together. They take a quite [opinioniated view on things](https://stack.convex.dev/not-sql), but have clearly put careful thought into how we might re-design modern application and data stacks without the baggage of (50 year old) SQL.
+[Convex](https://docs.convex.dev/database/advanced/occ) is not a database, strictly speaking, but is rather a full end-to-end framework for building database-backed applications in a convenient, all-in-one package. All of your application and infra code and configuration is essentially bundled together in one place, which provides nice opportunities for easily co-designing and optimizing these components together. They take a quite [opinioniated view on things](https://stack.convex.dev/not-sql), but have put careful thought into how we might re-design modern application and data stacks without the baggage of (50 year old) SQL.
 
 Their notion of transactions is called [mutations](https://docs.convex.dev/functions/mutation-functions) which are TypeScript functions that insert, update, or remove data from the database, and they execute transactionally. One of these looks something like the following:
 
@@ -170,26 +170,27 @@ There are a subset of research projects that take a similar, dataflow-oriented p
 
 ### Transactional Memory
 
-Outside of databases, Software Transactional Memory, originally [explored](https://www.microsoft.com/en-us/research/publication/beautiful-concurrency/) in the context of Haskell, was an attempt to provide a concurrent programming model that avoided the use of locks. This essentially provides an optimistic like transactional concurrency control mechanism within a standard programming language environment. There have also been experimental attempts at integrating these techniques into other programming languages e.g. in [Python](https://dl.acm.org/doi/abs/10.1145/3359619.3359747). None of these appear mainstream, though.
+Outside of databases, [Software Transactional Memory](https://groups.csail.mit.edu/tds/papers/Shavit/ShavitTouitou-podc95.pdf), originally [explored](https://www.microsoft.com/en-us/research/publication/beautiful-concurrency/) in the context of Haskell, was an attempt to provide a concurrent programming model that avoided the use of locks. This essentially provides an optimistic like transactional concurrency control mechanism within a standard programming language environment. There have also been experimental attempts at integrating these techniques into other programming languages e.g. in [Python](https://dl.acm.org/doi/abs/10.1145/3359619.3359747). None of these appear mainstream, though.
 
 
 ## Unified Perspectives
 
 A lot of these techniques and systems take quite a specific perspective on how to model and program transactions. 
-In a more abstract view, we may in some sense view transactions as *functions* that operate over database state i.e. they mutate the database from one *input* state to another *output* state. The primary question is then the way in which we express and represent these functions, with the approaches above taking varying perpsectives. 
+In a more abstract view, we may in some sense view transactions as *functions* that operate over database state i.e. they mutate the database from one *input* state to another *output* state. More concretely, we can see them as functions that take an input database state and return a set of *updates* i.e. a set of key-value pairs that are to be applied to the database. In general, we can represent these transaction functions as arbitrary programs, but in practice they often take on more restricted forms. A primary question then is the way in which we express and represent these functions in a way that is sufficiently general to capture the array of various models. 
 
-For most models this can be broken down into a *read phase* and *write phase*, especially for systems operating under snapshot read semantics. That is, if transactions operate over a consistent snapshot of the database, then all decisions based on reads that occur in the transaction are stable i.e. will not change regardless of when they occur within the transaction. So, in theory, it suffices to execute all reads upfront and this gives us the information we need to execute the writes of the transaction.
+
+For most models we can break any transaction down into a *read phase* and *write phase*, in particular under the assumption that systems are operating under snapshot read semantics. That is, if transactions operate over a consistent snapshot of the database, then all decisions based on reads that occur in the transaction are stable i.e. will not change regardless of when they occur within the transaction. So, in theory, it suffices to execute all reads upfront and this gives us the information we need to execute the writes of the transaction.
 
 So, a reasonable generic abstraction breaks down transactions into the following phase-based components:
 
 - **Read phase** executes reads and outputs: 
   1. Set of keys to update, $$K_w$$.
-  2. Set of keys, $$K_u$$, whose values are read to be used in the updates of keys.
-  3. Set of update functions $$F_U : K_w \rightarrow (K_u \rightarrow V)$$ where each $$f \in F_U$$ is a function for updating a specific key using a subset of key values as input and $$V$$ is simply the set of possible values.
+  2. Set of keys, $$K_v$$, whose values are can be used in the updates of keys during the write phase.
+  3. Set of update functions $$F_U$$, where each $$f : K_v \rightarrow V \in F_u$$ is a function for updating a specific key using the read values (or a subset of) key values read in $$K_v$$ as input and $$V$$ is simply the set of possible output values.
 
-- **Write phase** writes each key in $$K_W$$, by applying the update function $$f_u(k_u)$$ where $$k_u \subseteq K_u$$.
+- **Write phase** writes each key in $$K_w$$, by applying the update function $$f_u(k_v)$$ where $$k_v \subseteq K_v$$.
 
-In general, from an application perspective, it may be impossible to directly compute the full set of keys to be read upfront. For example, for general transaction code where the set of keys read is dependent on control flow choices: 
+In general, from an application perspective, it may be impossible to directly compute the full set of keys to be read upfront. For example, for general transactions code where the set of keys read is dependent on control flow choices: 
 
 ```python
 vx = read(x)
@@ -198,11 +199,8 @@ if vx > 0
 else:
  vy = read(y)
 ```
-we may not be able to determine the full set of keys to read upfront based only an initial read set. So, the read phase may actually be several, iterative sub-phases, each of which may modify the sets $$K_w$$ and $$K_u$$. The assumption is that, for loop-free transactions code, this should terminate at a fixed point after a finite number rounds, though in the most general case (e.g. in presence of loops) this may not hold. 
+we may not be able to determine the full set of keys to read upfront based only an initial read set. So, the read phase may actually be several, iterative sub-phases, each of which may modify the sets $$K_w$$ and $$K_v$$. The assumption is that, for loop-free transactions code, this should terminate at a fixed point after a finite number rounds, though in the most general case (e.g. in presence of loops) this may not hold. 
 
-<!-- This is similar to the considerations of *dependent transactions* in Calvin, though they mostly only worried about one round of reconnaissance reads in the initial phase. -->
-
-If you, in fact, can statically know what keys to write and what values to write for them, then the *read phase* is unnecessary. In general, though, a read phase is almost always conceptually required since the output of updates will in some way depend on the values read from the database.
 
 
 ```mermaid
@@ -212,26 +210,30 @@ flowchart LR
 
     %% Define style classes for black/white mode
     classDef bwNode fill:#fff,stroke:#111,color:#000,stroke-width:2px
-    classDef bwEmph fill:#eee,stroke:#111,color:#000,stroke-width:2px,font-weight:bold
-    classDef bwPhase fill:#fff,stroke:#111,color:#1a1a1a,stroke-width:2px
-    classDef bwOutput fill:#fff,stroke:#111,color:#1a1a1a,stroke-width:2px
+    classDef bwEmph fill:#eee,stroke:#111,color:#000,stroke-width:2px,font-size:18px;
+    classDef bwBox fill:#fff,stroke:#888,stroke-width:2px,color:#111
 
-    A[Current DB State]:::bwNode --> B[Read Phase]:::bwEmph
-    B --> C[[Keys to Write: K_w]]:::bwNode
-    B --> D[[Values Read: K_u]]:::bwNode
-    D -- "More keys to read?" --> B
-    C -- "More keys to read?" --> B
-    E -- "More keys to read?" --> B
-    B --> E[[Update Functions: F_U]]:::bwNode
-    C & D & E -->F[Apply Update Functions]:::bwEmph
-    subgraph Write Phase
-        F[Apply Updates]:::bwEmph
+    A(Input DB State):::bwNode --> B
+    B(<b>Read Phase</b> : <br> DB State → Updates):::bwEmph --> C(<b>Update Set</b> <br> K_w: keys to update <br> K_v: key values read <br> F_u: update functions):::bwNode
+    B2 --> D(Output DB State):::bwNode
+    A --> B2
+    C -- More reads--> B
+
+    subgraph Transaction["Transaction"]
+        direction LR
+        B2(<b>Write Phase</b>):::bwEmph
+        C -- All reads done? --> B2
+        B
+        C
+        style Transaction fill:#fafafa,stroke:#888,stroke-width:2.3px
     end
-    subgraph Read Outputs
-        C & D & E:::bwOutput
-    end
-    F --> G[Values Written to Keys]:::bwNode
 ```
+
+<!-- This is similar to the considerations of *dependent transactions* in Calvin, though they mostly only worried about one round of reconnaissance reads in the initial phase. -->
+
+If you can know statically what keys to write and what values to write for them, then the *read phase* can be omitted or, in other words, its outputs simply don't depend on the current DB state. In general, though, a read phase is almost always conceptually required since the output of updates will in some way depend on the values read from the database.
+
+
 <!-- 
 To achieve black and white style, we define custom node classes with only grayscale and black/white palette.
 If your site/process supports mermaid "themeVariables", you could add:
@@ -239,7 +241,7 @@ If your site/process supports mermaid "themeVariables", you could add:
 But as per instruction, using classDef for portable B&W style in standard markdown embeds.
 -->
 
-Making control flow decisions based on the return status of certain updates is also theoretically possible, and doesn't cleanly fit into this model. I believe this is quite rare, though, since most errors on updates may typically lead to a full transaction abort, and so the entire transaction has terminated anyway. The notion of *predicate writes* should also reduce to this model in almost all cases, since the result of a predicate that defines which keys are to be updated should always be stable, and so should be possible to compute upfront, and then directly specify the point query updates needed in the write phase.
+Making control flow decisions based on the return status of individual updates is also theoretically possible, and doesn't cleanly fit into this model. I believe this is quite rare, though, since most errors on updates may typically lead to a full transaction abort, and so the entire transaction has terminated anyway. The notion of *predicate writes* should also reduce to this model in almost all cases, since the result of a predicate that defines which keys are to be updated should always be stable, and so should be possible to compute upfront, and then directly specify the point query updates needed in the write phase.
 <!-- So, in the *read phase* we have a function $$f_R$$ that takes in the current database state and returns both a set of new keys to be read $$f_R'$$, a set of keys to be written $$f_W$$, along with the associated values that need to be fed in to those writes. In the write phase, we can imagine we have functions $f_W$ that take in the current set of values produced from $$f_R$$ and output the database state produced by applying these transformation functions on each relevant key. -->
 <!-- *Input to the read phase is the current database state. The read phase produces: (1) a set of keys to write ($$K_w$$), (2) values ($$K_u$$) needed to update those keys, and (3) update functions ($$F_U$$). The write phase applies the update functions to produce final key/value updates to the database.* -->
 
