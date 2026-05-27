@@ -204,7 +204,7 @@ if vx > 0
 else:
  vy = read(y)
 ```
-we may not be able to determine the full set of keys to read upfront based only an initial read set. So, the read phase may actually be several, iterative sub-phases, each of which may modify the sets $$K_w$$ and $$K_v$$. The assumption is that, for loop-free transactions code, this should terminate at a fixed point after a finite number rounds, though in the most general case (e.g. in presence of loops) this may not hold. Note that this basic partially appears via the notion of *dependent transactions* in Calvin, though I'm not sure if they exactly generalized this notion to the multi-round read case (e.g. requiring multiple rounds of reconnaissance reads).
+we may not be able to determine the full set of keys to read upfront based only an initial read set. So, the read phase may actually be several, iterative sub-phases, each of which may modify the sets $$K_w$$ and $$K_v$$. The assumption is that, for loop-free transactions code, this should terminate at a fixed point after a finite number rounds, though in the most general case (e.g. in presence of loops) this may not hold. Note that this basic concept partially appears via the notion of *dependent transactions* in Calvin, though I'm not sure if they exactly generalized this notion to the multi-round read case (e.g. requiring multiple rounds of reconnaissance reads).
 
 
 
