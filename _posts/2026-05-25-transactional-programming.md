@@ -4,20 +4,20 @@ title:  "Transactional Programming Models"
 categories: databases transactions programming
 ---
 
-Transactions are a defining feature of databases, but often developed in a lineage somewhat distinct from the programming languages community. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. Thus, the world of transactional programming interfaces is quite diverse, with a lack of convergence on accepted interfaces, and proliferation of different, often system or domain-specific approaches.
+Transactions are a defining feature of databases, but transactional systems were often developed in a lineage somewhat distinct from the programming languages community. This is perhaps also affected by the fact that transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes. The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. Thus, the world of transactional programming interfaces is quite diverse, with a lack of convergence on accepted interfaces, and proliferation of different, often system or domain-specific approaches.
 
 
 
-## Programming Transactions
+<!-- ## Programming Transactions -->
 
 <!-- One key tradeoffs in transactional programming models is the "interactive" vs. "one-shot" or "batch" models. The former being naturally the more intuitive and natural way of programming with transactions for a user, but one-shot transactions potentially simplifying concurrency control mechanisms and/or boosting performance and cutting down round-trip latency between the client and server. -->
 
-If we look at transactions from a programming language perspective, rather than a database or execution oriented perspective (e.g. a transaction that executes over many round trip interactions with a server), we can examine a host of different models. Note that some of these catgeorizations are in terms of the system that introduced or uses them rather than the language or technique itself. But, it's often that each system will introduce a somewhat custom-tailored or opinionated programming model, so it's useful to look at both underlying models and dominant systems (Spanner, DynamoDB, etc.)
+If we look at transactions from a programming language perspective, rather than a database or execution oriented perspective (e.g. a transaction that executes over many round trip interactions with a server), we can examine a host of different models. Note that some categorizations can be in terms of the system that introduced or makes use of them rather than the language or technique itself. It is often that each system will introduce a somewhat custom or opinionated programming model, so it's useful to look at both the underlying abstract models and the dominant transactional database systems.
 
 
 ### SQL
 
-SQL is probably the most classic and widely used transactional programming interface, as it is the de facto standard for interacting with most classic relational database systems. Running a simple interactive style transaction in SQL might look like the following:
+SQL is probably the most classic and widely used transactional programming interface, as it is the de facto standard for interacting with most classic relational database systems. Running a simple interactive style transaction in SQL might look like the following, where standard SQL queries and updates can be wrapped inside a transactional block:
 
 ```sql
 BEGIN TRANSACTION;
@@ -35,10 +35,9 @@ WHERE AccountID = 'B';
 -- Commit the transaction if both operations succeed
 COMMIT;
 ```
-Interestingly, SQL itself wasn't necessarily coupled with a transactional model, but over time these became more intertwined and transactions as a core feature within SQL. Codd's original [paper on the relational model](https://dl.acm.org/doi/10.1145/362384.362685) (1970) doesn't explicitly mention transactions or SQL, the language only later beind introduced in the [SEQUEL paper](https://dl.acm.org/doi/10.1145/800296.811515) (1974). Transactions seem to most directly appear formally in the [System R](https://www.cs.cmu.edu/~natassa/courses/15-721/papers/p97-astrahan.pdf) work (1976).
+Interestingly, the ideas behind SQL itself weren't initially coupled with a transactional model. Codd's original [paper on the relational model](https://dl.acm.org/doi/10.1145/362384.362685) (1970) doesn't explicitly mention transactions or SQL, the language only later being introduced in [SEQUEL](https://dl.acm.org/doi/10.1145/800296.811515) (1974). Transactions seem to first appear most directly in the [System R](https://www.cs.cmu.edu/~natassa/courses/15-721/papers/p97-astrahan.pdf) work (1976), and over time became more intertwined with and a core feature of SQL.
 
-
-[PL/SQL](https://www.geeksforgeeks.org/sql/pl-sql-transactions/), introduced around 1995, embeds standard sequential/imperative programming constructs into SQL. It extends classic SQL with loops, conditionals, error handling, and allows for transactions to be expressed in a *stored procedure* style. A simple stored procedure might look like the following:
+Making SQL a more generic programming environment required later extensions. [PL/SQL](https://www.geeksforgeeks.org/sql/pl-sql-transactions/), first introduced around 1988 (Oracle v6), embeds standard sequential/imperative programming constructs into SQL. It extends classic SQL with loops, conditionals, error handling, and allows for transactions to be expressed in a *stored procedure* style. A simple stored procedure might look like the following:
 
 ```sql
 DECLARE
@@ -52,6 +51,7 @@ DECLARE
      c := a + b ;
   END;
 ```
+Similarly, [Transact-SQL](https://en.wikipedia.org/wiki/Transact-SQL) (T-SQL) was Microsoft's and Sybase's proprierty extension to SQL present in the late 1980s that introduced similar procedural programming constructs.
 
 ### Sinfonia
 
