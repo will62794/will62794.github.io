@@ -76,7 +76,7 @@ Transactions that must perform reads in order to determine their full read/write
 
 ### Fauna Query Language (FQL)
 
-[FaunaDB](https://faunadb.org/), (now [defunct](https://news.ycombinator.com/item?id=43414742)), was an attempt at building a production-ready distributed database on many of the concepts from the Calvin and deterministic transaction ideas. The [Fauna Query Language ](https://faunadb-docs.netlify.app/fauna/current/learn/query/)(FQL) was a proprietary, TypeScript-like language they developed for reading/writing data in Fauna.
+[FaunaDB](https://faunadb.org/), (now [defunct](https://news.ycombinator.com/item?id=43414742)), was an attempt at building a production-ready distributed database on many of the concepts from the Calvin and deterministic transaction ideas. The [Fauna Query Language ](https://faunadb-docs.netlify.app/fauna/current/learn/query/)(FQL) was a proprietary, TypeScript-like language they developed for reading/writing data in Fauna. The documentation on this is a bit thin these days, but it appeared that it was essentially a productized version of the ideas in Calvin, with a goal of making static analysis of read/write sets easier.
 
 ### Spanner
 
@@ -161,9 +161,14 @@ export default mutation(async ({ db }, email, post) => {
 
 ### Dataflow Models
 
-There are a subset of research projects that take a similar, dataflow-oriented perspective on representing transactions. [Hackwrench](https://cs.nyu.edu/~apanda/assets/papers/hackwrench-vldb23.pdf) (VLDB 2023) is a recent project that takes a particular view on the semantics of transactions explicitly as dataflow graphs. [Morty](https://www.cs.cornell.edu/~matthelb/papers/morty-eurosys23.pdf) (EuroSys 2023) is another project that aims to innovate on concurrency control approaches througuh a similar "re-execution" style approach, but also adopts essentially a bespoke transactional programming model to make this work, based on a continuation-passing style programming model. This makes it easy to trace the dataflow and re-execute sub-chunks of the transactions as needed, but is also quite non-standard and is not clear in its mappability to SQL systems.
+There are a subset of research projects that take a similar, dataflow-oriented perspective on representing transactions. [Hackwrench](https://cs.nyu.edu/~apanda/assets/papers/hackwrench-vldb23.pdf) (VLDB 2023) is a recent project that takes a particular view on the semantics of transactions explicitly as dataflow graphs. 
 
-<img src="/assets/mortycps.png" alt="transactions programming models diagram" style="width:430px;display:block;margin:auto;padding-bottom:17px;border:1.5px solid #ccc;border-radius:7px;" />
+<img src="/assets/hackwrench-deps.png" alt="transactions programming models diagram" style="width:370px;display:block;margin:auto;padding-bottom:17px;border:1.5px solid #ccc;border-radius:7px;" />
+
+
+[Morty](https://www.cs.cornell.edu/~matthelb/papers/morty-eurosys23.pdf) (EuroSys 2023) is another project that aims to innovate on concurrency control approaches through a related "re-execution" style approach. It also adopts a somewhat bespoke transactional programming model to make this work, based on a continuation-passing style, which they claim to have adopted from earlier work on [FaRM](https://www.usenix.org/conference/nsdi14/technical-sessions/dragojevi%C4%87) (2014). This makes it easy to trace the dataflow and re-execute sub-portions of the transactions as needed, by making dependencies of separate contexts explicit, but the model is quite non-standard and seems quite far removed from how developers would expect to naturally express transactional code.
+
+<img src="/assets/mortycps.png" alt="transactions programming models diagram" style="width:410px;display:block;margin:auto;padding-bottom:17px;border:1.5px solid #ccc;border-radius:7px;" />
 
 
 <!-- viewing transactions largely in terms of their functional inputs/outputs and dataflow seems like a better standardization. There are cases when transactions may do "external" actions based on the results of data inside the transaction, but may not be core use cases. -->
