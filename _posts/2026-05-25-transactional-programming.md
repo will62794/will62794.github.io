@@ -4,7 +4,7 @@ title:  "Transactional Programming Models"
 categories: databases transactions programming
 ---
 
-Transactions are a core feature of databases, but not of most mainstream programming languages.
+Transactions are a core feature of databases, but absent from mainstream programming languages.
 <!-- Transactions are a defining feature of databases,  -->
 Thus, many approaches to transactional programming in database systems often developed in a lineage somewhat distinct from the programming languages community.
  <!-- Similarly, transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes.  -->
