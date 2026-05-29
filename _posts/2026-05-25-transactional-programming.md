@@ -118,7 +118,7 @@ There are also a few subtle interface choices one can make when programming in t
 
 <a name="dynamodb"></a>
 
-DynamoDB is a key-value store that somewhat recently [added support for transactions](https://www.usenix.org/system/files/atc23-idziorek.pdf) (USENIX ATC 2023).  They essentially adopt a truly "one-shot" model, which comes with some pros and cons.
+DynamoDB is a key-value store that recently [added support for transactions](https://www.usenix.org/system/files/atc23-idziorek.pdf) (USENIX ATC 2023).  They essentially adopt a truly "one-shot" model, which comes with some pros and cons.
 All transactions submitted as single request, using either a `TransactWriteItems` or `TransactGetItems` command. The general model of DynamoDB is basically a flat KV store, and you can set or update keys on a given table. A write-transaction can include, `PutItem`, `UpdateItem`, or `DeleteItem` as basic operations.
 
 <div style="justify-content:center; gap:20px; padding-bottom:17px;">
