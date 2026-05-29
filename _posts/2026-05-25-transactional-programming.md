@@ -71,7 +71,7 @@ Similarly, [Transact-SQL](https://en.wikipedia.org/wiki/Transact-SQL) (T-SQL) wa
 
 <img src="/assets/sinfonia-minitxns.png" alt="transactions programming models diagram" style="width:460px;display:block;margin:auto;padding-bottom:17px; border:1.5px solid #ccc; padding: 3px;" />
 
-It assumes the kind of low-level but sufficiently expressive primitive approach for building simple but scalable transaction systems. I'm not sure how ergonomic this interface is for developers, though, and what type of applications are willing to drop down to this lower level abstraction in practice. On the other hand, perhaps there are better programming interfaces/models that can be built on top of this, with tools for translation into these lower level primitive operations.
+It assumes this kind of low-level but sufficiently expressive primitive approach for building simple but scalable transaction systems. I'm not sure how ergonomic this interface is for developers, though, and what type of applications are willing to drop down to this lower level abstraction in practice. On the other hand, perhaps there are better programming interfaces/models that can be built on top of this, with tools for translation into these lower level primitive operations.
 
 
 ### Calvin
