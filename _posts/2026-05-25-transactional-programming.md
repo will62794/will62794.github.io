@@ -6,10 +6,10 @@ categories: databases transactions programming
 
 Transactions are a core feature of databases, but not of most mainstream programming languages.
 <!-- Transactions are a defining feature of databases,  -->
-Thus, many approaches to transactional programming often developed in a lineage somewhat distinct from the programming languages community.
+Thus, many approaches to transactional programming in database systems often developed in a lineage somewhat distinct from the programming languages community.
  <!-- Similarly, transactional programming is traditionally not a common feature of most mainstream programming languages, whereas for databases it has been more or less assumed as table stakes.  -->
  This has led to a diverse set of transactional programming models, with many system or domain-specific approaches.
- We can examine a variety of models that exist in practice, looking both at the different underlying programming models and also the dominant transactional systems that introduced them.
+ We can examine a variety of these models that exist in practice, looking at both the different underlying programming models and also the dominant transactional systems that introduced them.
  <!-- / Since it is often the case that systems will introduce their own, somewhat custom or opinionated programming model, it is useful to look at these categorizations in terms of both the underlying abstract models and the dominant transactional database systems that introduced them. -->
 
  <!-- The use of [transactional memory abstractions](https://en.wikipedia.org/wiki/Software_transactional_memory) is a somewhat well explored research area, but is still an esoteric feature for mainstream programming language environments. -->
