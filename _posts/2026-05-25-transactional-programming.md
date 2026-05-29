@@ -27,7 +27,7 @@ Thus, many approaches to transactional programming in database systems often dev
 
 ### SQL
 
-SQL is probably the most traditional and widely used transactional programming interface, as it is the de facto standard for interacting with most classic relational database systems. Running a simple interactive style transaction in SQL might look like the following, where standard SQL queries and updates can be wrapped inside a transactional block:
+SQL is probably the most traditional and widely used transactional programming interface, as it is the de facto standard for interacting with most relational database systems. Running a simple interactive style transaction in SQL might look like the following, where standard SQL queries and updates can be wrapped inside a transactional block:
 
 ```sql
 BEGIN TRANSACTION;
