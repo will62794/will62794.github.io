@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Programming with Transactions"
+title:  "Transactional Programming Models"
 categories: databases transactions programming
 ---
 
