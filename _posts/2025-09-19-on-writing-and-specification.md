@@ -10,7 +10,7 @@ In Andy Grove's [High Output Management](https://www.goodreads.com/book/show/324
 
 > But reports also have another totally different function. As they are formulated and written, the author is forced to be more precise than he might be verbally. Hence their value stems from the discipline and the thinking the writer is forced to impose upon himself as he identifies and deals with trouble spots in his presentation. Reports are more a **medium** of **self-discipline** than a way to communicate information. Writing the report is important; reading it often is not.
 
-This comment felt nicely portable to a core type of value derived from the use of formal methods in an engineering and design context, somewhat analogous to Leslie Lamport's quip on writing and mathematics:
+This comment felt portable to an aspect of value derived from the use of formal methods in an engineering and design context, somewhat analogous to Leslie Lamport's quip on writing and mathematics:
 
 > Writing is nature’s way of letting you know how sloppy your thinking is...Mathematics is nature’s way of letting you know how sloppy your writing is.
 
