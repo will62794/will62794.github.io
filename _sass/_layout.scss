@@ -436,6 +436,7 @@
 }
 
 .post-title {
+	font-size: 32px;
 	line-height: 1.5;
 	font-weight: 700;
 
@@ -454,10 +455,10 @@
 
 
 	h2 {
-		font-size: 32px;
+		font-size: 28px;
 
 		@include media-query($on-laptop) {
-			font-size: 28px;
+			font-size: 24px;
 		}
 	}
 
