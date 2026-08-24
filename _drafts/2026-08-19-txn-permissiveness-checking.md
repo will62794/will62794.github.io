@@ -20,12 +20,9 @@ We can pursue this analysis by examining different concrete algorithms for achie
 
 In general, we can consider the *permissiveness* of a transactional isolation algorithm as a quantitative metric defined over the algorithm's (potentially infinite) set of reachable behaviors. So, it seems challenging to define and compute such a metric concretely, but we can try to use finite modeling techniques to at least gain an approximation of it, and also check that the results match our intuitions.
 
-As a starting point, we can take a formal, TLA+ specification of a given transaction isolation algorithm and use a model checker for exhaustively exploring its reachable behaviors. 
+As a starting point, we can take a formal, TLA+ specification of a given transaction isolation algorithm and use a model checker for exhaustively exploring its reachable behaviors. This gives us a complete graph of reachable staets, from which we can think about how to compute our metric. In general, we might define this metric as a way of roughly measuring the total number of unique transactional histories that are allowed under the algorithm.
 
-For isolation algorithms, we can view them all as generators of histories, which are then projected down to a set fo committed transactional histories.
-
-
-We compute this metric by taking the TLC model checker and modifying it slightly. In particular, TLC by default will hash states into *state fingerprints* as they are explored, and stored these fingerprints in a hash table, as it executes a breadth-first search over the state graph. For our use case, we can use these hashes in a modified way to compute the total number of unique transactional histories as we go. That is, by essentially hashing just the *ops* state variable for each reachable state independently, and tracking this in its own "projected" state space hash set. We then use the final cardinality of this set to as our raw computed permissiveness metric for that algorithm.
+So, we can compute this metric by taking the TLC model checker and modifying it slightly. In particular, TLC by default will hash states into *state fingerprints* as they are explored, and stored these fingerprints in a hash table, as it executes a breadth-first search over the state graph. For our use case, we can use these hashes in a modified way to compute the total number of unique transactional histories as we go. That is, by essentially hashing just the *ops* state variable for each reachable state independently, and tracking this in its own "projected" state space hash set. We then use the final cardinality of this set to as our raw computed permissiveness metric for that algorithm.
 
 
 ## Examining OCC Algorithms
