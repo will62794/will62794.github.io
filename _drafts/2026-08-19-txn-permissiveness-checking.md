@@ -1,0 +1,67 @@
+---
+layout: post
+title:  "Modeling the Transactional Permissiveness Frontier"
+categories: databases transactions programming
+---
+
+If we want to formalize and compare concurrency control algorithms for different transaction isolation levels, we can compare them at a coarse level by what isolation guarantee they provide. In other words, what set of histories (or serializability anomalies) do they prevent? From a more fine-grained perspective, though, this may not be sufficient to adequately capture the subtle differences between implementations that provide the same high level isolation guarantees, or provide different isolation guarantees with different approaches.
+
+As we explored briefly in prior work, we can try to do this through the lens of transaction *permissiveness*. We've touched upon this idea briefly in prior work, but we explore how we can model and check this property in a bit more depth. This also better illustrates a formal methods use case that extends beyond just binary safety or correctness verification, but allows us to measure quantitative protocol properties more precisely.
+
+We can pursue this analysis a bit further by examining different concrete algorithms for achieving isolation levels and comparing them formally along both a correctness and permissiveness frontier. That is, permissiveness in this sense gives us a lightweight way to consider isolation algorithms not only on their correctness but whether they achieve that goal through an overly restrictive approach or not.
+
+A good example of this is to examine a range of common protocol techniques along a spectrum of isolation guarantees. Specifically, we can examine different, optimistic concurrency control techniques for providing serializability, as well as classic approach to snapshot isolation. Approximating a permissiveness metric in a quantitiatve way also lets us examine given algorithms on a "correctness vs. performance" frontier.
+
+To measure permissiveness in an approximate way, we can take a formal, TLA+ specification of a given transaction isolation algorithm and use a model checker for exhaustively exploring its reachable behaviors. For optimistic concurrency control algorithms, we can build a model that is quite abstract, but still lets us probe the behaviors of different algorithms. Concretely, we can imagine an abstract model of this family of algorithms as a setting where each transaction can either *Begin*, *Commit* or *Execute*, and we operate over a fixed, finite set of transaction ids, and keys. The *Begin* and *Commit* actions are straightforward, and the *Execute* action is important as it chooses a fixed set of keys to read and set of keys to write, atomically. 
+
+This approach is actually able to capture a relatively wide variety of optimistic concurrency control algorithms that complete validation on commit (e.g. not eargerly upon first conflict). That is, for algorithms that execute against a snapshot, while they are executing, other concurrent transactions don't affect their possible behavior, and their commit validation decision is dependent only on the set of keys they read or wrote (and when the transaction started). So, this helps provide a tractable formal model of transaction execution while still being general enough to capture a variety of algorithms. 
+
+We can start our permissiveness analysis by looking at a finite configuration with 4 transactions, 3 keys, and a maximum of 3 operations executed per transaction. We then measure permissiveness across the set of algorithms below, some at serializability and others at snapshot isolation. We compute this metric by taking the TLC model checker and modifying it slightly. In particular, TLC by default will hash states into *state fingerprints* as they are explored, and stored these fingerprints in a hash table, as it executes a breadth-first search over the state graph. For our use case, we can use these hashes in a modified way to compute the total number of unique transactional histories as we go. That is, by essentially hashing just the *ops* state variable for each reachable state independently, and tracking this in its own "projected" state space hash set. We then use the final cardinality of this set to as our raw computed permissiveness metric for that algorithm.
+
+<div style="text-align: center;">
+  <img width="600px" src="/assets/permissiveness_by_isolation.png" alt="Pareto frontier diagram" />
+</div>
+
+An important and interesting observation here is that we would naturally expect snapshot isolation to be "northwest" of any serializable algorithm. That is, it should be natural that any serializable algorithm will not be *more* permissive than snapshot isolation. Similarly, within the space of serializable algorithms, we can look at the different algorithms relationship to each other. The SSI and WSI .
+
+## Workload-Dependent Analysis
+
+This doesn't quite tell us the whole picture, though, since permissiveness is a nice metric in some cases but in other cases, for example, when algorithms are not strictly subsets of each other, it is harder to get a sense of how permissiveness is effectively "distributed across behaviors"
+That is, more practically, we may also often care about the *workload-dependent* properties of these algorithms. So, we can also examine workload-specific permissiveness i.e. permissiveness under certain assumptions on the operations that occur in transactions. One concrete version of this is to consider measuring across different read/write ratios. Even though our model is quite abstract, we can consider doing this by looking at two different read/write ratios by having each transaction skew 1/3 of its operations to reads or 1/3 of its operations to writes. This gives us two curves to examine and see how the permissiveness dynamics differ under the assumption of skewed read/write workloads.
+
+<div style="text-align: center;">
+  <img width="600px" src="/assets/permissiveness_by_isolation.png" alt="Pareto frontier diagram" />
+</div>
+
+We can observe that, as expected, snapshot isolation's permissiveness is still higher than SSI regardless of read/write skew. This makes sense since SSI is strictly stronger commit validation check. It is clear, though, that SI obviously performs better from a permissiveness standpoint under read-heavy workloads. Interestingly, WSI, which only aborts on read-write transactions, has a similar inverted pattern, and its permissiveness is not significantly different from SI under read-heavy workloads.
+
+
+## Final Thoughts
+
+This is a nice way te use model checking and simulation tools to examine quantitative properties of different algorithms. Often examining only binary notions of safety or liveness are not sufficient to adequately compare algorithmic beahviors at a finer-grained level. Moreover, this approach helps us understand concretely where an approach lies on the optimality frontier, and whether different changes can help us move closer to this frontier. In essence, this can be seen as a kind of very high fidelty and rigorous simulation, but one with maximum controllability and observability over the fundamental algorithmic characteristics. 
+
+Building much more efficient checking techniques for these types of properties remains an interesting open question and future topic to explore. We believe such approaches may have similarities to other, recent techniques for [checking quantitative hyperproperties](https://arxiv.org/abs/1905.13514), which are similar in that they aim to capture quantitative metrics over a protocol's entire set of reachable states. The theoretical literature on [permissiveness in transactional memory systems](https://infoscience.epfl.ch/server/api/core/bitstreams/a83c2ef3-e03d-4016-b362-4c8b624f6830/content) may also provide inspiration.
+
+
+
+<!-- 
+ 
+Serializable:
+
+- Serializable Snapshot Isolation (SSI)
+- Precisely serializable snapshot isolation (PSSI)
+- 2PL
+- Write Snapshot Isolation
+- Write Snapshot Isolation w/o read-only optimization
+- Snapshot Isolation with SELECT FOR UPDATE
+- Snapshot Isolation
+- Snapshot Isolation w/ blind write optimization
+- Read Committed
+
+It is also worth examining how we might consider the theoretical question of whether such a quantitative protocol property is well-defined over an infinite state protocol. It would seem challenging to compute such a value, but we can consider trying to approximate it with simulation data.
+
+Note that this approximation of permissivness also represents a metric essentially over all possible workloads. We can also consider cases where we effectively skew workloads in some ways e.g. write-heavy or read-heavy workloads.
+
+
+
+Pareto frontier diagram -->
