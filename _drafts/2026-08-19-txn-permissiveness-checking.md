@@ -8,18 +8,19 @@ If we want to formalize and compare concurrency control algorithms for different
 
 <div align="center">
   <img width="450px" src="/assets/isolation_pareto_frontier (3).png" alt="Pareto frontier diagram" style="border:2px solid #aaa; padding:12px; display:inline-block; border-radius:10px;" />
+  <div style="margin-top:8px; color:#666; font-size:15px;"><em>Abstract sketch of isolation techniques on an isolation-permissiveness frontier. Formal relationships between some algorithms are hard to establish.</em></div>
 </div>
 
 
 We can try to do this through the lens of transactional *permissiveness*. We've touched upon this idea briefly in prior work [[1](https://www.mongodb.com/company/blog/engineering/formal-methods-beyond-correctness-isolation-permissiveness-distributed-transactions),[2](https://dl.acm.org/doi/10.14778/3750601.3750626)], but we can explore how to model and check this property in a bit more depth. This also illustrates a formal modeling use case that extends beyond just binary safety or correctness verification, but allows us to measure quantitative protocol properties more precisely.
 
-We can pursue this analysis a bit further by examining different concrete algorithms for achieving isolation levels and comparing them formally along both a correctness and permissiveness frontier. That is, permissiveness in this sense gives us a lightweight way to consider isolation algorithms not only on their correctness but whether they achieve that goal through an overly restrictive approach or not.
-
-A good example of this is to examine a range of common protocol techniques along a spectrum of isolation guarantees. Specifically, we can examine different, optimistic concurrency control techniques for providing serializability, as well as classic approach to snapshot isolation. Approximating a permissiveness metric in a quantitiatve way also lets us examine given algorithms on a "correctness vs. performance" frontier.
+We can pursue this analysis a bit further by examining different concrete algorithms for achieving isolation levels and comparing them formally along both a correctness and permissiveness frontier. That is, permissiveness in this sense gives us a lightweight way to consider isolation algorithms not only on their correctness but whether they achieve that goal through an overly restrictive approach or not. We can concretely examine different, optimistic concurrency control techniques for providing serializability, as well as classic approach to snapshot isolation. Approximating a permissiveness metric in a quantitiatve way also lets us examine given algorithms on a "correctness vs. performance" frontier.
 
 ## Permissiveness Modeling in Depth
 
-To measure permissiveness in an approximate way, we can take a formal, TLA+ specification of a given transaction isolation algorithm and use a model checker for exhaustively exploring its reachable behaviors. For optimistic concurrency control algorithms, we can build a model that is quite abstract, but still lets us probe the behaviors of different algorithms. Concretely, we can imagine an abstract model of this family of algorithms as a setting where each transaction can either *Begin*, *Commit* or *Execute*, and we operate over a fixed, finite set of transaction ids, and keys. The *Begin* and *Commit* actions are straightforward, and the *Execute* action is important as it chooses a fixed set of keys to read and set of keys to write, atomically. 
+In general, we can consider the *permissiveness* of a transactional isolation algorithm as a quantitative metric defined over the algorithm's (potentially infinite) set of reachable behaviors. So, it seems challenging to define and compute such a metric concretely, but we can try to use finite modeling techniques to at least gain an approximation of it.
+
+As a starting point, we can take a formal, TLA+ specification of a given transaction isolation algorithm and use a model checker for exhaustively exploring its reachable behaviors. For optimistic concurrency control algorithms, we can build a model that is quite abstract, but still lets us probe the behaviors of different algorithms. Concretely, we can imagine an abstract model of this family of algorithms as a setting where each transaction can either *Begin*, *Commit* or *Execute*, and we operate over a fixed, finite set of transaction ids, and keys. The *Begin* and *Commit* actions are straightforward, and the *Execute* action is important as it chooses a fixed set of keys to read and set of keys to write, atomically. 
 
 This approach is actually able to capture a relatively wide variety of optimistic concurrency control algorithms that complete validation on commit (e.g. not eargerly upon first conflict). That is, for algorithms that execute against a snapshot, while they are executing, other concurrent transactions don't affect their possible behavior, and their commit validation decision is dependent only on the set of keys they read or wrote (and when the transaction started). So, this helps provide a tractable formal model of transaction execution while still being general enough to capture a variety of algorithms. 
 
@@ -27,7 +28,12 @@ We compute this metric by taking the TLC model checker and modifying it slightly
 
 ## Examining OCC Algorithms
 
-We can start our permissiveness analysis by looking at a finite configuration with 4 transactions, 3 keys, and a maximum of 3 operations executed per transaction. We then measure permissiveness across the set of algorithms below, some at serializability and others at snapshot isolation. 
+We can start our permissiveness analysis by looking at a finite configuration of our above transactions model containing 4 transactions, 3 keys, and a maximum of 3 operations executed per transaction. We then measure permissiveness across the set of algorithms below, some at serializability and others at snapshot isolation. 
+
+- Read Committed (RC)
+- Serializable Snapshot Isolation (SSI)
+- Write Snapshot Isolation (WSI)
+- Snapshot Isolation (SI)
 
 <div style="text-align: center;">
   <img width="600px" src="/assets/permissiveness_by_isolation.png" alt="Pareto frontier diagram" />
@@ -40,11 +46,11 @@ It is also useful to explore to what extent these metrics are stable across vary
 
 ## Workload Dependence
 
-This doesn't quite tell us the whole picture, though, since permissiveness is a nice metric in some cases but in other cases, for example, when algorithms are not strictly subsets of each other, it is harder to get a sense of how the permissiveness metric is effectively "distributed across behaviors".
+This doesn't quite tell us the whole picture, though, since permissiveness is a nice metric in some ways but, for example, when algorithms are not strictly subsets of each other, it is harder to get a sense of how the permissiveness metric is effectively "distributed across behaviors".
 That is, more practically, we may often care about the *workload-dependent* permissiveness properties of these algorithms. 
 <!-- So, we can also examine workload-specific permissiveness i.e. permissiveness under certain assumptions on the operations that occur in transactions.  -->
 
-One concrete version of this is to consider measuring across different read/write ratios, as we might do typically in a microbenchmarking evaluation.  Even though our formal model is quite abstract, we can consider doing this by looking at two different read/write ratios by having each transaction skew 1/3 of its operations to reads or 1/3 of its operations to writes. This gives us two curves to examine and see how the permissiveness dynamics differ under the assumption of skewed read/write workloads.
+One concrete version of this is to consider measuring across permissiveness different read/write ratios, as we might do in a typical microbenchmarking setup. Even though our formal model is quite abstract, we can try doing this by looking at two different read/write ratios by having each transaction skew 1/3 of its operations to reads or 1/3 of its operations to writes. This gives us curves to examine and see how the permissiveness dynamics differ under the assumption of skewed read/write workloads.
 
 <div style="text-align: center;">
   <img width="600px" src="/assets/permissiveness_by_workload.png" alt="Pareto frontier diagram" />
@@ -55,7 +61,7 @@ We can observe that, as expected, snapshot isolation's permissiveness is still h
 
 ## Related Work
 
-This is a nice way to use model checking and simulation tools to examine quantitative properties of transaction concurrency control algorithms. Often examining only binary notions of safety or liveness are not sufficient to adequately compare algorithmic beahviors at a finer-grained level. Moreover, this approach helps us understand concretely where an approach lies on the optimality frontier, and whether different changes can help us move closer to this frontier. In essence, this can be seen as a kind of very high fidelty and rigorous simulation, but one with maximum controllability and observability over the fundamental algorithmic characteristics. 
+The above is a nice way to use model checking and simulation tools to examine quantitative properties of transaction concurrency control algorithms. Often examining only binary notions of safety or liveness are not sufficient to adequately compare algorithmic beahviors at a finer-grained level. Moreover, this approach helps us understand concretely where an approach lies on the optimality frontier, and whether different changes can help us move closer to this frontier. In essence, this can be seen as a kind of very high fidelty and rigorous simulation, but one with maximum controllability and observability over the fundamental algorithmic characteristics. 
 
 Building more efficient checking techniques for these types of properties remains an interesting open question and future topic to explore e.g. we are still limited to analyses at relatively tiny model sizes. We believe such approaches may have similarities to other, recent techniques for [checking quantitative hyperproperties](https://arxiv.org/abs/1905.13514), which are similar in that they aim to capture quantitative metrics over a protocol's entire set of reachable states. The theoretical literature on [permissiveness in transactional memory systems](https://infoscience.epfl.ch/server/api/core/bitstreams/a83c2ef3-e03d-4016-b362-4c8b624f6830/content) may also provide inspiration.
 
