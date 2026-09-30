@@ -11,7 +11,7 @@ thumbnail: "lab30/littledata_cover.jpg"
 
 <img src="/assets/lab30/littledata_cover.jpg" alt="Three LittleData LED bars spelling out the word LittleData in a dark room">
 
-The LittleData is a smart LED display consisting of three vertical bars that pull data from the web and project it. The conceptual core of the project began with exploring how to display minimal but meaningful bits of data (or "little" bits of data) in an intuitive and simple way. The LED panels would receive information and display various messages controllable from a website.
+*[LittleData](http://www.old.tomorrow-lab.com/lab30)* is a smart LED display consisting of three vertical bars that pull data from the web and project it. The conceptual core of the project began with exploring how to display minimal but meaningful bits of data (or "little" bits of data) in an intuitive and simple way. The LED panels would receive information and display various messages controllable from a website.
 
 The general architectural concept is simple: a user logs into a web portal, configures specific options, sends a request to a Raspberry Pi web server, which in turn configures its hardware communication code to display the data as the user just configured it.
 
