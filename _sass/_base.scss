@@ -48,6 +48,26 @@ img {
     vertical-align: middle;
 }
 
+/**
+ * Side-by-side image rows
+ */
+.img-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.img-row > a {
+    flex: 1 1 45%;
+    min-width: 240px;
+}
+
+.img-row img {
+    display: block;
+    width: 100%;
+}
+
 
 
 /**
