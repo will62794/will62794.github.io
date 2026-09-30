@@ -11,7 +11,7 @@ thumbnail: "lab30/littledata_cover.jpg"
 
 <img src="/assets/lab30/littledata_cover.jpg" alt="Three LittleData LED bars spelling out the word LittleData in a dark room">
 
-The LittleData is a smart LED display consisting of three vertical bars that pull data from the web and project it. The conceptual core of the project began with exploring how to display minimal but meaningful bits of data (or "little" bits of data) in an intuitive and simple way. The LEDs would receive information and display various messages controllable from a website.
+The LittleData is a smart LED display consisting of three vertical bars that pull data from the web and project it. The conceptual core of the project began with exploring how to display minimal but meaningful bits of data (or "little" bits of data) in an intuitive and simple way. The LED panels would receive information and display various messages controllable from a website.
 
 The general architectural concept is simple: a user logs into a web portal, configures specific options, sends a request to a Raspberry Pi web server, which in turn configures its hardware communication code to display the data as the user just configured it.
 
@@ -20,7 +20,7 @@ The general architectural concept is simple: a user logs into a web portal, conf
   <a href="/assets/lab30/littledata_webui.jpg"><img src="/assets/lab30/littledata_webui.jpg" alt="The LittleData web interface, showing display modes for colors, weather, Asana and the subway"></a>
 </div>
 
-To achieve the initial vision, we had to research the appropriate hardware to use and develop the controller software to complement it. There are a total of six [RGB LED matrices](http://www.adafruit.com/products/420), each vertical bar containing two, allowing for three 16x64 pixel bars. Driving 1024 RGB LEDs without hardware PWM support requires a reasonable amount of processing power, so we chose Teensy 3.1 Cortex M4 processor-based microcontrollers, which run at 72MHz. The Teensy 3.1 boards are similar in character to Arduino (and were programmed using the Arduino IDE), though they provide a considerably higher amount of processing horsepower. For more information on the library available for driving LED matrices with the Teensy boards, check out [PixelMatix](https://github.com/pixelmatix/SmartMatrix).
+To achieve the initial vision, we researched the appropriate hardware to use and developed the controller software to complement it. There are a total of six [RGB LED matrices](http://www.adafruit.com/products/420), each vertical bar containing two, allowing for three 16x64 pixel bars. Driving 1024 RGB LEDs without hardware PWM support requires a reasonable amount of processing power, so we chose Teensy 3.1 Cortex M4 processor-based microcontrollers, which run at 72MHz. The Teensy 3.1 boards are similar in character to Arduino (and were programmed using the Arduino IDE), though they provide a considerably higher amount of processing horsepower. For more information on the library available for driving LED matrices with the Teensy boards, check out [PixelMatix](https://github.com/pixelmatix/SmartMatrix).
 
 The frame that supports the three bars is a single piece of 3/16" aluminum, water jet cut to specifications (and CNC engraved with the logo).
 
