@@ -44,7 +44,7 @@ Note that we separate transactions into "read" and "update" portions, where the 
 
 <!-- More formally, we simply define a transaction as a set of key transformer functions $$F_\mathcal{W_T}$$, where $$\mathcal{W_T} \subseteq \mathcal{K}$$ is the set of keys that the transaction updates, and each transformer function $$f_k$$ for $$k \in \mathcal{W_T}$$ is a function over some subset of key dependencies $$\mathcal{D_k} \subseteq \mathcal{K}$$. -->
 
-### Isolation Anomalies and Lost Update
+### Isolation Anomalies and Lost Updates
 
 Viewing transaction operations as being composed of these key transformer functions i.e. functions that read some values and produce some writes, helps clarify some awkward aspects of existing transaction isolation models and their treatment of anomalies. Particularly due to the fact that most traditional transaction formalisms don't make these kind of update/transformer operations an explicit first-class member of their formal model. 
 
