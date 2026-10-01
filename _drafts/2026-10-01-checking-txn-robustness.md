@@ -4,10 +4,10 @@ title:  "Verifying Robustness of Transactional Workloads"
 categories: databases transactions programming
 ---
 
-In [past work](https://www.mongodb.com/company/blog/engineering/formal-methods-beyond-correctness-isolation-permissiveness-distributed-transactions) we explored early attempts to model and verify transactional programs, building compositional TLA+ specifications of the MongoDB distributed transactions protocols. With the rapid advances in LLM capabilities over the past 6-9 months, though, we have seen entirely new specification and verification abilities emerge. In particular, the ability to not only write well-formed TLA+ specifications but also promising results on writing complete, machine-checked proofs for those specifications as well in the [TLA+ proof system](https://proofs.tlapl.us/doc/web/content/Home.html) (TLAPS). As a grounding historical data point, the original transactions modeling work we did was done over a year ago (~ February 2025), at which point the latest frontier models we had access to were Claude 3.7 Sonnet and GPT-4.5, and Claude Code was still in its relative infancy.
+In [past work](https://www.mongodb.com/company/blog/engineering/formal-methods-beyond-correctness-isolation-permissiveness-distributed-transactions) we explored early attempts to model and verify transactional programs, building [compositional TLA+ specifications](https://dl.acm.org/doi/10.14778/3750601.3750626) of the MongoDB distributed transactions protocols. With the rapid advances in LLM capabilities over the past 6-9 months, though, we have seen entirely new specification and verification abilities emerge. In particular, the ability to not only write well-formed TLA+ specifications but also promising results on writing complete, machine-checked proofs for those specifications as well in the [TLA+ proof system](https://proofs.tlapl.us/doc/web/content/Home.html) (TLAPS). As a grounding historical data point, the original transactions modeling work we did was done over a year ago (~ February 2025), at which point the latest frontier models we had access to were Claude 3.7 Sonnet and GPT-4.5, and Claude Code was still in its relative infancy.
 
 These LLM capabilities have opened up a lot of new opportunities for how we might apply formal methods in the design of our systems. If we can truly generate proofs "on demand" we might start considering a host of new use cases that were previously impossible or infeasible.
-In particular, we can use it for a particularly novel use case for transactional workloads. In particular, can we apply it for a kind of workload-specific correctness analysis. More specifically, applying it to the problem of checking *robustness*. That is, given a specific transactional application/workload, if we run it under an isolation level weaker than serializability, will it still provide serializable guarantees? There is some great [past work](https://link.springer.com/chapter/10.1007/978-3-030-25543-5_17) on how to formalize and check this problem in certain cases, but for arbitrary workloads this might be quite difficult to prove.
+In particular, we can use it for a particularly novel use case for transactional workloads. In particular, can we apply it for a kind of *workload-specific* correctness analysis. More specifically, applying it to the problem of checking *robustness*. That is, given a specific transactional application/workload, if we run it under an isolation level weaker than serializability, will it still provide serializable guarantees? There is some great [past work](https://link.springer.com/chapter/10.1007/978-3-030-25543-5_17) on how to formalize and check this problem in certain cases, but for arbitrary workloads this might be quite difficult to prove.
 
 Note that, for TPC-C, this robustness question was previously [established formally](https://dsf.berkeley.edu/cs286/papers/ssi-tods2005.pdf) in the affirmative by Fekete et al. in 2005. More recently, there was also some research that tried to tackle the problem in a more general way, for snapshot isolation specifically. And even for those approaches, the machinery was quite heavyweight and in general, might require new analysis and proof effort for every new given workload. With this use of LLMs, it theoretically gives us lightweight ways to do these kinds of program analysis tasks cheaply and in a very generic way e.g. proving one-off properties about our application code becomes a feasible ask. With the advent of proof-capable LLMs models, we can try this out.
 
@@ -55,25 +55,22 @@ Finding robustness violations for a workload like SmallBank is fairly well-known
 </div>
  -->
 
+ Using DeepSeek 4.1, we are able to generate a complete TLAPS proof of the `Serializable` invariant for TPC-C in around 1.5 hours, producing a proof that is ~2000 lines of TLA+, and can be checked using the TLAPS tool in ~30 seconds or so.
+
 
 ## Reflections and Future Possibilities
 
-There are a variety of other extensions we could imagine here, including checking whether standard program transformations like read promotion or SELECT FOR UPDATE style additions maintain serializability when a given workload is not robust to start with. There may be other, more elaborate transformations to explore as well that improve performance in other ways while maintaining the same underlying isolation correctness guarantees.
+This experiment is a relatively minimal proof of concept, but there are a broad class of extensions we could imagine exploring here. For example, checking whether standard program transformations like read promotion or SELECT FOR UPDATE style additions maintain serializability when a given workload is not robust to start with. There may be other, more elaborate transformations to explore as well that improve performance in other ways while maintaining the same underlying isolation correctness guarantees.
 
-Finding robustness violations for a workload like SmallBank is fairly well-known and understood, but more interestingly there have also been [explorations](https://www.vldb.org/pvldb/vol18/p2846-vandevoort.pdf) into how you can safely *promote* certain operations within a workload to ensure it executes serializably. This is closely related to and in some sense a generalization of the `SELECT FOR UPDATE` concept that is used to emulate serializability guarantees.
-
-This overall approach takes some of the other ideas from tools appearing across the space. Namely that of abstracting given code/systems into a “simulation” representation over which to reason about. In our case, we are using TLA+ as this abstract substrate, which gives us a mechanism to both look for bugs (via model checking) and also write proofs about correctness. The fluidity with which we can now move between programming language representations is opening up many new possibilities, and significantly expands the capabilities of program analysis and verification. Translating a system or code into a suitable format for other analysis tasks is largely free in many cases, and so we can start to think about any one representation as just a “lens” or “view” on an underlying source of truth.
+Finding robustness violations for a workload like SmallBank is fairly well-known and understood, but there have also been [explorations](https://www.vldb.org/pvldb/vol18/p2846-vandevoort.pdf) into how you can safely *promote* certain operations within a workload to ensure it executes serializably. This is closely related to and in some sense a generalization of the `SELECT FOR UPDATE` concept that is used to emulate serializability guarantees.
 
 [Other work](https://dl.acm.org/doi/10.1145/1065167.1065193) has also looked at a generalization of the above problem, referred to as *allocation*. This effectively tries to determine the weakest possible isolation level against which a given workload is robust. This in theory lets a database try to provide the weakest necessary guarantees and maximal performance characteristics for an arbitrary, given workload.
 
+
+This overall approach takes some of the other ideas from tools appearing across the space. Namely that of abstracting given code/systems into a “simulation” representation over which to reason about. In our case, we are using TLA+ as this abstract substrate, which gives us a mechanism to both look for bugs (via model checking) and also write proofs about correctness. The fluidity with which we can now move between programming language representations is opening up many new possibilities, and significantly expands the capabilities of program analysis and verification. Translating a system or code into a suitable format for other analysis tasks is largely free in many cases, and so we can start to think about any one representation as just a “lens” or “view” on an underlying source of truth.
+
+
 As with many LLM capabilities today, this also serves as a concrete upper bound on the speed and cost of this task going forward. That is, we can only expect intelligence and its cost to continue dropping by orders of magnitude over time, and so what might be a ~1 hour long agent session today costing $10s of dollars, may eventually be something that can be done in a few seconds and extremely cheaply.
-
-
-
-
-
-
-
 
 
 
