@@ -58,6 +58,8 @@ Finding robustness violations for a workload like SmallBank is fairly well-known
 
  We ran this experiment for the Auction workload as well, building a [formal spec](https://github.com/will62794/robustness-proofs/blob/main/Auction.tla) and asking for a serializability proof as well. Using Grok 4.6 it took about 1.5 hours to generate a complete TLAPS proof, which was over 2500 lines of TLA+, and can be checked from scratch in a few minutes.
 
+ There are some caveats to consider here, including the fact that, in general, that are kind of "known" proof techniques for some of these workloads out there in the wild, which may be implicitly in the training knowledge of these LLMs. Regardless, though, it still seems a strong data point in terms of the capability strenght of the LLMs. Furthermore, we expect it may be possible that proofs for a class of properties like these robustness questions may generally follow a similar shape, and so LLMs carrying out many of these proofs may derive helpful structural and strategic hints from past proofs for future ones.
+
 
 ## Reflections and Future Possibilities
 
