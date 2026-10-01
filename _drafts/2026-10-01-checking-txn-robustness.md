@@ -40,12 +40,12 @@ Please use the TLAPS tool binaries at usr/local/bin/tlapm. And please don't look
 
 
 
-## Finding and Fixing Robustness Violations
+<!-- ## Finding and Fixing Robustness Violations
 
 We can concretely establish that some other standard workloads, like SmallBank, are indeed not serializable when executed under snapshot isolation. This can then be established via standard model checking producing invariant counterexamples. This was possible prior to the advent of modern LLMs, but the generation of the specification itself of a given workload also becomes dramatically easier, and could even be directly inferred/generated from a given programming language.
 
 
-Finding robustness violations for a workload like SmallBank is fairly well-known and understood, but more interestingly there have also been explorations into how you can safely *promote* certain operations within a workload to ensure it executes serializably. This is closely related to and in some sense a generalization of the `SELECT FOR UPDATE` concept that is used to emulate serializability guarantees.
+Finding robustness violations for a workload like SmallBank is fairly well-known and understood, but more interestingly there have also been explorations into how you can safely *promote* certain operations within a workload to ensure it executes serializably. This is closely related to and in some sense a generalization of the `SELECT FOR UPDATE` concept that is used to emulate serializability guarantees. -->
 
 
 
@@ -59,6 +59,8 @@ Finding robustness violations for a workload like SmallBank is fairly well-known
 ## Reflections and Future Possibilities
 
 There are a variety of other extensions we could imagine here, including checking whether standard program transformations like read promotion or SELECT FOR UPDATE style additions maintain serializability when a given workload is not robust to start with. There may be other, more elaborate transformations to explore as well that improve performance in other ways while maintaining the same underlying isolation correctness guarantees.
+
+Finding robustness violations for a workload like SmallBank is fairly well-known and understood, but more interestingly there have also been [explorations](https://www.vldb.org/pvldb/vol18/p2846-vandevoort.pdf) into how you can safely *promote* certain operations within a workload to ensure it executes serializably. This is closely related to and in some sense a generalization of the `SELECT FOR UPDATE` concept that is used to emulate serializability guarantees.
 
 This overall approach takes some of the other ideas from tools appearing across the space. Namely that of abstracting given code/systems into a “simulation” representation over which to reason about. In our case, we are using TLA+ as this abstract substrate, which gives us a mechanism to both look for bugs (via model checking) and also write proofs about correctness. The fluidity with which we can now move between programming language representations is opening up many new possibilities, and significantly expands the capabilities of program analysis and verification. Translating a system or code into a suitable format for other analysis tasks is largely free in many cases, and so we can start to think about any one representation as just a “lens” or “view” on an underlying source of truth.
 
