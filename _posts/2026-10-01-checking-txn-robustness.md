@@ -56,7 +56,7 @@ Finding robustness violations for a workload like SmallBank is fairly well-known
 </div>
  -->
 
- Using DeepSeek 4.1 in Claude Code, we are able to generate a complete TLAPS proof of the `Serializable` invariant for TPC-C in around 1.5 hours, producing a proof that is ~2000 lines of TLA+, and can be checked using the TLAPS tool in ~30 seconds or so.
+ Using DeepSeek 4.1 in Claude Code, we were able to generate a complete TLAPS proof of the `Serializable` invariant for TPC-C in around 1.5 hours, producing a proof that is ~2000 lines of TLA+, and can be checked using the TLAPS tool in ~30 seconds or so.
  We created a [spec](https://github.com/will62794/robustness-proofs/blob/main/Auction.tla) for the *Auction* workload as well and ran this same proof experiment. Using Grok 4.6 it took about 1.5 hours to generate a complete TLAPS proof of Auction serializability under SI, which was over 2500 lines of TLA+. The proof can be re-checked from scratch in a few minutes.
 
  There are some caveats to consider here, including the fact that, in general, there are some "known" proof techniques for some of these workloads out there in the pre-existing literature, which may be implicitly in the training knowledge of the LLMs. Regardless, though, it still seems a strong data point in terms of the capability strenght of the LLMs. Furthermore, we expect it may be possible that proofs for a class of properties like these robustness questions may generally follow a similar shape, and so LLMs carrying out many of these proofs may derive helpful structural and strategic hints from past proofs for future ones.
