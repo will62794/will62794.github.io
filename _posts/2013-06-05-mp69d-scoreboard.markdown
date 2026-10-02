@@ -2,6 +2,7 @@
 layout: post
 title:  "Reverse Engineering the MP-69D Scoreboard Controller"
 year: 2013
+date: 2013-06-05 12:00:00
 categories: electronics hardware reverse-engineering
 thumbnail: "scoreboardcover4.jpg"
 ---
